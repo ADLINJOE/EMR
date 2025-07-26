@@ -1,0 +1,75 @@
+.layout-container {
+  display: flex;
+  min-height: calc(100vh - 100px); /* adjust header/footer height */
+}
+
+app-side-menu {
+  width: 250px;
+  background-color: #f4f4f4;
+  height: 100%;
+}
+
+.content-container {
+  flex: 1;
+  padding: 20px;
+  background-color: #fff;
+  overflow-y: auto;
+}
+
+app-header-main, app-footer-main {
+  height: 50px;
+  background-color: #003366;
+  color: white;
+  display: flex;
+  align-items: center;
+  padding: 0 15px;
+}
+
+
+
+
+
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+app-header-main, app-footer-main {
+  position: sticky;
+  z-index: 10;
+  background-color: #003366;
+  color: white;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+}
+
+app-header-main {
+  top: 0;
+  height: 60px;
+}
+
+app-footer-main {
+  bottom: 0;
+  height: 20px;
+}
+
+.layout-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+app-side-menu  {
+  width: 270px;
+  background-color: #f0f0f0;
+  overflow-y: auto;
+}
+
+.content-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  background-color: #fff;
+}

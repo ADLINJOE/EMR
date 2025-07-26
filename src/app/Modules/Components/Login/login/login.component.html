@@ -1,0 +1,76 @@
+<div class="container">
+    <div class="card" *ngIf="showLogin; else signupTemplate">
+        <h2>Login</h2>
+        <form [formGroup]="loginForm" (ngSubmit)="onLoginSubmit()">
+            <mat-form-field appearance="fill">
+                <mat-label>Email</mat-label>
+                <input matInput formControlName="email" placeholder="Enter your email" />
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+                <mat-label>Password</mat-label>
+                <input matInput type="password" formControlName="password" placeholder="Enter your password" />
+            </mat-form-field>
+
+            <a class="link" href="#">Forgot password?</a>
+
+            <button mat-flat-button color="primary" type="submit">Login</button>
+        </form>
+        <p>Don't have an account? <a (click)="toggleForm()">Signup</a></p>
+    </div>
+
+    <ng-template #signupTemplate>
+        
+    <div *ngIf="!UserType">
+        <div class="card">
+            <h2>Signup</h2>
+            <form [formGroup]="signupForm" (ngSubmit)="onSignupSubmit()">
+                <mat-form-field appearance="fill">
+                    <mat-label>Name</mat-label>
+                    <input matInput formControlName="Name" placeholder="Enter your Name" />
+                </mat-form-field>
+
+                <mat-form-field appearance="fill">
+                    <mat-label>Mobile</mat-label>
+                    <input matInput formControlName="Mobile" placeholder="Enter your Mobile" />
+                </mat-form-field>
+
+                <mat-form-field appearance="fill">
+                    <mat-label>Email</mat-label>
+                    <input matInput formControlName="Email" placeholder="Enter your email" />
+                </mat-form-field>
+
+                <mat-form-field appearance="fill">
+                    <mat-label>Password</mat-label>
+                    <input matInput type="password" formControlName="Password" placeholder="Create a password" />
+                </mat-form-field>
+                
+                <mat-form-field appearance="fill">
+                    <mat-label>Confirm Password</mat-label>
+                    <input matInput type="password" formControlName="ConfirmPassword" placeholder="Confirm your password" />
+                </mat-form-field>
+                <div *ngIf="signupForm.errors?.['passwordMismatch'] && signupForm.get('ConfirmPassword')?.touched"
+                    class="error">
+                    Passwords do not match.
+                </div>
+                <button mat-flat-button color="primary" type="submit">Register</button>
+            </form>
+            <p>Already have an account? <a (click)="toggleForm()">Login</a></p>
+        </div>
+    </div>
+    </ng-template>
+    <div *ngIf="UserType" class="card user-type-box">
+  <h3>Select User Type</h3>
+  <mat-form-field appearance="fill">
+    <mat-label>User Type</mat-label>
+    <mat-select [(ngModel)]="selectedUserType">
+      <mat-option *ngFor="let type of userTypes" [value]="type">{{ type }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <button mat-flat-button color="primary" (click)="onUserTypeSelected()" [disabled]="!selectedUserType">
+    Continue
+  </button>
+</div>
+
+</div>
