@@ -1,62 +1,18 @@
-<div class="side-nav">
-  <div class="top-section">
-    <div class="logo">Untitled</div>
-    <button class="menu-toggle">☰</button>
-  </div>
-
-  <div class="search-bar">
-    <input type="text" placeholder="Search">
-    <button class="search-button">Q</button>
-  </div>
-  <ul class="nav-links">
-    <!-- Loop through navItems -->
-    <li *ngFor="let item of navItems; let i = index">
-      <button class="nav-link" [ngClass]="{ active: selectedIndex === i }" (click)="toggleSubmenu(i)">
-        <span class="icon">{{ item.icon }}</span> {{ item.title }}
-      </button>
-      <ul *ngIf="item.isOpen" class="submenu">
-        <li *ngFor="let subItem of item.subItems">
-          <button class="nav-link">
-            <span class="icon">{{ subItem.icon }}</span> {{ subItem.title }}
-          </button>
-        </li>
-      </ul>
-    </li>
-  </ul>
-  
-  
-  
-  
-  
-
-  <div class="bottom-section">
-    <div class="notification">
-      <button class="notification-button">
-        <span class="icon">🔔</span> Notification
-        <span class="badge">12</span>
-      </button>
+<div class="sidebar">
+  <div class="menu-section" *ngFor="let section of menuSections()">
+    <div class="menu-header" (click)="toggleMenu(section)">
+      <span class="icon">{{ section.icon }}</span>
+      <span class="title">{{ section.title }}</span>
+      <span class="toggle-arrow">{{ section.isOpen ? '▲' : '▼' }}</span>
     </div>
-    <ul class="bottom-links">
-      <li>
-        <button class="bottom-link">
-          <span class="icon">❓</span> Support
-        </button>
-      </li>
-      <li>
-        <button class="bottom-link">
-          <span class="icon">⚙️</span> Settings
-        </button>
-      </li>
-    </ul>
-    <div class="user-profile">
-      <div class="avatar">
-        <!-- <img src="path/to/user-avatar.png" alt="User Avatar"> -->
+
+    <div class="submenu" *ngIf="section.isOpen">
+      <div
+        class="submenu-item"
+        *ngFor="let item of section.subItems"
+        (click)="navigateTo(item.path)">
+        {{ item.icon }} {{ item.title }}
       </div>
-      <div class="user-info">
-        <div class="name">Brooklyn Simmons</div>
-        <div class="email">brooklynsimmons.com</div>
-      </div>
-      <button class="more-options">...</button>
     </div>
   </div>
 </div>

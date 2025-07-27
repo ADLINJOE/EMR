@@ -2,6 +2,9 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { LoginComponent } from './Modules/Components/Login/login/login.component';
 import { LayoutComponent } from './Modules/Components/MainLayout/layout/layout.component';
+import { PatientInviteComponent } from './Modules/Components/Patient/patient-invite/patient-invite.component';
+import { PatientlistComponent } from './Modules/Components/Patient/patientlist/patientlist.component';
+import { PatientRegistrationlinkComponent } from './Modules/Components/Patient/patient-registrationlink/patient-registrationlink.component';
 
 export const routes: Routes = [
 
@@ -10,18 +13,22 @@ export const routes: Routes = [
     path: 'login',  
     component: LoginComponent,
   },
+    {
+    path: 'register',
+    component: PatientRegistrationlinkComponent,
+  },
   {
-    path: '',  
+    path: 'MainLayout',  
     component: LayoutComponent,
     children: [
-    //   {
-    //     path: 'appointment',  
-    //     component: AdminDashboardComponent,
-    //   },
-    //   {
-    //     path :'patientlist',
-    //     component : PatientListComponent
-    //   }
+      {
+        path: 'Patientinvite',  
+        component: PatientInviteComponent,
+      },
+      {
+        path :'patientlist',
+        component : PatientlistComponent
+      }
      
     ],
   },

@@ -1,0 +1,17 @@
+<div class="invite-container">
+  <h2>Invite Patient</h2>
+
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label>Patient Email</mat-label>
+    <input matInput [formControl]="email" placeholder="Enter email">
+    <mat-error *ngIf="email.invalid && email.touched">
+      Please enter a valid email
+    </mat-error>
+  </mat-form-field>
+
+  <button mat-raised-button color="primary" (click)="sendInvite()" [disabled]="email.invalid">
+    Send Invite
+  </button>
+
+  <p class="status" *ngIf="statusMessage">{{ statusMessage }}</p>
+</div>

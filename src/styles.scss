@@ -2,3 +2,121 @@
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+/* styles.css or global styles file */
+
+///---------------------------------Six month calendar design------End-----------------------
+
+// -----------------------------NGX toaster--------------------------------
+
+#toast-container>.toast-success {
+  border: 1.5px solid #25AE88;
+  margin-top: 5px;
+  color: black;
+  background-color: white;
+  width: 400px;
+  box-shadow: 2px 1px 1px 1px lightgrey;
+  background-image: url(../src/assets/Message_Icon/Sucess.svg);
+
+  .toast-progress {
+    opacity: 0.5;
+    background-color: #25AE88;
+  }
+
+  .toast-title {
+    // font-size: 14px;
+    font-size: 14px !important;
+    color: black;
+    opacity: 30;
+  }
+}
+
+#toast-container>.toast-error {
+  border: 1.5px solid #D75A4A;
+  margin-top: 5px;
+  color: black;
+  background-color: white;
+  width: 400px;
+  box-shadow: 2px 1px 1px 1px lightgrey;
+  background-image: url(../src/assets/Message_Icon//Error.svg);
+
+  .toast-progress {
+    opacity: 0.5;
+    background-color: #D75A4A;
+  }
+
+  .toast-title {
+    // font-size: 14px;
+    font-size: v14px !important;
+    color: black;
+    opacity: 30;
+  }
+}
+
+#toast-container>.toast-info {
+  border: 1.5px solid #2f96b4;
+  margin-top: 5px;
+  color: black;
+  background-color: white;
+  width: 400px;
+  box-shadow: 2px 1px 1px 1px lightgrey;
+  background-image: url(../src/assets/Message_Icon/Info.svg);
+
+  .toast-progress {
+    opacity: 0.5;
+    background-color: #2f96b4;
+  }
+
+  .toast-title {
+    // font-size: 14px;
+    font-size: 14px !important;
+    color: black;
+    opacity: 30;
+  }
+}
+
+#toast-container>.toast-warning {
+  border: 1.5px solid #f89406;
+  margin-top: 5px;
+  color: black;
+  background-color: white;
+  width: 400px;
+  box-shadow: 2px 1px 1px 1px lightgrey;
+  background-image: url(../src/assets/Message_Icon/Warning.svg);
+
+  .toast-progress {
+    opacity: 0.5;
+    background-color: #f89406;
+  }
+
+  .toast-title {
+    // font-size: 14px;
+    font-size: 14px !important;
+    color: black;
+    opacity: 30;
+  }
+}
+
+.toast-message {
+  color: black;
+  // font-size: 12px;
+  font-size: 12px !important;
+  font-weight: 500;
+  line-height: 15px;
+}
+#toast-container.toast-top-right {
+    position: absolute;
+  top: 40px; // 👈 adjust this depending on your header height
+  right: 20px;
+  z-index: 1050; // 👈 make sure it appears above other content
+  opacity: 0.95; // 👈 slight transparency
+  pointer-events: none; // prevent it from interfering with clicks
+}
+
+#toast-container > div {
+  pointer-events: auto; // re-enable pointer events for toast content
+  border-radius: 4px;
+  backdrop-filter: blur(2px); // optional subtle blur effect
+}
+
+// -----------------------------NGX toaster---End-----------------------------
+

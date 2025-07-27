@@ -21,7 +21,7 @@
 
     <ng-template #signupTemplate>
         
-    <div *ngIf="!UserType">
+    <!-- <div *ngIf="!UserType"> -->
         <div class="card">
             <h2>Signup</h2>
             <form [formGroup]="signupForm" (ngSubmit)="onSignupSubmit()">
@@ -57,9 +57,9 @@
             </form>
             <p>Already have an account? <a (click)="toggleForm()">Login</a></p>
         </div>
-    </div>
+    <!-- </div> -->
     </ng-template>
-    <div *ngIf="UserType" class="card user-type-box">
+    <!-- <div *ngIf="UserType" class="card user-type-box">
   <h3>Select User Type</h3>
   <mat-form-field appearance="fill">
     <mat-label>User Type</mat-label>
@@ -71,6 +71,6 @@
   <button mat-flat-button color="primary" (click)="onUserTypeSelected()" [disabled]="!selectedUserType">
     Continue
   </button>
-</div>
+</div> -->
 
 </div>

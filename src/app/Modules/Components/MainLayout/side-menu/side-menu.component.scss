@@ -1,0 +1,52 @@
+.sidebar {
+  width: 250px;
+  background-color: #f2f2f2;
+  border-right: 1px solid #ccc;
+  padding: 10px;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.menu-section {
+  margin-bottom: 10px;
+}
+
+.menu-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #dbeafe;
+  padding: 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s;
+}
+
+.menu-header:hover {
+  background-color: #bfdbfe;
+}
+
+.submenu {
+  margin-top: 5px;
+  padding-left: 15px;
+}
+
+.submenu-item {
+  padding: 6px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  color: #333;
+  transition: background-color 0.2s;
+}
+
+.submenu-item:hover {
+  background-color: #e0f2fe;
+}
+
+.icon {
+  margin-right: 8px;
+}
+
+.toggle-arrow {
+  font-size: 12px;
+}

@@ -6,8 +6,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
-import { HttpClient } from '@angular/common/http';
 import { CommonService } from '../../../../Service/common.service';
+import { SharedServiceService } from '../../../../Service/Sharedservice/shared-service.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -20,9 +21,9 @@ export class LoginComponent {
   loginForm: FormGroup;
   signupForm: FormGroup;
   showLogin = true;
-  UserType = false;
+  // UserType = false;
 
-  constructor(private fb: FormBuilder, private Http: CommonService) {
+  constructor(private fb: FormBuilder, private Http: CommonService, private Sharedservice: SharedServiceService,private router: Router,) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required]],
       //  email: ['', [Validators.required, Validators.email]],
@@ -51,6 +52,8 @@ export class LoginComponent {
 
   toggleForm() {
     this.showLogin = !this.showLogin;
+    this.signupForm.reset();
+    this.loginForm.reset();
   }
 
   userTypes = ['Doctor', 'Nurse', 'Pharmacist'];
@@ -59,46 +62,59 @@ export class LoginComponent {
 
   onLoginSubmit() {
     if (this.loginForm.valid) {
-      const { email, password } = this.loginForm.value;
-
-      // TODO: Replace with real API authentication
-      if (email === 'joe' && password === '123') {
-
+   this.Http.Post("Login/Login/", this.loginForm.value).subscribe({
+        next: (response) => {
+          if (response.success) {
+            this.Sharedservice.Messages('success', 'Login', response.message, 3000);
         this.showUserTypeSelection = true;
         this.toggleForm();
-        this.UserType = true;
-      } else {
-        alert('Invalid credentials');
-      }
+this.onLoginSuccess(response.components);
+      this.router.navigate(['/MainLayout']);
+        // this.UserType = true;
+          } else {
+            this.Sharedservice.Messages('error', 'Login', response.message, 3000);
+          }
+        },
+        error: (error) => {
+
+        }
+      });
+
+  
     } else {
       this.loginForm.markAllAsTouched();
     }
   }
-
+onLoginSuccess(response: any) {
+  const menuItems = response.filter((item: any) => item.componentName !== 'LoginComponent');
+  this.Sharedservice.setMenuItems(menuItems);
+}
   onUserTypeSelected() {
     if (this.selectedUserType) {
-      // Navigate to main page
-      // Example: this.router.navigate(['/dashboard'], { queryParams: { role: this.selectedUserType } });
+  
       alert('Logged in as ' + this.selectedUserType);
     }
   }
- onSignupSubmit() {
-  if (this.signupForm.valid) {
-    this.Http.Post("Login/Register/", this.signupForm.value).subscribe({
-      next: (response) => {
-        console.log('Registration successful:', response);
-        // optionally redirect or show a success message
-      },
-      error: (error) => {
-        console.error('Registration error:', error);
-        // handle error (e.g., show error message to user)
-      }
-    });
-  } else {
-    console.warn('Form is invalid');
-    // optionally mark all fields as touched to show validation errors
-    this.signupForm.markAllAsTouched();
+  onSignupSubmit() {
+    if (this.signupForm.valid) {
+      this.Http.Post("Login/Register/", this.signupForm.value).subscribe({
+        next: (response) => {
+          if (response.success) {
+            this.Sharedservice.Messages('success', 'Registration', response.message, 3000);
+
+          } else {
+            this.Sharedservice.Messages('error', 'Registration', response.message, 3000);
+          }
+        },
+        error: (error) => {
+
+        }
+      });
+    } else {
+      console.warn('Form is invalid');
+
+      this.signupForm.markAllAsTouched();
+    }
   }
-}
 
 }
