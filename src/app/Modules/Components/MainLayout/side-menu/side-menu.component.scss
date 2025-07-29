@@ -1,52 +1,82 @@
 .sidebar {
-  width: 250px;
-  background-color: #f2f2f2;
-  border-right: 1px solid #ccc;
-  padding: 10px;
-  font-family: 'Segoe UI', sans-serif;
-}
-
-.menu-section {
-  margin-bottom: 10px;
-}
-
-.menu-header {
+  width: 240px;
+  background-color: #2f4050;
+  color: white;
+  height: 100vh;
+  overflow-y: auto;
+  transition: width 0.3s ease;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #dbeafe;
-  padding: 10px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: background-color 0.3s;
-}
+  flex-direction: column;
 
-.menu-header:hover {
-  background-color: #bfdbfe;
-}
+  &.collapsed {
+    width: 70px;
 
-.submenu {
-  margin-top: 5px;
-  padding-left: 15px;
-}
+    .title,
+    .toggle-arrow {
+      display: none;
+    }
 
-.submenu-item {
-  padding: 6px 10px;
-  border-radius: 3px;
-  cursor: pointer;
-  color: #333;
-  transition: background-color 0.2s;
-}
+    .submenu {
+      display: none;
+    }
+  }
 
-.submenu-item:hover {
-  background-color: #e0f2fe;
-}
+  .sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+    font-size: 18px;
+    font-weight: bold;
+    background-color: #1c2833;
 
-.icon {
-  margin-right: 8px;
-}
+    .toggle-btn {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  }
 
-.toggle-arrow {
-  font-size: 12px;
+  .menu-section {
+    .menu-header {
+      padding: 12px 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      transition: background 0.3s;
+
+      &:hover {
+        background-color: #34495e;
+      }
+
+      .icon {
+        margin-right: 10px;
+      }
+
+      .toggle-arrow {
+        margin-left: auto;
+      }
+    }
+
+    .submenu {
+      .submenu-item {
+        padding: 10px 30px;
+        font-size: 14px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+
+        &.active,
+        &:hover {
+          background-color: #1abc9c;
+        }
+
+        .icon {
+          margin-right: 8px;
+        }
+      }
+    }
+  }
 }

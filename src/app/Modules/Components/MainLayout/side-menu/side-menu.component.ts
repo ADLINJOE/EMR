@@ -1,7 +1,7 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { SharedServiceService } from '../../../../Service/Sharedservice/shared-service.service';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-side-menu',
@@ -11,21 +11,17 @@ import { Router } from '@angular/router';
   styleUrl: './side-menu.component.scss',
 })
 export class SideMenuComponent implements OnInit {
-  constructor(private router: Router) {}
+  private router = inject(Router);
   private menuService = inject(SharedServiceService);
 
   rawMenu = signal(this.menuService.menuItems());
-
-  // Store actual menu structure in signal so it can be manipulated
   menuSections = signal<any[]>([]);
+  isCollapsed = signal(false); // Sidebar collapse state
 
   ngOnInit() {
-    // Build grouped menu
     const grouped: Record<string, any> = {};
-
     for (const item of this.rawMenu()) {
       const module = item.moduleType || 'General';
-
       if (!grouped[module]) {
         grouped[module] = {
           title: module,
@@ -43,11 +39,8 @@ export class SideMenuComponent implements OnInit {
     }
 
     const groupedArray = Object.values(grouped);
-
-    // Get current route (like 'Patientinvite')
     const currentPath = this.router.url.split('/').pop();
 
-    // Expand the section that includes current path
     for (const section of groupedArray) {
       if (section.subItems.some((s: any) => s.path === currentPath)) {
         section.isOpen = true;
@@ -57,7 +50,6 @@ export class SideMenuComponent implements OnInit {
 
     this.menuSections.set(groupedArray);
 
-    // Navigate to default if only at /MainLayout
     if (this.router.url === '/MainLayout') {
       this.router.navigate(['MainLayout', 'Patientinvite']);
     }
@@ -65,10 +57,18 @@ export class SideMenuComponent implements OnInit {
 
   toggleMenu(section: any) {
     section.isOpen = !section.isOpen;
-    this.menuSections.set([...this.menuSections()]); // trigger signal update
+    this.menuSections.set([...this.menuSections()]);
   }
 
   navigateTo(path: string) {
     this.router.navigate(['MainLayout', path]);
+  }
+
+  toggleSidebar() {
+    this.isCollapsed.update(val => !val);
+  }
+
+  isActiveRoute(path: string): boolean {
+    return this.router.url.endsWith(path);
   }
 }

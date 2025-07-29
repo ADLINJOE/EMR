@@ -5,6 +5,7 @@ import { LayoutComponent } from './Modules/Components/MainLayout/layout/layout.c
 import { PatientInviteComponent } from './Modules/Components/Patient/patient-invite/patient-invite.component';
 import { PatientlistComponent } from './Modules/Components/Patient/patientlist/patientlist.component';
 import { PatientRegistrationlinkComponent } from './Modules/Components/Patient/patient-registrationlink/patient-registrationlink.component';
+import { DrugMasterComponent } from './Modules/Components/Medicine/drug-master/drug-master.component';
 
 export const routes: Routes = [
 
@@ -25,10 +26,14 @@ export const routes: Routes = [
         path: 'Patientinvite',  
         component: PatientInviteComponent,
       },
-      {
-        path :'patientlist',
-        component : PatientlistComponent
-      }
+      // {
+      //   path :'patientlist',
+      //   component : PatientlistComponent
+      // }
+        {
+         path :'patientlist',
+          component : DrugMasterComponent
+        }
      
     ],
   },

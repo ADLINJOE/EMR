@@ -1,0 +1,58 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #e0f7fa, #e8f5e9);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.card {
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 128, 128, 0.1);
+  width: 100%;
+  max-width: 900px;
+  box-sizing: border-box;
+  border-top: 6px solid #00796b;
+}
+
+h2.text-center {
+  text-align: center;
+  margin-bottom: 24px;
+  color: #00796b;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.button-row {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.photo-upload {
+  display: flex;
+  flex-direction: column;
+  margin-top: 16px;
+}
+
+.preview-container {
+  text-align: center;
+  margin-top: 12px;
+}
+
+.preview-image {
+  width: 120px;
+  height: 120px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 2px solid #ccc;
+}

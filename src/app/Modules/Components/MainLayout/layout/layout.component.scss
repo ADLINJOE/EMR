@@ -18,11 +18,11 @@ app-side-menu {
 
 app-header-main, app-footer-main {
   height: 50px;
-  background-color: #003366;
+  background-color: #00796b;
   color: white;
   display: flex;
   align-items: center;
-  padding: 0 15px;
+  padding: 0 0px;
 }
 
 
@@ -36,13 +36,14 @@ app-header-main, app-footer-main {
 }
 
 app-header-main, app-footer-main {
+  width: 100%;
   position: sticky;
   z-index: 10;
-  background-color: #003366;
+  background-color: #00796b;
   color: white;
   display: flex;
   align-items: center;
-  padding: 0 20px;
+  padding: 0 0px;
 }
 
 app-header-main {
@@ -53,6 +54,7 @@ app-header-main {
 app-footer-main {
   bottom: 0;
   height: 20px;
+  width: 100%;
 }
 
 .layout-body {

@@ -1,1 +1,105 @@
-<p>patient-registrationlink works!</p>
+<div class="container">
+  <div class="card">
+    <!-- Login Form -->
+    <form *ngIf="isLoginMode" [formGroup]="loginForm" (ngSubmit)="onLoginSubmit()">
+      <h2 class="text-center">Patient Login</h2>
+      <div class="form-grid">
+        <mat-form-field appearance="fill">
+          <mat-label>Email</mat-label>
+          <input matInput formControlName="email" />
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Password</mat-label>
+          <input matInput type="password" formControlName="password" />
+        </mat-form-field>
+      </div>
+
+      <div class="button-row">
+        <button mat-flat-button color="primary" type="submit">Login</button>
+        <button mat-stroked-button color="accent" type="button" (click)="toggleMode()">Go to Register</button>
+      </div>
+    </form>
+
+    <!-- Registration Form -->
+    <form *ngIf="!isLoginMode" [formGroup]="registerForm" (ngSubmit)="onRegisterSubmit()">
+      <h2 class="text-center">Patient Registration</h2>
+      <div class="form-grid">
+        <mat-form-field appearance="fill">
+          <mat-label>First Name</mat-label>
+          <input matInput formControlName="firstName" />
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Last Name</mat-label>
+          <input matInput formControlName="lastName" />
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Age</mat-label>
+          <input matInput type="number" formControlName="age" />
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Date of Birth</mat-label>
+          <input matInput type="date" formControlName="dob" />
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Gender</mat-label>
+          <mat-select formControlName="gender">
+            <mat-option value="Male">Male</mat-option>
+            <mat-option value="Female">Female</mat-option>
+            <mat-option value="Other">Other</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Guardian</mat-label>
+          <input matInput formControlName="guardian" />
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Mobile No</mat-label>
+          <input matInput formControlName="MobileNo" />
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Email</mat-label>
+          <input matInput formControlName="email" />
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Password</mat-label>
+          <input matInput type="password" formControlName="password" />
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Confirm Password</mat-label>
+          <input matInput type="password" formControlName="confirmPassword" />
+        </mat-form-field>
+      </div>
+
+      <!-- Photo Upload -->
+      <div class="photo-upload">
+        <label for="photo">Upload Patient Photo</label>
+        <input type="file" id="photo" (change)="onFileSelected($event)" />
+      </div>
+
+      <!-- Preview -->
+      <div class="preview-container" *ngIf="previewUrl">
+        <img [src]="previewUrl" alt="Preview" class="preview-image" />
+      </div>
+
+      <div class="button-row">
+        <button mat-flat-button color="primary" type="submit">Register</button>
+        <button mat-stroked-button color="warn" type="button" (click)="toggleMode()">Cancel</button>
+      </div>
+
+      <div class="text-center mt-3">
+        <p>Already registered?</p>
+        <button mat-flat-button color="accent" type="button" (click)="toggleMode()">Go to Login</button>
+      </div>
+    </form>
+  </div>
+</div>

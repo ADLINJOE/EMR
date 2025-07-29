@@ -1,17 +1,26 @@
-<div class="sidebar">
+<div class="sidebar" [class.collapsed]="isCollapsed()">
+  <div class="sidebar-header">
+    <span class="logo">🩺 WEBHIS</span>
+    <button class="toggle-btn" (click)="toggleSidebar()">
+      <i class="fas" [ngClass]="{ 'fa-angle-left': !isCollapsed(), 'fa-angle-right': isCollapsed() }"></i>
+    </button>
+  </div>
+
   <div class="menu-section" *ngFor="let section of menuSections()">
     <div class="menu-header" (click)="toggleMenu(section)">
       <span class="icon">{{ section.icon }}</span>
-      <span class="title">{{ section.title }}</span>
-      <span class="toggle-arrow">{{ section.isOpen ? '▲' : '▼' }}</span>
+      <span class="title" *ngIf="!isCollapsed()">{{ section.title }}</span>
+      <span class="toggle-arrow" *ngIf="!isCollapsed()">{{ section.isOpen ? '▲' : '▼' }}</span>
     </div>
 
-    <div class="submenu" *ngIf="section.isOpen">
+    <div class="submenu" *ngIf="section.isOpen && !isCollapsed()">
       <div
         class="submenu-item"
         *ngFor="let item of section.subItems"
+        [class.active]="isActiveRoute(item.path)"
         (click)="navigateTo(item.path)">
-        {{ item.icon }} {{ item.title }}
+        <span class="icon">{{ item.icon }}</span>
+        <span class="title">{{ item.title }}</span>
       </div>
     </div>
   </div>
