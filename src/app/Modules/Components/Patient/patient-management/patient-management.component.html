@@ -1,0 +1,146 @@
+<mat-card class="dashboard-wrapper">
+  <!-- Tabs -->
+  <mat-tab-group [(selectedIndex)]="selectedTab" class="dashboard-tabs">
+    <!-- Medications Tab -->
+    <mat-tab label="Medications">
+      <section class="tab-content">
+        <div class="header-row">
+          <h2>Current Medications</h2>
+          <button mat-raised-button color="primary">
+            <mat-icon>add</mat-icon> Add Medication
+          </button>
+        </div>
+
+        <div class="filters">
+          <mat-form-field appearance="fill">
+            <mat-label>Search...</mat-label>
+            <input matInput [(ngModel)]="medicationSearch" (input)="filterMedications()" />
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="fill">
+            <mat-label>Status</mat-label>
+            <mat-select [(ngModel)]="statusFilter" (selectionChange)="filterMedications()">
+              <mat-option value="">All</mat-option>
+              <mat-option *ngFor="let status of medicationStatuses" [value]="status">{{ status }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <!-- Medications Table -->
+        <div class="table-wrapper">
+          <table mat-table [dataSource]="filteredMedications" class="styled-table">
+            <!-- Columns -->
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef>Medication</th>
+              <td mat-cell *matCellDef="let med">{{ med.name }} <small>{{ med.dosage }}</small></td>
+            </ng-container>
+
+            <ng-container matColumnDef="frequency">
+              <th mat-header-cell *matHeaderCellDef>Frequency</th>
+              <td mat-cell *matCellDef="let med">{{ med.frequency }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="prescribedBy">
+              <th mat-header-cell *matHeaderCellDef>Prescribed By</th>
+              <td mat-cell *matCellDef="let med">{{ med.prescribedBy }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="startDate">
+              <th mat-header-cell *matHeaderCellDef>Start Date</th>
+              <td mat-cell *matCellDef="let med">{{ med.startDate }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef>Status</th>
+              <td mat-cell *matCellDef="let med">
+                <mat-chip color="primary" [ngClass]="med.status.toLowerCase()">{{ med.status }}</mat-chip>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>Actions</th>
+              <td mat-cell *matCellDef="let med">
+                <button mat-icon-button color="primary"><mat-icon>edit</mat-icon></button>
+                <button mat-icon-button color="warn"><mat-icon>delete</mat-icon></button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="medicationColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: medicationColumns;"></tr>
+          </table>
+        </div>
+      </section>
+    </mat-tab>
+
+    <!-- Allergy Tab -->
+    <mat-tab label="Allergy Reports">
+      <section class="tab-content">
+        <div class="header-row">
+          <h2>Known Allergies</h2>
+          <button mat-raised-button color="primary">
+            <mat-icon>add</mat-icon> Add Allergy
+          </button>
+        </div>
+
+        <div class="filters">
+          <mat-form-field appearance="fill">
+            <mat-label>Search...</mat-label>
+            <input matInput [(ngModel)]="allergySearch" (input)="filterAllergies()" />
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="fill">
+            <mat-label>Severity</mat-label>
+            <mat-select [(ngModel)]="severityFilter" (selectionChange)="filterAllergies()">
+              <mat-option value="">All</mat-option>
+              <mat-option *ngFor="let sev of allergySeverities" [value]="sev">{{ sev }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="table-wrapper">
+          <table mat-table [dataSource]="filteredAllergies" class="styled-table">
+            <ng-container matColumnDef="allergen">
+              <th mat-header-cell *matHeaderCellDef>Allergen</th>
+              <td mat-cell *matCellDef="let allergy">{{ allergy.allergen }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="severity">
+              <th mat-header-cell *matHeaderCellDef>Severity</th>
+              <td mat-cell *matCellDef="let allergy">
+                <mat-chip [ngClass]="allergy.severity.toLowerCase()">{{ allergy.severity }}</mat-chip>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="reaction">
+              <th mat-header-cell *matHeaderCellDef>Reaction</th>
+              <td mat-cell *matCellDef="let allergy">{{ allergy.reaction }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="diagnosedDate">
+              <th mat-header-cell *matHeaderCellDef>Diagnosed</th>
+              <td mat-cell *matCellDef="let allergy">{{ allergy.diagnosedDate }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="diagnosedBy">
+              <th mat-header-cell *matHeaderCellDef>By</th>
+              <td mat-cell *matCellDef="let allergy">{{ allergy.diagnosedBy }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>Actions</th>
+              <td mat-cell *matCellDef="let allergy">
+                <button mat-icon-button color="primary"><mat-icon>edit</mat-icon></button>
+                <button mat-icon-button color="warn"><mat-icon>delete</mat-icon></button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="allergyColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: allergyColumns;"></tr>
+          </table>
+        </div>
+      </section>
+    </mat-tab>
+  </mat-tab-group>
+</mat-card>

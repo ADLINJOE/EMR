@@ -26,12 +26,12 @@ export const routes: Routes = [
         path: 'Patientinvite',  
         component: PatientInviteComponent,
       },
-      // {
-      //   path :'patientlist',
-      //   component : PatientlistComponent
-      // }
+      {
+        path :'patientlist',
+        component : PatientlistComponent
+      },
         {
-         path :'patientlist',
+         path :'drug',
           component : DrugMasterComponent
         }
      

@@ -1,105 +1,104 @@
 <div class="container">
   <div class="card">
-    <!-- Login Form -->
-    <form *ngIf="isLoginMode" [formGroup]="loginForm" (ngSubmit)="onLoginSubmit()">
-      <h2 class="text-center">Patient Login</h2>
-      <div class="form-grid">
+    <ng-container *ngIf="showLogin; else registerFormTpl">
+      <h2>Login</h2>
+      <form [formGroup]="loginForm" (ngSubmit)="onLoginSubmit()">
         <mat-form-field appearance="fill">
           <mat-label>Email</mat-label>
-          <input matInput formControlName="email" />
+          <input matInput formControlName="email" placeholder="Enter email" required />
         </mat-form-field>
 
         <mat-form-field appearance="fill">
           <mat-label>Password</mat-label>
-          <input matInput type="password" formControlName="password" />
-        </mat-form-field>
-      </div>
-
-      <div class="button-row">
-        <button mat-flat-button color="primary" type="submit">Login</button>
-        <button mat-stroked-button color="accent" type="button" (click)="toggleMode()">Go to Register</button>
-      </div>
-    </form>
-
-    <!-- Registration Form -->
-    <form *ngIf="!isLoginMode" [formGroup]="registerForm" (ngSubmit)="onRegisterSubmit()">
-      <h2 class="text-center">Patient Registration</h2>
-      <div class="form-grid">
-        <mat-form-field appearance="fill">
-          <mat-label>First Name</mat-label>
-          <input matInput formControlName="firstName" />
+          <input matInput type="password" formControlName="password" placeholder="Enter password" required />
         </mat-form-field>
 
-        <mat-form-field appearance="fill">
-          <mat-label>Last Name</mat-label>
-          <input matInput formControlName="lastName" />
-        </mat-form-field>
+        <div class="button-group">
+          <button mat-flat-button color="primary" type="submit">Login</button>
+          <button mat-flat-button color="warn" type="button" (click)="resetLogin()">Cancel</button>
+        </div>
 
-        <mat-form-field appearance="fill">
-          <mat-label>Age</mat-label>
-          <input matInput type="number" formControlName="age" />
-        </mat-form-field>
+        <p class="toggle-link">Don’t have an account?
+          <a (click)="toggleForm()">Register</a>
+        </p>
+      </form>
+    </ng-container>
 
-        <mat-form-field appearance="fill">
-          <mat-label>Date of Birth</mat-label>
-          <input matInput type="date" formControlName="dob" />
-        </mat-form-field>
+    <ng-template #registerFormTpl>
+      <h2>Register</h2>
+      <form [formGroup]="registerForm" (ngSubmit)="onRegisterSubmit()" enctype="multipart/form-data">
+        <div class="preview-container" *ngIf="previewUrl">
+  <img [src]="previewUrl" alt="Preview" class="preview-image" />
+</div>
+    <!-- Upload Section -->
+<div class="photo-upload">
+  <label class="upload-label" for="photo">
+    <mat-icon>cloud_upload</mat-icon> Upload Patient Photo
+  </label>
+  <input type="file" id="photo" (change)="onFileSelected($event)" />
+</div>
 
-        <mat-form-field appearance="fill">
-          <mat-label>Gender</mat-label>
-          <mat-select formControlName="gender">
-            <mat-option value="Male">Male</mat-option>
-            <mat-option value="Female">Female</mat-option>
-            <mat-option value="Other">Other</mat-option>
-          </mat-select>
-        </mat-form-field>
+<!-- Preview -->
 
-        <mat-form-field appearance="fill">
-          <mat-label>Guardian</mat-label>
-          <input matInput formControlName="guardian" />
-        </mat-form-field>
 
-        <mat-form-field appearance="fill">
-          <mat-label>Mobile No</mat-label>
-          <input matInput formControlName="MobileNo" />
-        </mat-form-field>
 
-        <mat-form-field appearance="fill">
-          <mat-label>Email</mat-label>
-          <input matInput formControlName="email" />
-        </mat-form-field>
 
-        <mat-form-field appearance="fill">
-          <mat-label>Password</mat-label>
-          <input matInput type="password" formControlName="password" />
-        </mat-form-field>
 
-        <mat-form-field appearance="fill">
-          <mat-label>Confirm Password</mat-label>
-          <input matInput type="password" formControlName="confirmPassword" />
-        </mat-form-field>
-      </div>
+        <div class="form-grid">
+          <mat-form-field appearance="fill">
+            <mat-label>First Name</mat-label>
+            <input matInput formControlName="FirstName" required />
+          </mat-form-field>
+ 
+          <mat-form-field appearance="fill">
+            <mat-label>Last Name</mat-label>
+            <input matInput formControlName="LastName" required />
+          </mat-form-field>
 
-      <!-- Photo Upload -->
-      <div class="photo-upload">
-        <label for="photo">Upload Patient Photo</label>
-        <input type="file" id="photo" (change)="onFileSelected($event)" />
-      </div>
+          <mat-form-field appearance="fill">
+            <mat-label>Age</mat-label>
+            <input matInput formControlName="age" type="number" required />
+          </mat-form-field>
 
-      <!-- Preview -->
-      <div class="preview-container" *ngIf="previewUrl">
-        <img [src]="previewUrl" alt="Preview" class="preview-image" />
-      </div>
+          <mat-form-field appearance="fill">
+            <mat-label>Gender</mat-label>
+            <mat-select formControlName="gender" required>
+              <mat-option value="Male">Male</mat-option>
+              <mat-option value="Female">Female</mat-option>
+              <mat-option value="Other">Other</mat-option>
+            </mat-select>
+          </mat-form-field>
 
-      <div class="button-row">
-        <button mat-flat-button color="primary" type="submit">Register</button>
-        <button mat-stroked-button color="warn" type="button" (click)="toggleMode()">Cancel</button>
-      </div>
+          <mat-form-field appearance="fill">
+            <mat-label>Mobile Number</mat-label>
+            <input matInput formControlName="mobile" type="tel" required />
+          </mat-form-field>
 
-      <div class="text-center mt-3">
-        <p>Already registered?</p>
-        <button mat-flat-button color="accent" type="button" (click)="toggleMode()">Go to Login</button>
-      </div>
-    </form>
+          <mat-form-field appearance="fill">
+            <mat-label>Email</mat-label>
+            <input matInput formControlName="email" type="email" required />
+          </mat-form-field>
+
+          <mat-form-field appearance="fill">
+            <mat-label>Password</mat-label>
+            <input matInput formControlName="password" type="password" required />
+          </mat-form-field>
+
+          <mat-form-field appearance="fill">
+            <mat-label>Confirm Password</mat-label>
+            <input matInput formControlName="confirmPassword" type="password" required />
+          </mat-form-field>
+        </div>
+
+        <div class="button-group">
+          <button mat-flat-button color="primary" type="submit">Register</button>
+          <button mat-flat-button color="warn" type="button" (click)="toggleForm()">Cancel</button>
+        </div>
+
+        <p class="toggle-link">Already have an account?
+          <a (click)="toggleForm()">Login</a>
+        </p>
+      </form>
+    </ng-template>
   </div>
 </div>

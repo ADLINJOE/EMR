@@ -7,6 +7,8 @@
   transition: width 0.3s ease;
   display: flex;
   flex-direction: column;
+  scrollbar-width: thin;
+  scrollbar-color: #888 #2f4050;
 
   &.collapsed {
     width: 70px;
@@ -45,7 +47,7 @@
       cursor: pointer;
       display: flex;
       align-items: center;
-      transition: background 0.3s;
+      transition: background 0.3s ease;
 
       &:hover {
         background-color: #34495e;
@@ -67,6 +69,7 @@
         cursor: pointer;
         display: flex;
         align-items: center;
+        transition: background-color 0.3s ease;
 
         &.active,
         &:hover {
@@ -78,5 +81,24 @@
         }
       }
     }
+  }
+
+  /* Custom Scrollbar - WebKit Browsers */
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #2f4050;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 4px;
+    border: 2px solid #2f4050;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: #aaa;
   }
 }
