@@ -1,13 +1,31 @@
-// patient-registration.component.ts
-export interface PatientRegistration {
+export interface PatientDetails {
+  patientID: number;
   firstName: string;
   lastName: string;
   age: number;
-  dob: Date;
   gender: string;
-  guardian: string;
   email: string;
-  password: string;
-  confirmPassword: string;
-  MobileNo: string;
+  mobile: string;
 }
+export interface MedicationDto {
+  id?: number;
+  patientId?: number;
+  medname?: string;
+  dosage?: string;
+  frequency?: string;
+  startDate?: Date;
+  ongoing?: boolean;
+  lastEditedBy?: string;
+  isNew?: boolean;
+  isEdited?: boolean;
+  Deleted?: boolean;  // <-- Add this line
+}
+
+
+export interface MedicationRequestDto {
+  mode :string;
+  patientId?: number;
+  medicationList: MedicationDto[];
+}
+
+

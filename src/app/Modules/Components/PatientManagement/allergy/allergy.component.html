@@ -1,0 +1,33 @@
+<div class="container">
+  <div class="card">
+    <h2>Allergy Details</h2>
+
+    <form [formGroup]="form">
+      <div class="add-button-wrapper">
+        <button type="button" class="btn-primary" (click)="addAllergy()">+ Add Allergy</button>
+      </div>
+<div class="tablefix">
+      <table class="full-width-table" formArrayName="AllergyList">
+        <thead>
+          <tr>
+            <th>Sl.No</th>
+            <th>Allergy Description</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let allergy of getFormControls.controls; let i = index; trackBy: trackByIndex" [formGroupName]="i">
+            <td>{{ i + 1 }}</td>
+            <td>
+              <textarea class="textarea-input" formControlName="description" rows="3" placeholder="Enter allergy details..."></textarea>
+            </td>
+            <td>
+              <button type="button" class="btn-danger" (click)="removeAllergy(i)">Remove</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+    </form>
+  </div>
+</div>

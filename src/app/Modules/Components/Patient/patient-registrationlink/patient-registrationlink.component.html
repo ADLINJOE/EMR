@@ -17,8 +17,8 @@
           <button mat-flat-button color="primary" type="submit">Login</button>
           <button mat-flat-button color="warn" type="button" (click)="resetLogin()">Cancel</button>
         </div>
-
-        <p class="toggle-link">Don’t have an account?
+        <a class="link" href="#">Forgot password?</a>
+        <p *ngIf="HideRegister" class="toggle-link">Don’t have an account?
           <a (click)="toggleForm()">Register</a>
         </p>
       </form>
@@ -28,17 +28,17 @@
       <h2>Register</h2>
       <form [formGroup]="registerForm" (ngSubmit)="onRegisterSubmit()" enctype="multipart/form-data">
         <div class="preview-container" *ngIf="previewUrl">
-  <img [src]="previewUrl" alt="Preview" class="preview-image" />
-</div>
-    <!-- Upload Section -->
-<div class="photo-upload">
-  <label class="upload-label" for="photo">
-    <mat-icon>cloud_upload</mat-icon> Upload Patient Photo
-  </label>
-  <input type="file" id="photo" (change)="onFileSelected($event)" />
-</div>
+          <img [src]="previewUrl" alt="Preview" class="preview-image" />
+        </div>
+        <!-- Upload Section -->
+        <div class="photo-upload">
+          <label class="upload-label" for="photo">
+            <mat-icon>cloud_upload</mat-icon> Upload Patient Photo
+          </label>
+          <input type="file" id="photo" (change)="onFileSelected($event)" />
+        </div>
 
-<!-- Preview -->
+        <!-- Preview -->
 
 
 
@@ -49,7 +49,7 @@
             <mat-label>First Name</mat-label>
             <input matInput formControlName="FirstName" required />
           </mat-form-field>
- 
+
           <mat-form-field appearance="fill">
             <mat-label>Last Name</mat-label>
             <input matInput formControlName="LastName" required />
@@ -76,7 +76,7 @@
 
           <mat-form-field appearance="fill">
             <mat-label>Email</mat-label>
-            <input matInput formControlName="email" type="email" required />
+            <input matInput formControlName="email" type="email" required [disabled]="true" />
           </mat-form-field>
 
           <mat-form-field appearance="fill">

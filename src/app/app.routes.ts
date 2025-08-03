@@ -6,38 +6,37 @@ import { PatientInviteComponent } from './Modules/Components/Patient/patient-inv
 import { PatientlistComponent } from './Modules/Components/Patient/patientlist/patientlist.component';
 import { PatientRegistrationlinkComponent } from './Modules/Components/Patient/patient-registrationlink/patient-registrationlink.component';
 import { DrugMasterComponent } from './Modules/Components/Medicine/drug-master/drug-master.component';
+import { CurrentmedicationComponent } from './Modules/Components/PatientManagement/currentmedication/currentmedication.component';
+import { AllergyComponent } from './Modules/Components/PatientManagement/allergy/allergy.component';
 
 export const routes: Routes = [
+  // Default path redirects to login
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
 
-    { path: '', redirectTo: 'login', pathMatch: 'full' },
+  // Login screen
+  { path: 'login', component: LoginComponent },
+
+  // Register screen – should stay on reload
+  { path: 'register', component: PatientRegistrationlinkComponent },
+
+  // Main layout with children
   {
-    path: 'login',  
-    component: LoginComponent,
-  },
-    {
-    path: 'register',
-    component: PatientRegistrationlinkComponent,
-  },
-  {
-    path: 'MainLayout',  
+    path: 'MainLayout',
     component: LayoutComponent,
     children: [
-      {
-        path: 'Patientinvite',  
-        component: PatientInviteComponent,
-      },
-      {
-        path :'patientlist',
-        component : PatientlistComponent
-      },
-        {
-         path :'drug',
-          component : DrugMasterComponent
-        }
-     
+      { path: 'Patientinvite', component: PatientInviteComponent },
+      { path: 'patientlist', component: PatientlistComponent },
+      { path: 'drug', component: DrugMasterComponent },
+      { path: 'currentmedication', component: CurrentmedicationComponent },
+      { path: 'allergy', component: AllergyComponent },
     ],
   },
+
+  // Wildcard path for unknown routes — do NOT match valid paths like /register
+  { path: '**', redirectTo: 'login', pathMatch: 'full' }
 ];
+
+
 @NgModule({
   imports: [RouterModule.forRoot(routes)],  
   exports: [RouterModule],

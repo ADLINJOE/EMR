@@ -1,0 +1,12 @@
+@import '../currentmedication/currentmedication.component.scss'; // Optional reuse if shared styles
+
+.textarea-input {
+  width: 100%;
+  padding: 8px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  resize: vertical;
+  min-height: 70px;
+  font-family: 'Segoe UI', sans-serif;
+}

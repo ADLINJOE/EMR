@@ -1,5 +1,5 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
+import { Component, HostListener, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -12,7 +12,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatIconModule } from "@angular/material/icon";
 import { CommonService } from '../../../../Service/common.service';
 import { SharedServiceService } from '../../../../Service/Sharedservice/shared-service.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-patient-registrationlink',
@@ -27,8 +27,31 @@ export class PatientRegistrationlinkComponent implements OnInit {
 
   loginForm: FormGroup;
   registerForm: FormGroup;
+  PatientEmail: string | null;
+  HideRegister: boolean = true;
+ @HostListener('window:keydown', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent) {
+    if ((event.key === 'F5') || (event.ctrlKey && event.key === 'r')) {
+      event.preventDefault();
+      event.stopPropagation();
+      alert('Page reload is disabled on registration screen.');
+    }
+  }
 
-  constructor(private fb: FormBuilder,private route: ActivatedRoute, private Commonservice: CommonService, private Sharedservice: SharedServiceService) {
+  // Warn or block refresh / tab close
+  @HostListener('window:beforeunload', ['$event'])
+  unloadNotification($event: any): void {
+    $event.preventDefault();
+    $event.returnValue = 'You will lose unsaved registration data.';
+  }
+
+  ngOnDestroy(): void {
+    // Clear beforeunload when leaving
+    window.onbeforeunload = null;
+  }
+  constructor(private router: Router, private fb: FormBuilder, private route: ActivatedRoute, private Commonservice: CommonService, private Sharedservice: SharedServiceService) {
+    this.PatientEmail = this.route.snapshot.queryParamMap.get('email');
+    this.CheckPatientRegister()
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required]
@@ -46,9 +69,36 @@ export class PatientRegistrationlinkComponent implements OnInit {
       photo: [null]
     });
   }
-ngOnInit(): void {
+  ngOnInit(): void {
 
-}
+  }
+  CheckPatientRegister() {
+    if (this.PatientEmail) {
+      this.Commonservice.Post('PatientRegistercheck', { Email: this.PatientEmail }).subscribe({
+        next: (response) => {
+          if (response.exists) {
+
+          //  this.HideRegister = false;
+this.registerForm.get('email')?.setValue(this.PatientEmail);
+this.registerForm.get('email')?.disable();
+    this.router.navigate(['MainLayout', 'login']);
+
+          } else {
+            this.showLogin = false;
+            this.Sharedservice.Messages('error', 'Login', 'Email not found.', 3000);
+           this.registerForm.get('email')?.setValue(this.PatientEmail);
+this.registerForm.get('email')?.disable();
+
+          }
+        },
+        error: (error) => {
+          console.error('API Error:', error);
+        }
+      });
+    } else {
+      this.Sharedservice.Messages('error', 'Error', 'No email found in query parameters.', 3000);
+    }
+  }
 
   photoBase64: string | null = null;
   toggleForm() {
@@ -56,15 +106,16 @@ ngOnInit(): void {
     this.previewUrl = null;
     this.registerForm.reset();
     this.loginForm.reset();
-      const emailFromQuery = this.route.snapshot.queryParamMap.get('email');
+    const emailFromQuery = this.route.snapshot.queryParamMap.get('email');
 
-  if (emailFromQuery) {
-    this.registerForm.patchValue({
-      email: emailFromQuery
-    });
-  }
-  }
+    if (emailFromQuery) {
+      this.registerForm.patchValue({
+        email: emailFromQuery
+      });
+    }
 
+    this.router.navigate(['MainLayout', 'login']);
+  }
   onLoginSubmit() {
     if (this.loginForm.valid) {
       console.log('Login form:', this.loginForm.value);
@@ -79,13 +130,14 @@ ngOnInit(): void {
       });
       const formDataAPI = {
         ...this.registerForm.value,
-        photoBase64: this.photoBase64
+        photoBase64: this.photoBase64,
+        email : this.PatientEmail
       };
       this.Commonservice.Post('PatientRegisterNew', formDataAPI).subscribe({
         next: (response) => {
           if (response.success) {
             this.Sharedservice.Messages('success', 'Login', response.message, 3000);
-            this.toggleForm();
+            //this.toggleForm();
             // this.UserType = true;
           } else {
             this.Sharedservice.Messages('error', 'Login', response.message, 3000);

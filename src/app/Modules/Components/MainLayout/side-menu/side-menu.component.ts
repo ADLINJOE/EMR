@@ -21,6 +21,7 @@ export class SideMenuComponent implements OnInit {
   ngOnInit() {
     const grouped: Record<string, any> = {};
     for (const item of this.rawMenu()) {
+      let startpage = item.startPage
       const module = item.moduleType || 'General';
       if (!grouped[module]) {
         grouped[module] = {
@@ -28,6 +29,7 @@ export class SideMenuComponent implements OnInit {
           icon: '📁',
           isOpen: false,
           subItems: [],
+          startpage:startpage
         };
       }
 
@@ -49,9 +51,10 @@ export class SideMenuComponent implements OnInit {
     }
 
     this.menuSections.set(groupedArray);
-
+let StartForm = this.menuSections();
+ let startpage =  StartForm[0].startpage
     if (this.router.url === '/MainLayout') {
-      this.router.navigate(['MainLayout', 'Patientinvite']);
+      this.router.navigate(['MainLayout', startpage]);
     }
   }
 

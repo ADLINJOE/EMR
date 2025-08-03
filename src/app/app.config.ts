@@ -5,6 +5,7 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { spinnerInterceptor } from './Security/auth.interceptor';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideToastr, ToastrModule } from 'ngx-toastr';
+import { provideNativeDateAdapter } from '@angular/material/core';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -16,6 +17,7 @@ export const appConfig: ApplicationConfig = {
       ])
     ),
      provideAnimations(),
+        provideNativeDateAdapter(),
       importProvidersFrom(ToastrModule.forRoot()),
        provideToastr({
       positionClass: 'toast-top-right' // 👈 this controls the position

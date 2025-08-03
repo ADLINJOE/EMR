@@ -1,0 +1,125 @@
+.container {
+  display: flex;
+  justify-content: center;
+  padding: 32px;
+  background: linear-gradient(135deg, #e0f7fa, #e8f5e9);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.card {
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 128, 128, 0.1);
+  width: 100%;
+  max-width: 1200px;
+  border-top: 6px solid #00796b;
+}
+
+h2 {
+  text-align: center;
+  color: #00796b;
+  margin-bottom: 24px;
+}
+
+.add-button-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+}
+
+.full-width-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 24px;
+}
+
+table th,
+table td {
+  padding: 10px;
+  border: 1px solid #ccc;
+  text-align: center;
+}
+
+table th {
+  background-color: cadetblue;
+  color: white;
+  font-weight: 600;
+}
+
+table th:first-child {
+  border-top-left-radius: 9px;
+  border-bottom-left-radius: 9px;
+}
+
+table th:last-child {
+  border-top-right-radius: 9px;
+  border-bottom-right-radius: 9px;
+}
+
+.plain-input {
+  width: 100%;
+  padding: 6px 5px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.center-checkbox {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn-primary {
+  background-color: #00796b;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background-color: #004d40;
+}
+
+.btn-danger {
+  background-color: #d32f2f;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-danger:hover {
+  background-color: #b71c1c;
+}
+
+.tablefix {
+  height: 20rem;
+  overflow: auto;
+}
+
+.btn-secondary {
+  background-color: #607d8b;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background-color: #455a64;
+}
+
+.margin_4px {
+  margin: 4px
+}
+
+.button_end {
+  justify-content: end;
+  display: flex;
+}

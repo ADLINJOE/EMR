@@ -1,0 +1,54 @@
+<div class="container">
+  <div class="card">
+    <h2 class="section-title">Current Medication</h2>
+
+    <form [formGroup]="form">
+      <div class="add-button-wrapper">
+        <button type="button" class="btn-primary" (click)="addMedication()">+ Add Medication</button>
+      </div>
+
+      <div class="tablefix">
+        <table class="full-width-table" formArrayName="Currentmedicine">
+          <thead>
+            <tr>
+              <th>Sl.No</th>
+              <th>Medication</th>
+              <th>Dosage</th>
+              <th>Frequency</th>
+              <th>Start Date</th>
+              <th>Ongoing</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let med of getFormControls.controls; let i = index; trackBy: trackByIndex">
+              <tr [formGroupName]="i" [hidden]="med.get('isDeleted')?.value">
+                <td>{{ i + 1 }}</td>
+                <td><input class="plain-input" formControlName="medname" placeholder="Medication" /></td>
+                <td><input class="plain-input" formControlName="dosage" placeholder="Dosage" /></td>
+                <td><input class="plain-input" formControlName="frequency" placeholder="Frequency" /></td>
+                <td><input class="plain-input" type="date" formControlName="startDate" [max]="today" /></td>
+                <td class="center-checkbox">
+                  <input type="checkbox" formControlName="ongoing" />
+                </td>
+                <td>
+                  <button type="button" class="btn-danger" (click)="removeMedication(i)">Remove</button>
+                </td>
+              </tr>
+            </ng-container>
+
+          </tbody>
+        </table>
+
+
+      </div>
+      <div class="button-group button_end">
+        <button type="button" class="btn-primary margin_4px" (click)="saveAll()">Save</button>
+        <button type="button" class="btn-secondary margin_4px" (click)="cancel()">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Allergy section -->
+<app-allergy></app-allergy>

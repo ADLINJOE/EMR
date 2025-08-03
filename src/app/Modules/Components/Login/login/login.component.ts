@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, effect } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ValidationErrors, ValidatorFn, AbstractControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatInputModule } from '@angular/material/input';
@@ -21,11 +21,12 @@ export class LoginComponent {
   loginForm: FormGroup;
   signupForm: FormGroup;
   showLogin = true;
+  ShowRegister = false;
   // UserType = false;
 
-  constructor(private fb: FormBuilder, private Http: CommonService, private Sharedservice: SharedServiceService,private router: Router,) {
+  constructor(private fb: FormBuilder, private Http: CommonService, private Sharedservice: SharedServiceService, private router: Router) {
     this.loginForm = this.fb.group({
-      email: ['', [Validators.required]],
+      email: ['', [Validators.required, Validators.email]],
       //  email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required]
     });
@@ -38,8 +39,9 @@ export class LoginComponent {
         Password: ['', Validators.required],
         ConfirmPassword: ['', Validators.required]
       },
-      { validators: this.passwordMatchValidator() }
+      { validators: this.passwordMatchValidator() } // ✅ sync validator
     );
+
   }
 
   passwordMatchValidator(): ValidatorFn {
@@ -51,7 +53,7 @@ export class LoginComponent {
   }
 
   toggleForm() {
-    this.showLogin = !this.showLogin;
+    //  this.showLogin = !this.showLogin;
     this.signupForm.reset();
     this.loginForm.reset();
   }
@@ -61,37 +63,53 @@ export class LoginComponent {
   showUserTypeSelection = false;
 
   onLoginSubmit() {
-    if (this.loginForm.valid) {
-   this.Http.Post("Login/Login/", this.loginForm.value).subscribe({
-        next: (response) => {
-          if (response.success) {
-            this.Sharedservice.Messages('success', 'Login', response.message, 3000);
-        this.showUserTypeSelection = true;
-        this.toggleForm();
-this.onLoginSuccess(response.components);
-      this.router.navigate(['/MainLayout']);
-        // this.UserType = true;
-          } else {
-            this.Sharedservice.Messages('error', 'Login', response.message, 3000);
-          }
-        },
-        error: (error) => {
-
-        }
-      });
-
-  
-    } else {
+    if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
+      return;
     }
+
+    const email = this.loginForm.get('email')?.value;
+    const password = this.loginForm.get('password')?.value;
+
+    // Bypass API for admin
+    if (email === 'Admin123@gmail.com' && password === 'Admin@123') {
+      this.showLogin = false;
+      this.toggleForm();
+      return;
+    }
+
+    this.Http.Post("Login/Login/", this.loginForm.value).subscribe({
+      next: (response) => {
+        if (response.success) {
+          if (response.patient) {
+            this.Sharedservice.setPatientDetails(response.patient)
+          }
+          this.Sharedservice.Messages('success', 'Login', response.message, 3000);
+          this.showUserTypeSelection = true;
+          this.onLoginSuccess(response.components);
+        } else {
+          this.Sharedservice.Messages('error', 'Login', response.message, 3000);
+        }
+      },
+      error: (error) => {
+        console.error('Login API error:', error);
+        this.Sharedservice.Messages('error', 'Login Failed', 'Something went wrong.', 3000);
+      }
+    });
   }
-onLoginSuccess(response: any) {
-  const menuItems = response.filter((item: any) => item.componentName !== 'LoginComponent');
-  this.Sharedservice.setMenuItems(menuItems);
-}
+
+  toggleLoginForm() {
+    this.showLogin = !this.showLogin;
+  }
+  onLoginSuccess(response: any) {
+    const menuItems = response.filter((item: any) => item.componentName !== 'LoginComponent');
+    this.Sharedservice.setMenuItems(menuItems);
+    this.router.navigate(['/MainLayout']);
+  }
+
   onUserTypeSelected() {
     if (this.selectedUserType) {
-  
+
       alert('Logged in as ' + this.selectedUserType);
     }
   }
@@ -101,7 +119,7 @@ onLoginSuccess(response: any) {
         next: (response) => {
           if (response.success) {
             this.Sharedservice.Messages('success', 'Registration', response.message, 3000);
-
+            this.toggleLoginForm()
           } else {
             this.Sharedservice.Messages('error', 'Registration', response.message, 3000);
           }
@@ -116,5 +134,6 @@ onLoginSuccess(response: any) {
       this.signupForm.markAllAsTouched();
     }
   }
+
 
 }
