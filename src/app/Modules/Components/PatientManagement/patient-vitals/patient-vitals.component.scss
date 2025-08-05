@@ -1,0 +1,149 @@
+.container {
+  display: flex;
+  justify-content: center;
+  padding: 32px;
+  background: linear-gradient(135deg, #e0f7fa, #e8f5e9);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.card {
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 128, 128, 0.15);
+  width: 100%;
+  max-width: 1100px;
+  border-top: 6px solid #00796b;
+}
+
+h2 {
+  text-align: center;
+  color: #00796b;
+  margin-bottom: 24px;
+  font-weight: 600;
+}
+
+.add-button-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+}
+
+.tablefix {
+  height: 20rem;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.full-width-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fafafa;
+}
+
+table th,
+table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #ddd;
+  text-align: center;
+}
+
+table th {
+  background-color: #00796b;
+  color: white;
+  font-weight: 500;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.vital-header {
+  font-size: 12px;
+  font-weight: 400;
+  color: #e0f7fa;
+}
+
+table tr:hover {
+  background-color: #f1fdfb;
+}
+
+.vital-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.plain-input {
+  width: 70px;
+  padding: 4px;
+  border: 1px solid #bbb;
+  border-radius: 4px;
+  text-align: center;
+  font-size: 13px;
+}
+
+.plain-input:focus {
+  border-color: #00796b;
+  box-shadow: 0 0 4px rgba(0, 121, 107, 0.3);
+}
+
+.btn-primary,
+.btn-secondary,
+.btn-danger {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-primary {
+  background-color: #00796b;
+  color: white;
+}
+.btn-primary:hover {
+  background-color: #00594d;
+}
+
+.btn-secondary {
+  background-color: #607d8b;
+  color: white;
+}
+.btn-secondary:hover {
+  background-color: #455a64;
+}
+
+.btn-danger {
+  background-color: #d32f2f;
+  color: white;
+}
+.btn-danger:hover {
+  background-color: #b71c1c;
+}
+
+.margin_4px {
+  margin: 4px;
+}
+
+.button_end {
+  justify-content: end;
+  display: flex;
+  margin-top: 12px;
+}
+.full-width-table thead th {
+  position: sticky;
+  top: 0;
+  background-color: #00796b;
+  color: white;
+  z-index: 3; /* Ensure it stays above rows */
+}
+
+.full-width-table thead tr:nth-child(2) th {
+  top: 34px; /* Height of first header row */
+  background-color: #00695c; /* Slightly darker for sub-header */
+  z-index: 2;
+}

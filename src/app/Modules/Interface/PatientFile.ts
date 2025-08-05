@@ -27,5 +27,19 @@ export interface MedicationRequestDto {
   patientId?: number;
   medicationList: MedicationDto[];
 }
+export interface AllergyDto {
+  PatientId?: number;
+  AllergyList: AllergyDesCls[];
+  Mode?: string;
+}
+
+export interface AllergyDesCls {
+  Id?: number;
+  PatientId?: number;
+  Description: string;
+  Deleted?: boolean;
+  LastEditedBy: string;
+}
+
 
 

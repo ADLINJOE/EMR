@@ -7,7 +7,7 @@
         <button type="button" class="btn-primary" (click)="addAllergy()">+ Add Allergy</button>
       </div>
 <div class="tablefix">
-      <table class="full-width-table" formArrayName="AllergyList">
+      <table class="full-width-table" formArrayName="allergyList">
         <thead>
           <tr>
             <th>Sl.No</th>
@@ -16,7 +16,9 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let allergy of getFormControls.controls; let i = index; trackBy: trackByIndex" [formGroupName]="i">
+              <ng-container *ngFor="let allergy of getFormControls.controls; let i = index; trackBy: trackByIndex">
+          <tr  [formGroupName]="i" [hidden]="allergy.get('isDeleted')?.value">
+        
             <td>{{ i + 1 }}</td>
             <td>
               <textarea class="textarea-input" formControlName="description" rows="3" placeholder="Enter allergy details..."></textarea>
@@ -25,8 +27,13 @@
               <button type="button" class="btn-danger" (click)="removeAllergy(i)">Remove</button>
             </td>
           </tr>
+          </ng-container>
         </tbody>
       </table>
+      </div>
+         <div class="button-group button_end">
+        <button type="button" class="btn-primary margin_4px" (click)="saveAll()">Save</button>
+        <button type="button" class="btn-secondary margin_4px" (click)="cancel()">Cancel</button>
       </div>
     </form>
   </div>

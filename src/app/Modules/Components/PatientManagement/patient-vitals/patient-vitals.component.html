@@ -1,0 +1,73 @@
+<div class="container">
+  <div class="card">
+    <h2>Patient Vitals</h2>
+
+    <form [formGroup]="form">
+      <!-- Add button -->
+      <div class="add-button-wrapper">
+        <button type="button" class="btn-primary" (click)="addVital()">+ Add Vitals</button>
+      </div>
+
+      <!-- Scrollable table -->
+      <div class="tablefix">
+        <table class="full-width-table" formArrayName="vitalList">
+        <thead>
+  <tr>
+    <th rowspan="2">Sl.No</th>
+    <th rowspan="2">Date & Time</th>
+    <th>BP</th>
+    <th>Sugar</th>
+    <th rowspan="2">Actions</th>
+  </tr>
+  <tr>
+    <th>
+      <div class="vital-header">
+        <span>Sys (90–140)</span> / <span>Dia (60–90)</span> mmHg
+      </div>
+    </th>
+    <th>
+      <div class="vital-header">
+        <span>Fasting (70–100)</span> / <span>PP (100–140)</span> mg/dL
+      </div>
+    </th>
+  </tr>
+</thead>
+
+          <tbody>
+            <ng-container *ngFor="let vital of getFormControls.controls; let i = index; trackBy: trackByIndex">
+              <tr [formGroupName]="i" [hidden]="vital.get('isDeleted')?.value">
+                <td>{{ i + 1 }}</td>
+                <td>
+                  <input class="plain-input" style="width:92%" type="datetime-local" formControlName="readingDateTime">
+                </td>
+                <td>
+                  <div class="vital-row">
+                    <input class="plain-input" type="number" formControlName="systolic">
+                    /
+                    <input class="plain-input" type="number" formControlName="diastolic">
+                  </div>
+                </td>
+                <td>
+                  <div class="vital-row">
+                    <input class="plain-input" type="number" formControlName="sugarFasting">
+                    /
+                    <input class="plain-input" type="number" formControlName="sugarPP">
+                  </div>
+                </td>
+                <td>
+                  <button type="button" class="btn-danger" (click)="removeVital(i)">Remove</button>
+                </td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Buttons -->
+      <div class="button-group button_end">
+        <button type="button" class="btn-primary margin_4px" (click)="saveAll()">Save</button>
+        <button type="button" class="btn-secondary margin_4px" (click)="cancel()">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>

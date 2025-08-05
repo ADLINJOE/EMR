@@ -8,6 +8,8 @@ import { PatientRegistrationlinkComponent } from './Modules/Components/Patient/p
 import { DrugMasterComponent } from './Modules/Components/Medicine/drug-master/drug-master.component';
 import { CurrentmedicationComponent } from './Modules/Components/PatientManagement/currentmedication/currentmedication.component';
 import { AllergyComponent } from './Modules/Components/PatientManagement/allergy/allergy.component';
+import { PatientVitalsComponent } from './Modules/Components/PatientManagement/patient-vitals/patient-vitals.component';
+import { VitalsdashboardComponent } from './Modules/Components/PatientManagement/vitalsdashboard/vitalsdashboard.component';
 
 export const routes: Routes = [
   // Default path redirects to login
@@ -29,6 +31,8 @@ export const routes: Routes = [
       { path: 'drug', component: DrugMasterComponent },
       { path: 'currentmedication', component: CurrentmedicationComponent },
       { path: 'allergy', component: AllergyComponent },
+      {path: 'vitals',component: PatientVitalsComponent},
+      {path:'vitalsdashboard',component:VitalsdashboardComponent}
     ],
   },
 

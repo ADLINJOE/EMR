@@ -1,0 +1,42 @@
+<div class="vitals-dashboard-container">
+  <mat-tab-group>
+    <!-- Summary Tab -->
+    <mat-tab label="Summary">
+      <div class="summary-grid">
+        <mat-card class="summary-card" *ngFor="let card of summaryCards">
+          <h3>{{ card.title }}</h3>
+          <p class="value">{{ card.value }}</p>
+          <p class="sub">{{ card.subtext }}</p>
+        </mat-card>
+      </div>
+
+      <div class="alerts-section" *ngIf="criticalAlerts.length > 0">
+        <h3>Critical Alerts</h3>
+        <ul>
+          <li *ngFor="let alert of criticalAlerts">
+            ⚠️ {{ alert.message }}
+          </li>
+        </ul>
+      </div>
+    </mat-tab>
+
+    <!-- Charts Tab -->
+    <mat-tab label="Charts">
+      <div class="chart-container">
+        <canvas baseChart
+          [data]="bpChartData"
+          [options]="chartOptions"
+          [type]="'line'">
+        </canvas>
+      </div>
+
+      <div class="chart-container">
+        <canvas baseChart
+          [data]="sugarChartData"
+          [options]="chartOptions"
+          [type]="'line'">
+        </canvas>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>

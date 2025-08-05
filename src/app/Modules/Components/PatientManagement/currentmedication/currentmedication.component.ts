@@ -76,6 +76,9 @@ export class CurrentmedicationComponent implements OnInit {
           const medsArray = this.getFormControls;
           medsArray.clear();
           res.result.forEach((med: any) => medsArray.push(this.createMedication(med, false)));
+          if(medsArray.controls.length == 0){
+          medsArray.push(this.createMedication())
+          }
         }
       },
       error: () => {
@@ -154,21 +157,20 @@ export class CurrentmedicationComponent implements OnInit {
       .catch(err => console.error('Save failed', err));
   }
 
-  removeMedication(index: number): void {
-    const meds = this.getFormControls;
-    const ctrl = meds.at(index);
+removeMedication(index: number) {
+  const meds = this.getFormControls;
+  const ctrl = meds.at(index) as FormGroup;
+  if (!ctrl) return;
 
-    if (!ctrl) return;
+  // Mark as deleted
+  ctrl.patchValue({
+    isDeleted: true,
+    isEdited: false
+  });
 
-    if (ctrl.value.id) {
-      ctrl.patchValue({
-        isDeleted: true,
-        isEdited: false
-      });
-    } else {
-      meds.removeAt(index);
-    }
-  }
+  
+
+}
 
   clear() {
     const meds = this.getFormControls;
