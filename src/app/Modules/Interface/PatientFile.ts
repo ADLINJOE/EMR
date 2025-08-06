@@ -41,5 +41,18 @@ export interface AllergyDesCls {
   LastEditedBy: string;
 }
 
-
-
+export interface VitalDto {
+  Mode: string;
+  PatientId: number;
+  VitalList: {
+    Id: number | null;
+    PatientId: number;
+    ReadingDateTime: Date;
+    Systolic: number;
+    Diastolic: number;
+    SugarFasting: number;
+    SugarPP: number;
+    Deleted: boolean;
+    LastEditedBy: string;
+  }[];
+}

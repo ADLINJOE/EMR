@@ -1,0 +1,36 @@
+<mat-card class="dashboard-card">
+  <mat-card-header>
+    <mat-card-title>🫀 Patient Vitals Dashboard</mat-card-title>
+    <mat-card-subtitle>{{ patientDetails()?.patientID || 'Unknown Patient' }}</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <mat-tab-group [(selectedIndex)]="selectedTab" (selectedIndexChange)="updateCharts()">
+      <mat-tab label="Blood Pressure">
+        <div class="charts-grid">
+          <div>
+            <h3>📈 BP Time Series</h3>
+            <canvas #bpTimeChart></canvas>
+          </div>
+          <div>
+            <h3>📊 BP Daily Trends</h3>
+            <canvas #bpTrendChart></canvas>
+          </div>
+        </div>
+      </mat-tab>
+
+      <mat-tab label="Blood Sugar">
+        <div class="charts-grid">
+          <div>
+            <h3>📈 Sugar Time Series</h3>
+            <canvas #sugarTimeChart></canvas>
+          </div>
+          <div>
+            <h3>📊 Sugar Daily Trends</h3>
+            <canvas #sugarTrendChart></canvas>
+          </div>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </mat-card-content>
+</mat-card>

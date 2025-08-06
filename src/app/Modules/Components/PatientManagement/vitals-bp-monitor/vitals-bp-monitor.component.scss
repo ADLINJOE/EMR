@@ -1,0 +1,36 @@
+.dashboard-card {
+  margin: 20px;
+  padding: 15px;
+  background: #f8fbff;
+  box-shadow: 0 4px 20px rgba(0, 128, 255, 0.1);
+  border-radius: 12px;
+
+  h3 {
+    font-weight: 600;
+    color: #1e3a8a;
+    margin-bottom: 10px;
+  }
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px;
+  margin-top: 20px;
+}
+
+canvas {
+  background: #fff;
+  border: 1px solid #e0e6f0;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.mat-mdc-tab-group {
+  background: transparent;
+}
+
+.mat-mdc-card-header {
+  background: #e3f2fd;
+  border-radius: 10px 10px 0 0;
+}

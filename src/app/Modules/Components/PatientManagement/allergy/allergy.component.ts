@@ -57,7 +57,13 @@ get allergyList(): FormArray {
 
 // Example: Adding a new allergy row
 addAllergy(data?: any, isNew = true) {
-  this.allergyList.push(this.createAllergy(data, isNew));
+   const meds = this.getFormControls;
+    const last = meds.at(meds.length - 1);
+    if (last?.invalid) {
+      last.markAllAsTouched();
+      return;
+    }
+    meds.push(this.createAllergy());
 }
 
   ngOnInit(): void {

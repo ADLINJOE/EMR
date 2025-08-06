@@ -10,6 +10,7 @@ import { CurrentmedicationComponent } from './Modules/Components/PatientManageme
 import { AllergyComponent } from './Modules/Components/PatientManagement/allergy/allergy.component';
 import { PatientVitalsComponent } from './Modules/Components/PatientManagement/patient-vitals/patient-vitals.component';
 import { VitalsdashboardComponent } from './Modules/Components/PatientManagement/vitalsdashboard/vitalsdashboard.component';
+import { VitalsBpMonitorComponent } from './Modules/Components/PatientManagement/vitals-bp-monitor/vitals-bp-monitor.component';
 
 export const routes: Routes = [
   // Default path redirects to login
@@ -32,7 +33,7 @@ export const routes: Routes = [
       { path: 'currentmedication', component: CurrentmedicationComponent },
       { path: 'allergy', component: AllergyComponent },
       {path: 'vitals',component: PatientVitalsComponent},
-      {path:'vitalsdashboard',component:VitalsdashboardComponent}
+      {path:'vitalsdashboard',component:VitalsBpMonitorComponent}
     ],
   },
 
