@@ -1,104 +1,131 @@
-.sidebar {
-  width: 240px;
-  background-color: #2f4050;
-  color: white;
-  height: 100vh;
-  overflow-y: auto;
-  transition: width 0.3s ease;
-  display: flex;
-  flex-direction: column;
-  scrollbar-width: thin;
-  scrollbar-color: #888 #2f4050;
+ @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
 
-  &.collapsed {
-    width: 70px;
-
-    .title,
-    .toggle-arrow {
-      display: none;
+    .sidebar {
+      position: fixed;
+      top: 60px; /* header height */
+      left: 0;
+      height: calc(100vh - 90px); /* header + footer */
+      width: 250px;
+      background: linear-gradient(135deg, #1f3b4d, #305974);
+      color: #fff;
+      box-shadow: 2px 0 12px rgba(0, 0, 0, 0.2);
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.3s ease, width 0.3s ease;
+      z-index: 1200;
+      overflow-y: auto;
     }
 
-    .submenu {
-      display: none;
+    .sidebar.collapsed {
+      width: 70px;
     }
-  }
 
-  .sidebar-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 15px;
-    font-size: 18px;
-    font-weight: bold;
-    background-color: #1c2833;
+    /* Mobile styles */
+    .sidebar.mobile {
+      top: 60px;
+      height: calc(100vh - 90px);
+      width: 250px;
+      transform: translateX(0);
+    }
+
+    .sidebar.mobile.collapsed {
+      transform: translateX(-100%);
+    }
+
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.25rem;
+      font-size: 1.3rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      background: rgba(0, 0, 0, 0.25);
+    }
+
+    .logo {
+      user-select: none;
+    }
 
     .toggle-btn {
       background: none;
       border: none;
       color: white;
-      font-size: 16px;
       cursor: pointer;
-    }
-  }
-
-  .menu-section {
-    .menu-header {
-      padding: 12px 16px;
-      cursor: pointer;
+      font-size: 2.2rem;
       display: flex;
       align-items: center;
-      transition: background 0.3s ease;
-
-      &:hover {
-        background-color: #34495e;
-      }
-
-      .icon {
-        margin-right: 10px;
-      }
-
-      .toggle-arrow {
-        margin-left: auto;
-      }
+      justify-content: center;
+      transition: transform 0.3s ease;
     }
 
-    .submenu {
-      .submenu-item {
-        padding: 10px 30px;
-        font-size: 14px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        transition: background-color 0.3s ease;
-
-        &.active,
-        &:hover {
-          background-color: #1abc9c;
-        }
-
-        .icon {
-          margin-right: 8px;
-        }
-      }
+    .toggle-btn:hover {
+      color: #1abc9c;
+      transform: rotate(90deg);
     }
-  }
 
-  /* Custom Scrollbar - WebKit Browsers */
-  &::-webkit-scrollbar {
-    width: 8px;
-  }
+    .menu-section {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      padding-top: 0.5rem;
+    }
 
-  &::-webkit-scrollbar-track {
-    background: #2f4050;
-  }
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.85rem 1.5rem;
+      font-size: 1.05rem;
+      color: #dde5eb;
+      text-decoration: none;
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.25s ease, color 0.25s ease, box-shadow 0.3s ease;
+      border-radius: 0 25px 25px 0;
+    }
 
-  &::-webkit-scrollbar-thumb {
-    background-color: #888;
-    border-radius: 4px;
-    border: 2px solid #2f4050;
-  }
+    .menu-item .icon {
+      font-size: 1.8rem;
+      color: #a1b5c9;
+      transition: color 0.25s ease;
+    }
 
-  &::-webkit-scrollbar-thumb:hover {
-    background-color: #aaa;
-  }
-}
+    .menu-item:hover {
+      background-color: #1abc9c;
+      color: white;
+      box-shadow: 0 0 10px #1abc9caa;
+    }
+
+    .menu-item:hover .icon {
+      color: white;
+    }
+
+    .menu-item.active {
+      background-color: #16a085;
+      color: white;
+      box-shadow: 0 0 15px #16a085cc;
+    }
+
+    .menu-item.active .icon {
+      color: white;
+    }
+
+    /* Hide title on collapse */
+    .sidebar.collapsed .title {
+      display: none;
+    }
+
+    .backdrop {
+      position: fixed;
+      top: 60px;
+      left: 0;
+      right: 0;
+      bottom: 30px; /* footer height */
+      background-color: rgba(0, 0, 0, 0.45);
+      z-index: 1100;
+      cursor: pointer;
+      opacity: 1;
+      transition: opacity 0.3s ease;
+    }
+    

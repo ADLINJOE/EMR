@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 900" width="1400" height="900">
+  <defs>
+    <linearGradient id="tealGrad" x1="0" x2="1">
+      <stop offset="0" stop-color="#00c6a7"/>
+      <stop offset="1" stop-color="#00897b"/>
+    </linearGradient>
+    <linearGradient id="bgGrad" x1="0" x2="1">
+      <stop offset="0" stop-color="#c9fff6" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#e6fffb" stop-opacity="0.15"/>
+    </linearGradient>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#tealGrad)"/>
+  <!-- Soft decorative blob -->
+  <path d="M0,340 C120,120 360,80 540,120 C760,170 980,90 1200,240 C1280,320 1300,520 1140,640 C980,760 640,720 420,680 C200,640 60,520 0,360 Z"
+        fill="url(#bgGrad)"/>
+  <!-- Phone + UI elements -->
+  <g transform="translate(160,120) scale(1)">
+    <rect x="220" y="60" rx="24" ry="24" width="300" height="480" fill="#08364d" />
+    <rect x="250" y="100" rx="18" ry="18" width="240" height="320" fill="#bfeff0" />
+    <circle cx="370" cy="220" r="48" fill="#ff6b6b" />
+    <path d="M330 340 C350 300 430 300 450 340" stroke="#00383a" stroke-width="10" fill="none" stroke-linecap="round"/>
+    <rect x="580" y="180" width="200" height="120" rx="10" fill="#bfeff0" />
+    <path d="M600 240 q40 -40 80 0 q40 40 80 0" stroke="#00695c" stroke-width="6" fill="none" stroke-linecap="round"/>
+  </g>
+  <!-- Patient on chair simplified -->
+  <g transform="translate(60,420) scale(0.95)">
+    <rect x="40" y="40" width="180" height="160" rx="20" fill="#cdeff0" />
+    <circle cx="120" cy="0" r="36" fill="#ffbb91" />
+    <path d="M80 60 q40 80 0 140" fill="#ff7b6b" />
+  </g>
+</svg>

@@ -1,80 +1,97 @@
-/* Outer container with hospital theme background */
-.container {
+/* login.component.scss */
+.auth-container {
   display: flex;
-  justify-content: center;
+  min-height: 100vh;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  align-items: stretch;
+}
+
+/* left image with teal gradient */
+.auth-image {
+  flex: 1;
+  display: flex;
   align-items: center;
-  height: 100vh;
-  padding: 16px;
-  background: linear-gradient(135deg, #e0f7fa, #e8f5e9); /* medical color blend */
-  font-family: 'Segoe UI', sans-serif;
+  justify-content: center;
+  background: linear-gradient(90deg, #00c6a7, #00897b);
+  padding: 40px;
+
+  img {
+    width: 92%;
+    max-width: 760px;
+    height: auto;
+    display: block;
+    border-radius: 8px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+  }
 }
 
-/* Card styling */
-.card {
-  background: #ffffff;
-  padding: 0px 24px;
-  border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(0, 128, 128, 0.1); /* subtle teal shadow */
-  width: 100%;
-  max-width: 420px;
-  box-sizing: border-box;
-  border-top: 6px solid #00796b; /* bold hospital green top line */
+/* right panel */
+.auth-panel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+  background: #f7fbfd;
+
+  .card {
+    width: 100%;
+    max-width: 480px;
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 28px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+    border-top: 6px solid rgba(0,198,167,0.12);
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+
+      .logo { height: 36px; }
+
+      .toggle-btn {
+        border-radius: 20px;
+        background: #f6f7fb;
+        padding: 6px 14px;
+      }
+    }
+
+    h2 {
+      color: #00695c;
+      font-size: 32px;
+      margin: 8px 0 20px;
+    }
+
+    mat-form-field { width: 100%; margin-bottom: 16px; }
+
+    .options {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+
+      .forgot { color: #0288d1; text-decoration: none; }
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 12px;
+      border-radius: 28px;
+      background: linear-gradient(90deg,#00c6a7,#00897b);
+      color: white;
+      font-weight: 700;
+    }
+
+    .switch { text-align: center; margin-top: 12px; }
+  }
 }
 
-/* Headings */
-.card h2 {
-  text-align: center;
-  margin-bottom: 24px;
-  color: #00796b; /* hospital green */
-}
+/* responsive */
+@media (max-width: 900px) {
+  .auth-container { flex-direction: column; }
 
-/* Material fields */
-mat-form-field {
-  width: 100%;
-  margin-bottom: 16px;
-}
-
-/* Buttons */
-button {
-  width: 100%;
-  margin-top: 8px;
-  font-weight: bold;
-}
-
-/* Link styling */
-.link,
-.card a {
-  color: #0288d1; /* hospital blue */
-  font-size: 14px;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-.card a:hover {
-  text-decoration: underline;
-}
-.mat-flat-button.mat-primary {
-  background-color: #00796b;
-  color: white;
-}
-
-.mat-flat-button.mat-primary:hover {
-  background-color: #004d40;
-}
-.error {
-  color: #d32f2f;
-  font-size: 13px;
-  margin-top: -12px;
-  margin-bottom: 12px;
-  margin-left: 4px;
-}
-.user-type-box {
-  margin-top: 24px;
-  padding: 20px;
-  background-color: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  max-width: 400px;
-  margin-left: auto;
-  margin-right: auto;
+  .auth-image { order: -1; padding: 20px; img { max-width: 340px; } }
+  .auth-panel { padding: 24px; .card { box-shadow: none; border-radius: 10px; } }
 }

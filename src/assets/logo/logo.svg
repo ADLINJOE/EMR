@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Hospital logo">
+  <rect width="64" height="64" rx="10" fill="#00796b"/>
+  <g transform="translate(8,8) scale(0.75)">
+    <path d="M24 2 v36" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+    <path d="M8 20 h32" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+  </g>
+</svg>

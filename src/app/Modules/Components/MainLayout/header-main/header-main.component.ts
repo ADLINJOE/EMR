@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { MatIconModule } from "@angular/material/icon";
 
 @Component({
@@ -8,5 +8,5 @@ import { MatIconModule } from "@angular/material/icon";
   styleUrl: './header-main.component.scss'
 })
 export class HeaderMainComponent {
-
+  @Output() toggleSidebar = new EventEmitter<void>();
 }

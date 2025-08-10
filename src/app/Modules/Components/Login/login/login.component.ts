@@ -9,11 +9,13 @@ import { MatOptionModule } from '@angular/material/core';
 import { CommonService } from '../../../../Service/common.service';
 import { SharedServiceService } from '../../../../Service/Sharedservice/shared-service.service';
 import { Router } from '@angular/router';
+import { MatCheckbox } from "@angular/material/checkbox";
+import { MatTab, MatTabsModule } from "@angular/material/tabs";
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, MatInputModule, MatFormFieldModule, MatButtonModule, MatSelectModule, MatOptionModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, MatInputModule, MatFormFieldModule, MatButtonModule, MatSelectModule, MatOptionModule, MatCheckbox, MatTab, MatTabsModule],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })

@@ -1,13 +1,23 @@
-.app-footer {
-    background-color: #00796b;
-    color: #333;
-    text-align: center;
-    padding: 2px 15px;
-    font-size: 0.85rem;
-    display: flex;
-    justify-content: space-between;
-    border-top: 1px solid #ccc;
-    display: flex;
-    justify-content: center;
-    width: 100%;
-}
+ .app-footer {
+      width: 100%;
+      background-color: #00796b;
+      color: white;
+      position: sticky;
+      bottom: 0;
+      z-index: 1100;
+      height: 30px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.15);
+    }
+
+    .footer-inner {
+      max-width: 100%;
+      width: 100%;
+      padding: 0 20px;
+      display: flex;
+      justify-content: center;
+      font-size: 0.85rem;
+      box-sizing: border-box;
+    }

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, OnInit, Output, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { SharedServiceService } from '../../../../Service/Sharedservice/shared-service.service';
@@ -11,67 +11,74 @@ import { SharedServiceService } from '../../../../Service/Sharedservice/shared-s
   styleUrl: './side-menu.component.scss',
 })
 export class SideMenuComponent implements OnInit {
+  menuItems = signal<any[]>([]);
+  isMobile = window.innerWidth <= 768;
+
+  @Input() collapsed: boolean = true;
+  @Output() collapsedChange = new EventEmitter<boolean>();
+  @Output() closeSidebar = new EventEmitter<void>();
+
+  private sharedService = inject(SharedServiceService);
   private router = inject(Router);
-  private menuService = inject(SharedServiceService);
+get showBackdrop() {
+  return this.isMobile && !this.collapsed;
+}
 
-  rawMenu = signal(this.menuService.menuItems());
-  menuSections = signal<any[]>([]);
-  isCollapsed = signal(false); // Sidebar collapse state
+ ngOnInit() {
+  const items = this.sharedService.menuItems().map(item => ({
+    title: item.componentName.replace('Component', ''),
+    icon: item.icon || 'medical_services',
+    path: item.componentPath,
+    startpage: item.startPage,
+  }));
+  this.menuItems.set(items);
 
-  ngOnInit() {
-    const grouped: Record<string, any> = {};
-    for (const item of this.rawMenu()) {
-      let startpage = item.startPage
-      const module = item.moduleType || 'General';
-      if (!grouped[module]) {
-        grouped[module] = {
-          title: module,
-          icon: '📁',
-          isOpen: false,
-          subItems: [],
-          startpage:startpage
-        };
-      }
-
-      grouped[module].subItems.push({
-        title: item.componentName.replace('Component', ''),
-        icon: '🔹',
-        path: item.componentPath,
-      });
-    }
-
-    const groupedArray = Object.values(grouped);
-    const currentPath = this.router.url.split('/').pop();
-
-    for (const section of groupedArray) {
-      if (section.subItems.some((s: any) => s.path === currentPath)) {
-        section.isOpen = true;
-        break;
-      }
-    }
-
-    this.menuSections.set(groupedArray);
-let StartForm = this.menuSections();
- let startpage =  StartForm[0].startpage
-    if (this.router.url === '/MainLayout') {
-      this.router.navigate(['MainLayout', startpage]);
+  // ✅ Select the first menu item initially if exists
+  if (items.length > 0) {
+    const firstPath = items[0].path;
+    if (!this.router.url.includes(firstPath)) {
+      this.router.navigate(['MainLayout', firstPath]);
     }
   }
+}
 
-  toggleMenu(section: any) {
-    section.isOpen = !section.isOpen;
-    this.menuSections.set([...this.menuSections()]);
+
+  toggleSidebar() {
+    this.collapsed = !this.collapsed;
+    this.collapsedChange.emit(this.collapsed);
+  }
+
+  isActiveRoute(path: string): boolean {
+    const currentPath = this.router.url.split('/').pop();
+    return currentPath === path;
   }
 
   navigateTo(path: string) {
     this.router.navigate(['MainLayout', path]);
+    if (this.isMobile) {
+      this.collapsed = true;
+      this.collapsedChange.emit(this.collapsed);
+    }
   }
 
-  toggleSidebar() {
-    this.isCollapsed.update(val => !val);
+  @HostListener('window:resize', ['$event'])
+  onResize(event: any) {
+    this.isMobile = event.target.innerWidth <= 768;
+    if (!this.isMobile) {
+      this.collapsed = false;
+      this.collapsedChange.emit(this.collapsed);
+    } else {
+      this.collapsed = true;
+      this.collapsedChange.emit(this.collapsed);
+    }
   }
 
-  isActiveRoute(path: string): boolean {
-    return this.router.url.endsWith(path);
+  // Rename this method to avoid conflict with @Output() closeSidebar
+  closeSidebarClick() {
+    if (this.isMobile) {
+      this.collapsed = true;
+      this.collapsedChange.emit(this.collapsed);
+      this.closeSidebar.emit();
+    }
   }
 }

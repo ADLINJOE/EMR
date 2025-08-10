@@ -1,27 +1,41 @@
-<div class="sidebar" [class.collapsed]="isCollapsed()">
+<div
+  class="sidebar"
+  [class.collapsed]="collapsed"
+  [class.mobile]="isMobile"
+  role="navigation"
+  aria-label="Main menu"
+>
   <div class="sidebar-header">
-    <span class="logo">🩺 WEBHIS</span>
-    <button class="toggle-btn" (click)="toggleSidebar()">
-      <i class="fas" [ngClass]="{ 'fa-angle-left': !isCollapsed(), 'fa-angle-right': isCollapsed() }"></i>
+    <span class="logo" *ngIf="!collapsed">🩺 Medico</span>
+    <button
+      class="toggle-btn"
+      (click)="toggleSidebar()"
+      aria-label="Toggle menu"
+      [attr.aria-expanded]="!collapsed"
+    >
+      <span class="material-icons">{{ collapsed ? 'menu' : 'close' }}</span>
     </button>
   </div>
 
-  <div class="menu-section" *ngFor="let section of menuSections()">
-    <div class="menu-header" (click)="toggleMenu(section)">
-      <span class="icon">{{ section.icon }}</span>
-      <span class="title" *ngIf="!isCollapsed()">{{ section.title }}</span>
-      <span class="toggle-arrow" *ngIf="!isCollapsed()">{{ section.isOpen ? '▲' : '▼' }}</span>
-    </div>
-
-    <div class="submenu" *ngIf="section.isOpen && !isCollapsed()">
-      <div
-        class="submenu-item"
-        *ngFor="let item of section.subItems"
-        [class.active]="isActiveRoute(item.path)"
-        (click)="navigateTo(item.path)">
-        <span class="icon">{{ item.icon }}</span>
-        <span class="title">{{ item.title }}</span>
-      </div>
-    </div>
-  </div>
+  <nav class="menu-section">
+    <a
+      class="menu-item"
+      *ngFor="let item of menuItems()"
+      [class.active]="isActiveRoute(item.path)"
+      (click)="navigateTo(item.path)"
+      href="javascript:void(0)"
+      role="link"
+      tabindex="0"
+    >
+      <span class="material-icons icon">{{ item.icon || 'medical_services' }}</span>
+      <span class="title" *ngIf="!collapsed">{{ item.title }}</span>
+    </a>
+  </nav>
 </div>
+
+<div
+  class="backdrop"
+  *ngIf="showBackdrop"
+  (click)="closeSidebarClick()"
+  aria-hidden="true"
+></div>

@@ -1,33 +1,21 @@
 <header class="app-header full-width">
   <div class="header-inner">
+    <!-- Mobile toggle -->
+    <button class="sidebar-toggle-btn" (click)="toggleSidebar.emit()" aria-label="Toggle sidebar">
+      <span class="material-icons">menu</span>
+    </button>
+
     <div class="logo-section">
-<svg width="200" height="60" viewBox="0 0 300 60"fill="none">
-  <!-- White background for contrast on green forms -->
-  <circle cx="30" cy="30" r="28" fill="#ffffff" stroke="#004d40" stroke-width="2"/>
-  <rect x="25" y="15" width="10" height="30" fill="#00796b" rx="1"/>
-  <rect x="15" y="25" width="30" height="10" fill="#00796b" rx="1"/>
-
-  <!-- White or light text if form is dark -->
-  <text x="70" y="38" font-family="Segoe UI, sans-serif" font-size="24" fill="#ffffff" font-weight="bold">
-    MedCare+
-  </text>
-
-  <text x="70" y="52" font-family="Segoe UI, sans-serif" font-size="12" fill="#c8e6c9">
-    Your Health, Our Priority
-  </text>
-</svg>
-
-
       <h1 class="title">MediCare Portal</h1>
     </div>
 
     <div class="user-section">
       <span class="welcome">Welcome, Admin</span>
-      <button mat-icon-button color="primary">
-        <mat-icon>account_circle</mat-icon>
+      <button aria-label="Account">
+        <span class="material-icons">account_circle</span>
       </button>
-      <button mat-icon-button color="warn" aria-label="Logout">
-        <mat-icon>logout</mat-icon>
+      <button aria-label="Logout">
+        <span class="material-icons">logout</span>
       </button>
     </div>
   </div>
