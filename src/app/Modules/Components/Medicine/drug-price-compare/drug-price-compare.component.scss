@@ -1,0 +1,14 @@
+@import '../../PatientManagement/currentmedication/currentmedication.component.scss'; // reuse same theme if needed
+
+
+
+.no-data {
+  margin-top: 20px;
+  color: #999;
+  font-style: italic;
+}
+
+.loading {
+  margin-top: 20px;
+  color: #007bff;
+}

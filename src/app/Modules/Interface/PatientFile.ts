@@ -56,3 +56,26 @@ export interface VitalDto {
     LastEditedBy: string;
   }[];
 }
+
+
+export interface DrugDto {
+  id?: number;
+  drugName?: string;
+  genericName?: string;
+  brandName?: string;
+  drugCode?: string;
+  strength?: string;
+  dosageForm?: string;
+  medicineType?: string;
+  unitPrice?: number;
+  status?: string;
+  lastEditedBy?: string;
+  isNew?: boolean;
+  isEdited?: boolean;
+  isDeleted?: boolean;
+}
+
+export interface DrugRequestDto {
+  mode: string;
+  drugList: DrugDto[];
+}

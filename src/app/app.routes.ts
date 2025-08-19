@@ -11,6 +11,7 @@ import { AllergyComponent } from './Modules/Components/PatientManagement/allergy
 import { PatientVitalsComponent } from './Modules/Components/PatientManagement/patient-vitals/patient-vitals.component';
 import { VitalsdashboardComponent } from './Modules/Components/PatientManagement/vitalsdashboard/vitalsdashboard.component';
 import { VitalsBpMonitorComponent } from './Modules/Components/PatientManagement/vitals-bp-monitor/vitals-bp-monitor.component';
+import { DrugPriceCompareComponent } from './Modules/Components/Medicine/drug-price-compare/drug-price-compare.component';
 
 export const routes: Routes = [
   // Default path redirects to login
@@ -33,7 +34,8 @@ export const routes: Routes = [
       { path: 'currentmedication', component: CurrentmedicationComponent },
       { path: 'allergy', component: AllergyComponent },
       {path: 'vitals',component: PatientVitalsComponent},
-      {path:'vitalsdashboard',component:VitalsBpMonitorComponent}
+      {path:'vitalsdashboard',component:VitalsBpMonitorComponent},
+      {path:'drugcompare',component:DrugPriceCompareComponent}
     ],
   },
 

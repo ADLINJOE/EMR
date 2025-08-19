@@ -1,17 +1,31 @@
-<div class="invite-container">
-  <h2>Invite Patient</h2>
+<div class="container">
+  <div class="card invite-card">
+    <h2>Invite Patient</h2>
 
-  <mat-form-field appearance="fill" class="full-width">
-    <mat-label>Patient Email</mat-label>
-    <input matInput [formControl]="email" placeholder="Enter email">
-    <mat-error *ngIf="email.invalid && email.touched">
-      Please enter a valid email
-    </mat-error>
-  </mat-form-field>
+    <form>
+      <!-- Patient Email -->
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Patient Email</mat-label>
+        <input matInput [formControl]="email" placeholder="Enter email" />
+        <mat-error *ngIf="email.invalid && email.touched">
+          Please enter a valid email
+        </mat-error>
+      </mat-form-field>
 
-  <button mat-raised-button color="primary" (click)="sendInvite()" [disabled]="email.invalid">
-    Send Invite
-  </button>
+      <!-- Actions -->
+      <div class="button-group">
+        <button type="button"
+          mat-raised-button
+          color="primary"
+          (click)="sendInvite()"
+          [disabled]="email.invalid"
+        >
+          Send Invite
+        </button>
+      </div>
 
-  <p class="status" *ngIf="statusMessage">{{ statusMessage }}</p>
+      <!-- Status Message -->
+      <p class="status" *ngIf="statusMessage">{{ statusMessage }}</p>
+    </form>
+  </div>
 </div>

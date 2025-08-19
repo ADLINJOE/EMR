@@ -27,6 +27,9 @@ export class PatientInviteComponent {
 
 
 const emailPayload = {
+  Sentby:'shara',
+  SentUSerId:'5',
+  SentbyRole:'Pharmacist',
   ToEmail : this.email.value,
   Subject : 'Patient Registration Invitation',
   Body : `
@@ -42,9 +45,11 @@ const emailPayload = {
 
       this.inviteService.Post("PatientHandle/PTinvite", emailPayload).subscribe(val => {
         if (val.success) {
-          this.Sharedservice.Messages('success', 'Patient Invite Successfully', val.message, 3000);
+          this.Sharedservice.Messages('success', 'Patient Invite', val.message, 3000);
           // token
 
+        }else{
+           this.Sharedservice.Messages('warning', 'Patient Invite', val.message, 3000)
         }
       });
     }

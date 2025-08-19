@@ -1,128 +1,174 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
-import * as XLSX from 'xlsx';
+import { FormArray, FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { CommonService } from '../../../../Service/common.service';
+import { SharedServiceService } from '../../../../Service/Sharedservice/shared-service.service';
 
 @Component({
   selector: 'app-drug-master',
   standalone: true,
-  imports: [
-    CommonModule, MatTableModule, MatIconModule, MatButtonModule
-  ],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './drug-master.component.html',
-  styleUrl: './drug-master.component.scss'
+  styleUrls: ['./drug-master.component.scss']
 })
-export class DrugMasterComponent {
+export class DrugMasterComponent implements OnInit {
+  private fb = inject(FormBuilder);
+  private commonService = inject(CommonService);
+  private sharedService = inject(SharedServiceService);
 
-  dataSource = new MatTableDataSource<any>([]);
-  columnsToDisplay = [
-    'drugName', 'genericName', 'brandName', 'drugCode', 'barcode',
-    'strength', 'dosageForm', 'route', 'unitPrice', 'status', 'actions'
-  ];
+  form: FormGroup;
+  today = new Date().toISOString().split('T')[0];
+  patientDetails = computed(() => this.sharedService.patientDetails());
+
+  medicineTypes = ['Tablet', 'Injection', 'Syrup', 'Capsule', 'Ointment', 'Powder'];
 
   constructor() {
-    // Initial mock data
-    this.dataSource.data = [
-      {
-        drugName: 'Paracetamol',
-        genericName: 'Acetaminophen',
-        brandName: 'Crocin',
-        drugCode: 'DRG001',
-        barcode: '8901234567890',
-        strength: '500 mg',
-        dosageForm: 'Tablet',
-        route: 'Oral',
-        unitPrice: 1.5,
-        status: 'Active'
-      },
-      {
-        drugName: 'Amoxicillin',
-        genericName: 'Amoxicillin',
-        brandName: 'Amoxil',
-        drugCode: 'DRG002',
-        barcode: '8901234567891',
-        strength: '250 mg',
-        dosageForm: 'Capsule',
-        route: 'Oral',
-        unitPrice: 2.0,
-        status: 'Active'
-      }
-    ];
+    this.form = this.fb.group({
+      drugs: this.fb.array([])
+    });
   }
 
-  // ADD new drug (for now, mock form)
-  openDrugForm() {
-    const newDrug = {
-      drugName: 'New Drug',
-      genericName: 'Generic',
-      brandName: 'Brand',
-      drugCode: 'DRG' + (this.dataSource.data.length + 1).toString().padStart(3, '0'),
-      barcode: '89012345678' + (10 + this.dataSource.data.length),
-      strength: '100 mg',
-      dosageForm: 'Tablet',
-      route: 'Oral',
-      unitPrice: 1.0,
-      status: 'Active'
-    };
-    this.dataSource.data = [...this.dataSource.data, newDrug];
+  ngOnInit(): void {
+    this.loadDrugsFromAPI();
   }
 
-  editDrug(row: any) {
-    // Replace with dialog/form in real case
-    row.drugName = prompt('Edit Drug Name', row.drugName) || row.drugName;
-    this.refreshTable();
+  get getFormControls(): FormArray {
+    return this.form.get('drugs') as FormArray;
   }
 
-  deleteDrug(row: any) {
-    if (confirm(`Delete ${row.drugName}?`)) {
-      this.dataSource.data = this.dataSource.data.filter(d => d !== row);
+  createDrug(data?: any, isNew = true): FormGroup {
+  const group = this.fb.group({
+    id: [data?.id ?? null],
+drugName: [data?.drugName ?? '', Validators.required],
+genericName: [data?.genericName ?? ''],
+brandName: [data?.brandName ?? ''],
+drugCode: [data?.drugCode ?? ''],
+strength: [data?.strength ?? ''],
+dosageForm: [data?.dosageForm ?? ''],
+medicineType: [data?.medicineType ?? '', Validators.required],
+unitPrice: [data?.unitPrice ?? null],
+status: [data?.status ?? 'Active'],
+lastEditedBy: [data?.lastEditedBy ?? ''],
+isNew: [isNew],
+isEdited: [data?.isEdited ?? false],
+isDeleted: [data?.isDeleted ?? false]
+
+  });
+
+  group.valueChanges.subscribe(() => {
+    if (!group.get('IsNew')?.value && !group.get('isEdited')?.value) {
+      group.get('isEdited')?.setValue(true, { emitEvent: false });
     }
+  });
+
+  return group;
+}
+
+
+  loadDrugsFromAPI() {
+  const drugsArray = this.getFormControls;
+  drugsArray.clear();
+
+  const payload = { Mode: 'GET' };
+
+  this.commonService.Post('Drug/DrugMaster', payload).subscribe({
+    next: (res: any) => {
+      if (res?.success && Array.isArray(res.result)) {
+        res.result.forEach((drug: any) => 
+          drugsArray.push(this.createDrug(drug, false))
+        );
+      }
+
+      if (drugsArray.length === 0) {
+        drugsArray.push(this.createDrug());
+      }
+    },
+    error: () => {
+      drugsArray.clear();
+      drugsArray.push(this.createDrug());
+    }
+  });
+}
+
+
+  addDrug(): void {
+    const drugs = this.getFormControls;
+    const last = drugs.at(drugs.length - 1);
+    if (last?.invalid) {
+      last.markAllAsTouched();
+      return;
+    }
+    drugs.push(this.createDrug());
   }
 
-  // Excel Template Download
-  downloadTemplate() {
-    const headers = [
-      'Drug Name', 'Generic Name', 'Brand Name', 'Drug Code', 'Barcode',
-      'Strength', 'Dosage Form', 'Route of Administration', 'Indications',
-      'Contraindications', 'Side Effects', 'Manufacturer', 'Supplier',
-      'Country of Origin', 'Unit Price', 'Reorder Level', 'Expiry Alert (Months)',
-      'Is Narcotic', 'Is Antibiotic', 'Is OTC', 'Schedule Type', 'Remarks', 'Status'
-    ];
-
-    const ws: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet([headers]);
-    const wb: XLSX.WorkBook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Template');
-    XLSX.writeFile(wb, 'DrugMasterTemplate.xlsx');
+  removeDrug(index: number): void {
+    const ctrl = this.getFormControls.at(index) as FormGroup;
+    if (!ctrl) return;
+    ctrl.patchValue({
+      isDeleted: true,
+      isEdited: false
+    });
   }
 
-  // Download current table data as Excel
-  downloadExcel() {
-    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(this.dataSource.data);
-    const wb: XLSX.WorkBook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'DrugMaster');
-    XLSX.writeFile(wb, 'DrugMasterData.xlsx');
+  saveAll(): void {
+    const drugsArray = this.getFormControls;
+
+    let hasInvalid = false;
+    drugsArray.controls.forEach(ctrl => {
+      if (ctrl.invalid && !ctrl.get('isDeleted')?.value) {
+        hasInvalid = true;
+        ctrl.markAllAsTouched();
+      }
+    });
+
+    if (hasInvalid) {
+      this.sharedService.Messages('error', 'Drug Master', 'Fill Mandatory Fields', 3000);
+      return;
+    }
+
+    const rows = drugsArray.controls.map(ctrl => ctrl.value);
+
+    const toSave = rows.filter(d => (d.isNew || d.isEdited) && !d.isDeleted);
+    const toDelete = rows.filter(d => d.isDeleted && d.id);
+
+    const allRequests = [];
+
+    if (toSave.length > 0) {
+      const savePayload = {
+        mode: 'SAVE',
+        DrugList: toSave
+      };
+      allRequests.push(this.commonService.Post('Drug/DrugMaster', savePayload).toPromise());
+    }
+
+    if (toDelete.length > 0) {
+      const deletePayload = {
+        mode: 'DELETE',
+        DrugList: toDelete
+      };
+      allRequests.push(this.commonService.Post('Drug/DrugMaster', deletePayload).toPromise());
+    }
+
+    Promise.all(allRequests)
+      .then(() => this.loadDrugsFromAPI())
+      .catch(err => console.error('Save failed', err));
   }
 
-  // Upload Excel
-  uploadExcel(event: any) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const reader: FileReader = new FileReader();
-    reader.onload = (e: any) => {
-      const bstr: string = e.target.result;
-      const wb: XLSX.WorkBook = XLSX.read(bstr, { type: 'binary' });
-      const wsname: string = wb.SheetNames[0];
-      const ws: XLSX.WorkSheet = wb.Sheets[wsname];
-      const data = XLSX.utils.sheet_to_json(ws, { defval: '' });
-      this.dataSource.data = data as any[];
-    };
-    reader.readAsBinaryString(file);
+  cancel(): void {
+    this.loadDrugsFromAPI();
   }
 
-  refreshTable() {
-    this.dataSource.data = [...this.dataSource.data];
+  clear(): void {
+    const drugs = this.getFormControls;
+    drugs.clear();
+    drugs.push(this.createDrug());
+  }
+
+  get visibleDrugs() {
+    return this.getFormControls.controls.filter(ctrl => !ctrl.value.isDeleted);
+  }
+
+  trackByIndex(index: number): number {
+    return index;
   }
 }

@@ -1,0 +1,62 @@
+<div class="container">
+  <div class="card">
+    <h2>Medicine Price Comparison</h2>
+
+    <form [formGroup]="form">
+      <!-- Search box and button -->
+      <div class="add-button-wrapper">
+        <input
+          class="plain-input"
+          formControlName="search"
+          placeholder="Search medicine name..."
+        />
+        <button type="button" class="btn-primary" (click)="searchMedicine()">
+          Search
+        </button>
+      </div>
+
+      <!-- Results Table -->
+      <div class="tablefix" *ngIf="results.length > 0">
+        <table class="full-width-table">
+          <thead>
+            <tr>
+              <th>Sl.No</th>
+              <th>Brand Name</th>
+              <th>Generic Name</th>
+              <th>Strength</th>
+              <th>Dosage Form</th>
+              <th>Unit Price</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let med of results; let i = index">
+              <td>{{ i + 1 }}</td>
+              <td>{{ med.brandName }}</td>
+              <td>{{ med.genericName }}</td>
+              <td>{{ med.strength }}</td>
+              <td>{{ med.dosageForm }}</td>
+              <td>{{ med.unitPrice | currency:'USD' }}</td>
+              <td>{{ med.status }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Messages -->
+      <div *ngIf="!loading && results.length === 0" class="no-data">
+        No matching records found.
+      </div>
+      <div *ngIf="loading" class="loading">
+        Loading...
+      </div>
+
+      <!-- Button Group -->
+      <div class="button-group button_end">
+        <button type="button" class="btn-secondary margin_4px" (click)="cancel()">
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
