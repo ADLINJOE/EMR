@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { computed, Injectable, signal } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { PatientDetails } from '../../Modules/Interface/PatientFile';
 
@@ -13,13 +13,19 @@ export class SharedServiceService {
 
 
   private _menuItems = signal<any[]>([]);
+  private _patientDetails = signal<PatientDetails | null>(null);
+  private  _userInfo = signal<any | null>(null);
   readonly menuItems = this._menuItems.asReadonly();
+
+
 
   setMenuItems(items: any[]) {
     this._menuItems.set(items);
   }
-  private _patientDetails = signal<PatientDetails | null>(null);
-
+  SetUserInfo(data:any){
+  if (data) this._userInfo.set(data);
+  }
+userInfo =  this._userInfo.asReadonly();
   // Readonly version for components
   patientDetails = this._patientDetails.asReadonly();
 

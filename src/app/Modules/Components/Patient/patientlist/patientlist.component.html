@@ -1,3 +1,29 @@
 
 <app-patient-invite></app-patient-invite>
-<p>patientlist works!</p>
+<div class="container">
+  <div class="card invite-card">
+    <h2>My Patients</h2>
+
+  <table class="full-width-table">
+    <thead>
+      <tr>
+        <th>Sl.No</th>
+        <th>Patient Name</th>
+        <th>Gender</th>
+        <th>Age</th>
+        <th>Invite Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let p of patients index as ID" >
+        <td>{{ID + 1}}</td>
+        <td>{{ p.name }}</td>
+        <td>{{ p.gender }}</td>
+        <td>{{ p.age }}</td>
+        <td>{{ p.sendInvite == true ? 'Invited' : 'Send Invite' }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+</div>
+

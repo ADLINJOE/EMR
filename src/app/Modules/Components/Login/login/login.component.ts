@@ -89,6 +89,7 @@ export class LoginComponent {
           this.Sharedservice.Messages('success', 'Login', response.message, 3000);
           this.showUserTypeSelection = true;
           this.onLoginSuccess(response.components);
+          this.UserinfosetGlobal(response.userInfo)
         } else {
           this.Sharedservice.Messages('error', 'Login', response.message, 3000);
         }
@@ -108,7 +109,9 @@ export class LoginComponent {
     this.Sharedservice.setMenuItems(menuItems);
     this.router.navigate(['/MainLayout']);
   }
-
+UserinfosetGlobal(data:any){
+ this.Sharedservice.SetUserInfo(data)
+}
   onUserTypeSelected() {
     if (this.selectedUserType) {
 
