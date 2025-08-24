@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, computed, EventEmitter, Input, Output } from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonService } from '../../../../Service/common.service';
 import { MatInputModule } from '@angular/material/input';
@@ -19,17 +19,28 @@ export class PatientInviteComponent {
    URL = "https://localhost:44308/"
   email = new FormControl('', [Validators.required, Validators.email]);
   statusMessage = '';
-
+    UserSetGlobal: any;
+ @Input() Email: any[] = []; 
+   @Output() inviteCompleted = new EventEmitter<any>();
   constructor(private inviteService: CommonService, private Sharedservice: SharedServiceService) { }
+    userinfo = computed(() => this.Sharedservice.userInfo());
   sendInvite() {
-    if (this.email.valid) {
+     if (this.Email) {
+    // If Email is an array, take the first element, otherwise just use it directly
+    const emailValue = Array.isArray(this.Email) ? this.Email[0] : this.Email;
+
+    // Set value into FormControl
+    this.email.setValue(emailValue);
+  }
+    if (this.email.valid ) {
    const registrationLink = `http://localhost:4200/register?email=${encodeURIComponent(this.email.value ?? '')}`;
 
-
+    this.UserSetGlobal = this.userinfo();
 const emailPayload = {
-  Sentby:'shara',
-  SentUSerId:'5',
-  SentbyRole:'Pharmacist',
+
+  Sentby:this.UserSetGlobal.name,
+  SentUSerId: this.UserSetGlobal?.userID?.toString() ?? '',
+  SentbyRole:this.UserSetGlobal.userType,
   ToEmail : this.email.value,
   Subject : 'Patient Registration Invitation',
   Body : `
@@ -46,12 +57,14 @@ const emailPayload = {
       this.inviteService.Post("PatientHandle/PTinvite", emailPayload).subscribe(val => {
         if (val.success) {
           this.Sharedservice.Messages('success', 'Patient Invite', val.message, 3000);
-          // token
+           this.inviteCompleted.emit(true);
 
         }else{
-           this.Sharedservice.Messages('warning', 'Patient Invite', val.message, 3000)
+           this.Sharedservice.Messages('warning', 'Patient Invite', val.message, 3000);
         }
       });
+    }else {
+       this.Sharedservice.Messages('warning', 'Patient Invite', 'Not a Valid Mail Address', 3000)
     }
   }
 }

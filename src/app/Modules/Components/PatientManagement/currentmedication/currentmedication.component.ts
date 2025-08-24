@@ -20,6 +20,7 @@ export class CurrentmedicationComponent implements OnInit {
 
   form: FormGroup;
   patientDetails = computed(() => this.sharedService.patientDetails());
+   patientglobal =  computed(() => this.sharedService.patient());
   today: any;
 
   constructor() {
@@ -62,12 +63,13 @@ export class CurrentmedicationComponent implements OnInit {
   loadMedicationsFromAPI() {
     const meds = this.getFormControls;
     meds.clear();
-    const details = this.patientDetails();
-    if (!details) return;
+    var details = this.patientDetails();
+  var ptDetails  = this.patientglobal()
+  
 
     const payload = {
       mode: 'GET',
-      patientId: details.patientID
+      patientId:  details?.patientID ?? ptDetails.patientId
     };
 
     this.commonService.Post("CurrentMedication/currentmedication/", payload).subscribe({
@@ -104,8 +106,9 @@ export class CurrentmedicationComponent implements OnInit {
 
   saveAll(): void {
     const medsArray = this.getFormControls;
-    const details = this.patientDetails();
-    if (!details?.patientID) return console.error('Patient ID missing.');
+    var details = this.patientDetails();
+     var ptDetails  = this.patientglobal()
+ 
 
     let hasInvalid = false;
 
@@ -131,10 +134,10 @@ export class CurrentmedicationComponent implements OnInit {
     if (toSave.length > 0) {
       const savePayload: MedicationRequestDto = {
         mode: 'SAVE',
-        patientId: details.patientID,
+        patientId: details?.patientID ?? ptDetails.patientId,
         medicationList: toSave.map(med => ({
           ...med,
-          lastEditedBy: details.email
+          lastEditedBy: details?.email ?? ptDetails.email
         }))
       };
       allRequests.push(this.commonService.Post("CurrentMedication/currentmedication/", savePayload).toPromise());
@@ -143,17 +146,18 @@ export class CurrentmedicationComponent implements OnInit {
     if (toDelete.length > 0) {
       const deletePayload: MedicationRequestDto = {
         mode: 'DELETE',
-        patientId: details.patientID,
+        patientId: details!.patientID,
         medicationList: toDelete.map(med => ({
           ...med,
-          lastEditedBy: details.email
+          lastEditedBy: details!.email
         }))
       };
       allRequests.push(this.commonService.Post("CurrentMedication/currentmedication/", deletePayload).toPromise());
     }
 
     Promise.all(allRequests)
-      .then(() => this.loadMedicationsFromAPI())
+      .then(() => {  this.sharedService.Messages('success', 'Current Medication', 'Saved Successfully', 3000);
+        this.loadMedicationsFromAPI()})
       .catch(err => console.error('Save failed', err));
   }
 

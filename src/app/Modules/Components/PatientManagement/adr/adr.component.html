@@ -1,0 +1,112 @@
+<!-- <div class="container">
+  <div class="card">
+    <h2>Adverse Drug Reaction (ADR) Records</h2>
+
+    <form [formGroup]="adrForm" (ngSubmit)="submit()" class="margin_4px">
+      <input class="plain-input margin_4px" formControlName="patientName" placeholder="Patient Name">
+      <input class="plain-input margin_4px" formControlName="drugName" placeholder="Drug Name">
+      <input class="plain-input margin_4px" formControlName="reaction" placeholder="Reaction">
+      <input class="plain-input margin_4px" formControlName="severity" placeholder="Severity">
+
+      <label class="center-checkbox margin_4px">
+        <input type="checkbox" formControlName="isSerious"> Serious?
+      </label>
+
+      <button type="submit" class="btn-primary margin_4px">
+        {{ isEditing ? 'Update' : 'Add' }} ADR
+      </button>
+      <button type="button" class="btn-secondary margin_4px" (click)="resetForm()">Reset</button>
+    </form>
+
+    <div class="tablefix">
+      <table class="full-width-table">
+        <thead>
+          <tr>
+            <th>Patient</th>
+            <th>Drug</th>
+            <th>Reaction</th>
+            <th>Severity</th>
+            <th>Serious</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let adr of adrs">
+            <td>{{ adr.patientName }}</td>
+            <td>{{ adr.drugName }}</td>
+            <td>{{ adr.reaction }}</td>
+            <td>{{ adr.severity }}</td>
+            <td>{{ adr.isSerious ? 'Yes' : 'No' }}</td>
+            <td>
+              <button class="btn-primary margin_4px" (click)="edit(adr)">Edit</button>
+              <button class="btn-danger margin_4px" (click)="delete(adr.id)">Delete</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div> -->
+<mat-card class="p-4">
+      <h2 class="text-xl font-bold mb-4">Adverse Drug Reaction Cases</h2>
+      <form (ngSubmit)="submitADR()">
+  <h3>ADR Report Form</h3>
+
+  <label for="reaction">Reaction:</label>
+  <input id="reaction" [(ngModel)]="adrPayload.reaction[0].reactionmeddrapt" name="reaction" required />
+
+  <label for="drug">Drug:</label>
+  <input id="drug" [(ngModel)]="adrPayload.drug[0].openfda.brand_name[0]" name="drug" required />
+
+  <button type="submit">Submit ADR</button>
+</form>
+
+      <table mat-table [dataSource]="reports" class="mat-elevation-z8 w-full">
+        
+        <!-- Patient Info -->
+        <ng-container matColumnDef="patient">
+          <th mat-header-cell *matHeaderCellDef> Patient Info </th>
+          <td mat-cell *matCellDef="let report">
+            Age: {{report.patient?.patientonsetage || 'N/A'}}, 
+            Gender: {{mapSex(report.patient?.patientsex)}}, 
+            Weight: {{report.patient?.patientweight || 'N/A'}}
+          </td>
+        </ng-container>
+
+        <!-- Drugs -->
+        <ng-container matColumnDef="drugs">
+          <th mat-header-cell *matHeaderCellDef> Drugs </th>
+          <td mat-cell *matCellDef="let report">
+            <ul>
+              <li *ngFor="let d of report.patientdrug">
+                {{d.medicinalproduct}} ({{d.drugadministrationroute || 'N/A'}})
+              </li>
+            </ul>
+          </td>
+        </ng-container>
+
+        <!-- Reactions -->
+        <ng-container matColumnDef="reactions">
+          <th mat-header-cell *matHeaderCellDef> Reactions </th>
+          <td mat-cell *matCellDef="let report">
+            <ul>
+              <li *ngFor="let r of report.patientreaction">
+                {{r.reactionmeddrapt}}
+              </li>
+            </ul>
+          </td>
+        </ng-container>
+
+        <!-- Outcome -->
+        <ng-container matColumnDef="outcome">
+          <th mat-header-cell *matHeaderCellDef> Outcome </th>
+          <td mat-cell *matCellDef="let report">
+            {{report.seriousnessdeath ? 'Death' : report.serious ? 'Serious' : 'Non-serious'}}
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="columns"></tr>
+        <tr mat-row *matRowDef="let row; columns: columns;"></tr>
+      </table>
+      <button type="button" class="btn-primary" (click)="submitADR()"></button>
+    </mat-card>

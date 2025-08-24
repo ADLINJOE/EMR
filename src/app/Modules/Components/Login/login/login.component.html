@@ -60,7 +60,10 @@
             <mat-label>Email</mat-label>
             <input matInput formControlName="Email" autocomplete="email" />
           </mat-form-field>
-
+        <mat-form-field appearance="outline">
+            <mat-label>Mobile</mat-label>
+            <input matInput formControlName="Mobile" autocomplete="mobile" />
+          </mat-form-field>
           <mat-form-field appearance="outline">
             <mat-label>Password</mat-label>
             <input matInput type="password" formControlName="Password" autocomplete="new-password" />
@@ -71,7 +74,7 @@
             <input matInput type="password" formControlName="ConfirmPassword" autocomplete="new-password" />
           </mat-form-field>
 
-          <!-- <button mat-flat-button color="primary" class="submit-btn" type="submit">Register</button> -->
+          <button mat-flat-button color="primary" class="submit-btn" type="submit">Register</button>
         </form>
         <p class="switch">Already have an account? <a (click)="toggleLoginForm()">Login</a></p>
       </ng-template>

@@ -21,6 +21,7 @@ export class AllergyComponent implements OnInit {
   private commonService = inject(CommonService);
     private sharedService = inject(SharedServiceService);
   patientDetails = computed(() => this.sharedService.patientDetails());
+    patientglobal =  computed(() => this.sharedService.patient());
     form: FormGroup;
    constructor() {
     this.form = this.fb.group({
@@ -77,11 +78,11 @@ addAllergy(data?: any, isNew = true) {
     const meds = this.getFormControls;
     meds.clear();
     const details = this.patientDetails();
-    if (!details) return;
+      var ptDetails  = this.patientglobal()
 
     const payload = {
       mode: 'GET',
-      patientId: details.patientID
+      patientId: details?.patientID ?? ptDetails.patientId
     };
 
     this.commonService.Post("CurrentMedication/Allergy/", payload).subscribe({
@@ -107,7 +108,8 @@ addAllergy(data?: any, isNew = true) {
   saveAll(): void {
     const medsArray = this.getFormControls;
     const details = this.patientDetails();
-    if (!details?.patientID) return console.error('Patient ID missing.');
+      var ptDetails  = this.patientglobal()
+
 
     let hasInvalid = false;
 
@@ -133,13 +135,13 @@ addAllergy(data?: any, isNew = true) {
     if (toSave.length > 0) {
  const savePayload: AllergyDto = {
   Mode: 'SAVE',
-  PatientId: details.patientID,
+  PatientId: details?.patientID ?? ptDetails.patientId,
   AllergyList: toSave.map(med => ({
     Id: med.id,
-    PatientId: details.patientID, // <-- capital P, capital I
+    PatientId: details?.patientID ?? ptDetails.patientId,
     Description: med.description,
     Deleted: med.deleted,
-    LastEditedBy: details.email
+    LastEditedBy: details?.email ?? ptDetails.email
   }))
 };
 
@@ -152,20 +154,20 @@ addAllergy(data?: any, isNew = true) {
     if (toDelete.length > 0) {
       const deletePayload: AllergyDto = {
         Mode: 'DELETE',
-        PatientId: details.patientID,
+        PatientId: details?.patientID ?? ptDetails.patientId,
          AllergyList: toDelete.map(med => ({
     Id: med.id,
-    PatientId: details.patientID, // <-- capital P, capital I
+    PatientId: details?.patientID ?? ptDetails.patientId,
     Description: med.description,
     Deleted: med.deleted,
-    LastEditedBy: details.email
+    LastEditedBy: details?.email ?? ptDetails.email
   }))
       };
       allRequests.push(this.commonService.Post("CurrentMedication/Allergy/", deletePayload).toPromise());
     }
 
     Promise.all(allRequests)
-      .then(() => this.loadMedicationsFromAPI())
+      .then(() => {  this.sharedService.Messages('success', 'Current Medication', 'Saved Successfully', 3000);this.loadMedicationsFromAPI()})
       .catch(err => console.error('Save failed', err));
   }
 cancel(){

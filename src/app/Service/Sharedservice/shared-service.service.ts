@@ -18,7 +18,15 @@ export class SharedServiceService {
   readonly menuItems = this._menuItems.asReadonly();
 
 
+patient = signal<any>(null);
 
+  setPatient(data: any) {
+    this.patient.set(data);
+  }
+
+  getPatient() {
+    return this.patient();
+  }
   setMenuItems(items: any[]) {
     this._menuItems.set(items);
   }

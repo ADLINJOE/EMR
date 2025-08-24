@@ -1,0 +1,29 @@
+<h2 mat-dialog-title>Add Patient</h2>
+<div mat-dialog-content>
+  <form #patientForm="ngForm">
+    <div class="form-group">
+      <label>Patient Name</label>
+      <input type="text" [(ngModel)]="patient.name" name="name" class="plain-input" required>
+    </div>
+    <div class="form-group">
+      <label>Gender</label>
+      <select [(ngModel)]="patient.gender" name="gender" class="plain-input" required>
+        <option value="">-- Select --</option>
+        <option>Male</option>
+        <option>Female</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Age</label>
+      <input type="number" [(ngModel)]="patient.age" name="age" class="plain-input" required>
+    </div>
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" [(ngModel)]="patient.email" name="email" class="plain-input" required>
+    </div>
+  </form>
+</div>
+<div mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button mat-button color="primary" [mat-dialog-close]="patient" [disabled]="!patientForm.valid">Save</button>
+</div>

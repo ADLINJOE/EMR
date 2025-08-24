@@ -15,7 +15,7 @@ import { MatTab, MatTabsModule } from "@angular/material/tabs";
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, MatInputModule, MatFormFieldModule, MatButtonModule, MatSelectModule, MatOptionModule, MatCheckbox, MatTab, MatTabsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, MatInputModule, MatFormFieldModule, MatButtonModule, MatSelectModule, MatOptionModule, MatCheckbox, MatTabsModule],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
@@ -36,7 +36,7 @@ export class LoginComponent {
     this.signupForm = this.fb.group(
       {
         Name: ['', Validators.required],
-        Mobile: ['', [Validators.required, Validators.pattern('[0-9]{10}')]],
+         Mobile: ['', [Validators.required, Validators.pattern('[0-9]{10}')]],
         Email: ['', [Validators.required, Validators.email]],
         Password: ['', Validators.required],
         ConfirmPassword: ['', Validators.required]

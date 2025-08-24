@@ -1,29 +1,56 @@
 
-<app-patient-invite></app-patient-invite>
+<app-patient-invite  [Email]="patientsinvite"  (inviteCompleted)="onInviteCompleted($event)" [hidden]="true" ></app-patient-invite>
+<!-- <app-adr></app-adr> -->
 <div class="container">
   <div class="card invite-card">
     <h2>My Patients</h2>
-
-  <table class="full-width-table">
+ <div class="add-button-wrapper">
+  <div class="search-container">
+    <i class="bi bi-search search-icon"></i>
+    <input 
+      type="text" 
+      style="width: 55%"
+      class="form-control search-box" 
+      placeholder="Search patients..." 
+      [(ngModel)]="searchText"
+    />
+  </div>
+  <button class="btn btn-primary add-btn" (click)="openAddPatientDialog()">
+    + Add Patient
+  </button>
+</div>
+<div class="table-scroll-wrapper">
+  <table class="full-width-table ">
     <thead>
       <tr>
         <th>Sl.No</th>
         <th>Patient Name</th>
         <th>Gender</th>
         <th>Age</th>
+        <th>Email</th>
         <th>Invite Status</th>
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let p of patients index as ID" >
+      <tr *ngFor="let p of patients | patientFilter:searchText; index as ID"   (click)="openPatientDetails(p)">
         <td>{{ID + 1}}</td>
         <td>{{ p.name }}</td>
         <td>{{ p.gender }}</td>
         <td>{{ p.age }}</td>
-        <td>{{ p.sendInvite == true ? 'Invited' : 'Send Invite' }}</td>
+        <td>{{p.email}}</td>
+     <td>
+  <ng-container *ngIf="p.sendInvite; else inviteBtn">
+    Invited
+  </ng-container>
+  <ng-template #inviteBtn>
+    <button style="cursor: pointer;" class="btn btn-primary" (click)="sendInvite(p.email); $event.stopPropagation()">Send Invite</button>
+  </ng-template>
+</td>
+
       </tr>
     </tbody>
   </table>
+  </div>
 </div>
-</div>
+
 

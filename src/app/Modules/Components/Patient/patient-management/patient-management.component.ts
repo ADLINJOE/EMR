@@ -1,44 +1,24 @@
-import { Component } from '@angular/core';
+import { Component, computed, effect } from '@angular/core';
+import { SharedServiceService } from '../../../../Service/Sharedservice/shared-service.service';
+import { CurrentmedicationComponent } from "../../PatientManagement/currentmedication/currentmedication.component";
+import { AllergyComponent } from "../../PatientManagement/allergy/allergy.component";
 
 @Component({
   selector: 'app-patient-management',
-  imports: [],
+  imports: [CurrentmedicationComponent, AllergyComponent],
   templateUrl: './patient-management.component.html',
   styleUrl: './patient-management.component.scss'
 })
 export class PatientManagementComponent {
- selectedTab = 0;
 
-  medicationSearch = '';
-  statusFilter = '';
-  medicationStatuses = ['Active', 'Discontinued', 'Completed'];
 
-  allergySearch = '';
-  severityFilter = '';
-  allergySeverities = ['Mild', 'Moderate', 'Severe'];
+  constructor(private patientDataService: SharedServiceService) {}
+ 
+   patient =  computed(() => this.patientDataService.patient());
+  ngOnInit() {
+    let data = this.patient();
+ 
 
-  medications: Medication[] = [/* ...same data as before... */];
-  allergies: Allergy[] = [/* ...same data as before... */];
-
-  filteredMedications = [...this.medications];
-  filteredAllergies = [...this.allergies];
-
-  medicationColumns = ['name', 'frequency', 'prescribedBy', 'startDate', 'status', 'actions'];
-  allergyColumns = ['allergen', 'severity', 'reaction', 'diagnosedDate', 'diagnosedBy', 'actions'];
-
-  filterMedications() {
-    this.filteredMedications = this.medications.filter(m =>
-      (!this.statusFilter || m.status === this.statusFilter) &&
-      (m.name.toLowerCase().includes(this.medicationSearch.toLowerCase()) ||
-       m.prescribedBy.toLowerCase().includes(this.medicationSearch.toLowerCase()))
-    );
-  }
-
-  filterAllergies() {
-    this.filteredAllergies = this.allergies.filter(a =>
-      (!this.severityFilter || a.severity === this.severityFilter) &&
-      (a.allergen.toLowerCase().includes(this.allergySearch.toLowerCase()) ||
-       a.reaction.toLowerCase().includes(this.allergySearch.toLowerCase()))
-    );
+   
   }
 }

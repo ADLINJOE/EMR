@@ -2,6 +2,7 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Chart, ChartConfiguration ,registerables} from 'chart.js';
 import { MatTab, MatTabsModule } from "@angular/material/tabs";
 import { MatCardModule } from '@angular/material/card';
+import { CommonModule } from '@angular/common';
 
 Chart.register(...registerables); // Required for Chart.js v4+
 
@@ -14,7 +15,7 @@ interface VitalReading {
 }
 @Component({
   selector: 'app-vitalsdashboard',
-  imports: [MatTabsModule, MatCardModule],
+  imports: [MatTabsModule, MatCardModule,CommonModule],
     template: `
     <div class="dashboard-container">
       <h2>Vitals Dashboard</h2>
