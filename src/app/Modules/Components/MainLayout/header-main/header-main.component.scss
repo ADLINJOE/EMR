@@ -74,3 +74,20 @@
       font-size: 28px;
       vertical-align: middle;
     }
+
+    .logo-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  .company-logo {
+    height: 180px;   // adjust as per your header height
+    width: auto;
+  }
+
+  .title {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 0;
+  }
+}

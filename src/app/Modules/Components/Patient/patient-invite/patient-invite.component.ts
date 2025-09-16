@@ -1,6 +1,6 @@
 import { Component, computed, EventEmitter, Input, Output } from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { CommonService } from '../../../../Service/common.service';
+import { CommonService, DeployUrl } from '../../../../Service/common.service';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
@@ -16,7 +16,7 @@ import { SharedServiceService } from '../../../../Service/Sharedservice/shared-s
   styleUrl: './patient-invite.component.scss'
 })
 export class PatientInviteComponent {
-   URL = "https://localhost:44308/"
+  
   email = new FormControl('', [Validators.required, Validators.email]);
   statusMessage = '';
     UserSetGlobal: any;
@@ -33,7 +33,7 @@ export class PatientInviteComponent {
     this.email.setValue(emailValue);
   }
     if (this.email.valid ) {
-   const registrationLink = `http://localhost:4200/register?email=${encodeURIComponent(this.email.value ?? '')}`;
+   const registrationLink = `${DeployUrl.Front}register?email=${encodeURIComponent(this.email.value ?? '')}`;
 
     this.UserSetGlobal = this.userinfo();
 const emailPayload = {
@@ -45,12 +45,12 @@ const emailPayload = {
   Subject : 'Patient Registration Invitation',
   Body : `
     <p>Dear Patient,</p>
-    <p>Welcome to the [Pharmacy Name] family!</p>
+    <p>Welcome to the RxSmart family!</p>
     <p>You're just one step away from completing your registration.</p>
     <p>Please click the link below to get started:</p>
     <p><a href="${registrationLink}" target="_blank">Complete Your Registration</a></p>
-    <p>If you have any questions, feel free to reach out to us at [Pharmacy Email].</p>
-    <p>Best regards,<br/>The [Pharmacy Name] Team</p>
+    <p>If you have any questions, feel free to reach out to us at rxsmart789@gmail.com.</p>
+    <p>Best regards,<br/>The RxSmart Team</p>
   `
 };
 

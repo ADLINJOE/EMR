@@ -1,217 +1,318 @@
+import { Component, computed, inject, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule, FormsModule, FormControl } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { CommonService } from '../../../../Service/common.service';
-import { MatTableModule } from '@angular/material/table';
-import { MatCardModule } from '@angular/material/card';
-import { HttpClient } from '@angular/common/http';
-import { ADRPayload } from '../../../Interface/Adr';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatButtonModule } from '@angular/material/button';
+import { HttpClientModule, HttpClient } from '@angular/common/http';
+import { CommonService, DeployUrl } from '../../../../Service/common.service';
+import { SharedServiceService } from '../../../../Service/Sharedservice/shared-service.service';
+import { map, Observable, of, startWith } from 'rxjs';
+import { MatAutocomplete } from "@angular/material/autocomplete";
+import { MatSelectModule } from "@angular/material/select";
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { PatientlistComponent } from '../../Patient/patientlist/patientlist.component';
 
-// export interface Adr {
-//   id: number;
-//   title: string;
-//   description: string;
-//   decisionDate: string;
-//   status: string;
-// }
 
-interface ADRReport {
-  patient?: {
-    patientonsetage?: string;
-    patientsex?: string;
-    patientweight?: string;
-  };
-  patientdrug?: { medicinalproduct: string; drugadministrationroute?: string }[];
-  patientreaction?: { reactionmeddrapt: string }[];
-  serious?: string;
-  seriousnessdeath?: string;
-  receiptdate?: string;
-}
 @Component({
   selector: 'app-adr',
-   imports: [CommonModule, FormsModule, ReactiveFormsModule, MatCardModule,MatTableModule],
+  standalone: true,
+  imports: [
+    CommonModule,
+    MatInputModule,
+    MatFormFieldModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatButtonModule,
+    CommonModule,
+    MatAutocomplete,
+    MatSelectModule,
+    ReactiveFormsModule,
+    MatAutocompleteModule,
+    FormsModule,
+    MatFormFieldModule,
+    ReactiveFormsModule, MatInputModule,
+    MatFormFieldModule, CommonModule,
+    MatButtonModule,
+   
+  ],
   templateUrl: './adr.component.html',
-  styleUrl: './adr.component.scss'
+  styleUrls: ['./adr.component.scss', 
+    '../../../Shared/styles/table-template.scss','../../Patient/patientlist/patientlist.component.scss']
 })
-export class ADRComponent {
+export class ADRComponent implements OnInit {
+  
+  private fb = inject(FormBuilder);
+  private http = inject(HttpClient);
+  private Http = inject(CommonService);
+  private sharedService = inject(SharedServiceService);
 
-  payload: ADRPayload = {
-    patient: {
-      patientId: '',
-      firstName: '',
-      lastName: '',
-      age: 0,
-      gender: ''
-    },
-    drug: {
-      drugName: '',
-      dosage: ''
-    },
-    adverseEvent: {
-      eventDescription: ''
-    },
-    reporter: {
-      reporterType: '',
-      reporterName: ''
-    },
-    optional: {
-      concomitantDrugs: [],
-      labResults: [],
-      attachments: [],
-      comments: ''
-    }
-  };
-//   private fb = inject(FormBuilder);
+  searchPatientControl = new FormControl();
+  filteredPatients: Observable<any[]> | undefined;
 
-//   adrForm!: FormGroup;
-//   adrs: any[] = [];
-//   isEditing = false;
-//   editId: number | null = null;
-
-//   ngOnInit(): void {
-//     this.adrForm = this.fb.group({
-//       patientName: ['', Validators.required],
-//       drugName: ['', Validators.required],
-//       reaction: ['', Validators.required],
-//       severity: ['', Validators.required],
-//       isSerious: [false]
-//     });
-
-//     this.loadAdrs();
-//   }
-
-//   loadAdrs() {
-//     // this.http.get<any[]>('https://localhost:5001/api/adrs')
-//     //   .subscribe(res => this.adrs = res);
-//   }
-
-//   submit() {
-//     if (this.adrForm.invalid) return;
-
-//     if (this.isEditing && this.editId !== null) {
-//       // this.http.put(`https://localhost:5001/api/adrs/${this.editId}`, this.adrForm.value)
-//       //   .subscribe(() => {
-//       //     this.loadAdrs();
-//       //     this.resetForm();
-//       //   });
-//     } else {
-//       // this.http.post('https://localhost:5001/api/adrs', this.adrForm.value)
-//       //   .subscribe(() => {
-//       //     this.loadAdrs();
-//       //     this.resetForm();
-//       //   });
-//     }
-//   }
-
-//   edit(adr: any) {
-//     this.adrForm.patchValue(adr);
-//     this.isEditing = true;
-//     this.editId = adr.id;
-//   }
-
-//   delete(id: number) {
-//     // this.http.delete(`https://localhost:5001/api/adrs/${id}`)
-//     //   .subscribe(() => this.loadAdrs());
-//   }
-
-//   resetForm() {
-//     this.adrForm.reset();
-//     this.isEditing = false;
-//     this.editId = null;
-//   }
-
-
- reports: ADRReport[] = [];
-  columns = ['patient', 'drugs', 'reactions', 'outcome'];
-
-  constructor(private http: HttpClient, private adrService :CommonService) {}
-
+  adrForm: FormGroup;
+  UserSetGlobal: any;
+  patients: any[] = [];
+  constructor() {
+    this.adrForm = this.fb.group({
+      reactions: this.fb.array([])
+    });
+   // this.addReaction();
+  }
+  userinfo = computed(() => this.sharedService.userInfo());
   ngOnInit(): void {
-    // Example query: ADRs involving "paracetamol"
-    this.http
-      .get<any>('https://api.fda.gov/drug/event.json?search=patient.drug.medicinalproduct:paracetamol&limit=5')
-      .subscribe({
-        next: (res) => (this.reports = res.results),
-        error: (err) => console.error('API error', err),
-      });
+    this.UserSetGlobal = this.userinfo();
+    const payload = {
+      UserType: this.UserSetGlobal.userType,
+      UserId: this.UserSetGlobal.userID
+    }
+    this.Http.Post('PatientHandle/Getmypatients', payload).subscribe({
+      next: (res) => {
+
+        if (res.success) {
+          this.patients = res.patients.filter((x: any) => x.isRegistered === true);
+          this.setupPatientFilter();
+        }
+
+      },
+
+    });
+  }
+  private setupPatientFilter() {
+    this.filteredPatients = this.searchPatientControl.valueChanges.pipe(
+      startWith(''),
+      map(value => this._filterPatients(value || ''))
+    );
+  }
+  get reactions(): FormArray {
+    return this.adrForm.get('reactions') as FormArray;
   }
 
-  mapSex(sex?: string): string {
-    if (sex === '1') return 'Male';
-    if (sex === '2') return 'Female';
-    return 'Unknown';
+createReaction(patient?: any, isNew: boolean = false): FormGroup {
+  return this.fb.group({
+    ID: [patient?.id || 0],
+    patientName: [patient?.patientName || null],
+    email: [patient?.email || null],
+    drugname: [patient?.drugName || '', isNew ? Validators.required : []],
+    description: [patient?.description || '', isNew ? Validators.required : []],
+    dateOccurred: [patient?.dateOccurred || new Date],
+    aiSeveritySuggestion: [patient?.aiSeveritySuggestion || ''],
+    patientId: [patient?.patientId || null, Validators.required]
+  });
+}
+
+
+
+  addReaction() {
+  // get last form group
+  const lastReaction = this.reactions.at(this.reactions.length - 1);
+
+  if (lastReaction) {
+    // check if required fields are filled
+    const { drugname, description, dateOccurred } = lastReaction.value;
+
+    const isFilled =
+   
+      drugname && drugname.trim() !== '' &&
+      description && description.trim() !== '' &&
+      dateOccurred;
+
+    if (!isFilled) {
+      console.warn("Please fill the current reaction before adding a new one.");
+      return; // stop adding new row
+    }
   }
+   if (this.selectedPatient) {
+         this.reactions.push(this.createReaction({ patientId: this.selectedPatient.patientId , email: this.selectedPatient.email,id : this.selectedPatient.id }, true));
+   }
+  // add empty reaction
+
+}
+
+
+  private _filterPatients(value: string): any[] {
+    const filterValue = value.toLowerCase();
+    return this.patients.filter(p =>
+      p.name?.toLowerCase().includes(filterValue) 
+      // ||
+      // p.patientId?.toLowerCase().includes(filterValue) ||
+      // p.email?.toLowerCase().includes(filterValue)
+    ).slice(0, 10);
+  }
+
+
+
+
+
+  removeReaction(index: number) {
+    this.reactions.removeAt(index);
+  }
+
+  async checkSeverity(index: number) {
+    const group = this.reactions.at(index) as FormGroup;
+    const description = group.get('description')?.value;
+    const drugname = group.get('drugname')?.value;
+
+    if (!description) return;
+
+    // Build payload description (do not update form control)
+    const payloadDescription = `Drug: ${drugname || 'Unknown'}, Description: ${description}`;
+
+    try {
+      const response: any = await this.http
+        .post(`${DeployUrl.URL}api/ADR/check-severity`, { description: payloadDescription })
+        .toPromise();
+
+      const severity = response.severity || 'Unknown';
+      group.patchValue({ aiSeveritySuggestion: severity });
+    } catch (error:any) {
+      if (error.status === 429) {
+       this.sharedService.Messages('warning', 'AI Analysis', 'Rate limit exceeded. Please try later or upgrade your plan.', 3000);
+      } else {
+        console.error('ADR API Analysis error:', error);
+      }
+      
+      group.patchValue({ aiSeveritySuggestion: 'Error from AI' });
+    }
+  }
+
+ displayPatient(patient: any): string {
+  return patient ? patient.name : '';
+}
+selectedPatient: any = null;
+
+patientselect(patid: number) {
+  console.log("Selected Patient ID:", patid);
+this.selectedPatient = this.patients.find(p => p.patientId === patid) || null;
+  const payload = {
+    patID: patid,
+    email: this.selectedPatient.email  // optional if you don’t want to filter by email
+  };
+      this.reactions.clear();
+  this.Http.Post('api/ADR/getByPatient', payload).subscribe({
+    next: (res: any[]) => {
+      console.log("ADR Data:", res);
+
+      this.reactions.clear();
+      if (res.length === 0) {
+
+
+
+         this.reactions.push(this.createReaction({ patientId: patid, email: this.selectedPatient.email,id : this.selectedPatient.id }, true));
+
+      } else {
+        this.reactions.clear();
+      res.forEach((med: any) => {
+  
+        this.reactions.push(this.createReaction(med));
+      });
+      }
+
+    },
+    error: (err) => {
+      console.error("Error fetching ADRs", err);
+    }
+  });
+}
+
+
+
 
   
+  saveForm() {
+    if(this.selectedPatient.patientId == null || this.selectedPatient.patientId == undefined){
+      alert("Please select patient");
+      return;
+    }
+  this.reactions.controls.forEach((ctrl, index) => {
+    ctrl.markAllAsTouched();
 
+    if (ctrl.invalid) {
+      console.warn(`Row ${index + 1} has validation errors:`);
 
-  addConcomitantDrug() {
-    this.payload.optional?.concomitantDrugs?.push({
-      drugName: '',
-      dosage: ''
-    });
-  }
-
-  addLabResult() {
-    this.payload.optional?.labResults?.push({
-      testName: '',
-      result: ''
-    });
-  }
-
-  addAttachment(file: File) {
-    const reader = new FileReader();
-    reader.onload = () => {
-      this.payload.optional?.attachments?.push({
-        fileName: file.name,
-        fileType: file.type,
-        base64Data: (reader.result as string).split(',')[1] // Remove data:image prefix
+      const group = ctrl as FormGroup;
+      Object.keys(group.controls).forEach(key => {
+        const control = group.get(key);
+        if (control && control.invalid) {
+          console.warn(`  - Control: ${key}, Errors:`, control.errors);
+        }
       });
-    };
-    reader.readAsDataURL(file);
+    }
+  });
+
+  if (this.reactions.invalid) {
+    console.warn("Some rows are incomplete, fix the above errors before saving.");
+    return;
   }
-adrPayload = {
-    safetyreportid: '12345678-9',
-    receivedate: '2025-08-22',
-    patient: {
-      age: 45,
-      ageunit: 'YEARS',
-      sex: 'M',
-      weight: 70,
-      weightunit: 'KG',
-    },
-    reaction: [
-      {
-        reactionmeddrapt: 'Headache',
-        reactionmeddraversionpt: '10000001',
-        reactionoutcome: '1',
+
+  // ✅ proceed with saving if no errors
+  console.log("All rows valid. Proceeding to save...");
+
+
+
+    // convert FormArray to simple array payload
+    const payload = (this.reactions.controls || []).map(ctrl => {
+      const val = ctrl.value;
+      // normalize date to ISO or 'yyyy-MM-dd HH:mm:ss' if backend expects that
+      let dateOccurred = val.dateOccurred;
+      if (dateOccurred) {
+        // If Date object, convert to ISO string
+        if (dateOccurred instanceof Date) {
+          dateOccurred = dateOccurred.toISOString(); // backend can parse
+        } else {
+          // If mat-datepicker gives {year,month,day} or string, try new Date(...)
+          const d = new Date(dateOccurred);
+          dateOccurred = isNaN(d.getTime()) ? null : d.toISOString();
+        }
+      }
+
+      return {
+        ID: val.ID || 0,  // assuming 0 for new entries
+        PatientId: val.patientId ?? null,             // optional; include if you have it
+        PatientName: val.patientName || '',
+        Email: val.email || '',
+        DrugName: val.drugname || null,
+        Description: val.description || null,
+        DateOccurred: dateOccurred,
+        AISeveritySuggestion: val.aiSeveritySuggestion || null
+      };
+    });
+
+    this.http.post(`${DeployUrl.URL}api/ADR/save`, payload).subscribe({
+      next: res => {
+
+        this.patientselect(this.selectedPatient.patientId);
       },
-    ],
-    drug: [
-      {
-        openfda: {
-          brand_name: ['Paracetamol'],
-          generic_name: ['Paracetamol'],
-          manufacturer_name: ['Acme Pharmaceuticals'],
-        },
-        drugindication: 'Pain relief',
-        drugdosageform: 'Tablet',
-        drugroute: 'Oral',
-        doseage: '500 mg',
-        doseageunit: 'MG',
-        drugstartdate: '2025-08-20',
-        drugenddate: '2025-08-22',
-      },
-    ],
-  };
-  submitADR() {
-    this.adrService.submitADR(this.adrPayload).subscribe({
-      next: (res) => {
-        console.log('ADR submitted successfully', res);
-      },
-      error: (err) => {
-        console.error('Error submitting ADR', err);
+      error: err => {
+        console.error('Save failed', err);
+        // show error message
       }
     });
   }
- }
+
+
+  resetForm() {
+    this.adrForm = this.fb.group({
+      reactions: this.fb.array([])
+    });
+    this.reactions.clear();
+     if (this.selectedPatient) {
+      this.selectedPatient = null;
+          this.searchPatientControl.setValue('');
+      this.searchPatientControl.markAsPristine();
+      this.searchPatientControl.markAsUntouched();
+  } else {
+    // fallback blank row if no patient is selected
+    this.addReaction();
+  }
+         this.searchPatientControl.setValue('');
+      this.searchPatientControl.markAsPristine();
+      this.searchPatientControl.markAsUntouched();
+  }
+
+  trackByIndex(index: number): number {
+    return index;
+  }
+}

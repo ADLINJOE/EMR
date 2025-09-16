@@ -1,0 +1,120 @@
+<div class="emr-container">
+  <div class="emr-card">
+    <div class="emr-card-header">
+      <h2 class="emr-card-title">
+        <span class="emr-icon">📚</span> Patient Learning Hub
+      </h2>
+      <div class="emr-category-selector">
+        <label class="emr-label">Choose Topic:</label>
+        <mat-form-field class="emr-form-field" appearance="outline">
+          <mat-select [(value)]="selectedCategory" (selectionChange)="loadAll()" class="emr-select">
+            <mat-option *ngFor="let cat of categories" [value]="cat.key">{{ cat.label }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="emr-card-content">
+      <!-- Tabs -->
+      <div class="emr-tab-buttons">
+        <!-- <button class="emr-btn emr-tab-btn" 
+                [class.emr-tab-active]="activeTab === 'articles'" 
+                (click)="activeTab='articles'">
+          <span class="emr-btn-icon">📄</span> Articles
+        </button> -->
+        <button class="emr-btn emr-tab-btn" 
+                [class.emr-tab-active]="activeTab === 'videos'" 
+                (click)="activeTab='videos'">
+          <span class="emr-btn-icon">🎬</span> Videos
+        </button>
+        <!-- <button class="emr-btn emr-tab-btn" 
+                [class.emr-tab-active]="activeTab === 'topics'" 
+                (click)="activeTab='topics'">
+          <span class="emr-btn-icon">📋</span> Topics
+        </button> -->
+      </div>
+
+      <!-- Articles Tab -->
+      <div *ngIf="activeTab==='articles'" class="emr-tab-content">
+        <div *ngIf="loadingTopics" class="emr-loading">
+          <mat-spinner class="emr-spinner"></mat-spinner>
+          <p class="emr-loading-text">Loading articles...</p>
+        </div>
+        <div *ngIf="!loadingTopics && (!topics || topics.length === 0)" class="emr-no-content">
+          <span class="emr-no-content-icon">📄</span>
+          <p class="emr-no-content-text">No articles available for this topic.</p>
+        </div>
+        <div *ngIf="!loadingTopics && topics.length > 0" class="emr-table-container">
+          <table class="emr-table">
+            <thead class="emr-table-header">
+              <tr>
+                <th class="emr-th">Summary</th>
+                <th class="emr-th emr-th-actions">Link</th>
+              </tr>
+            </thead>
+            <tbody class="emr-table-body">
+              <tr *ngFor="let topic of topics" class="emr-table-row">
+                <td class="emr-td">{{ topic.Teaser || 'N/A' }}</td>
+                <td class="emr-td emr-td-actions">
+                  <a [href]="topic.Url" target="_blank" class="emr-btn emr-btn-primary emr-btn-sm">
+                    <span class="emr-btn-icon">📖</span> Read
+                  </a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Videos Tab -->
+      <div *ngIf="activeTab==='videos'" class="emr-tab-content">
+        <div *ngIf="loadingVideos" class="emr-loading">
+          <mat-spinner class="emr-spinner"></mat-spinner>
+          <p class="emr-loading-text">Loading videos...</p>
+        </div>
+        <div *ngIf="!loadingVideos && (!videos || videos.length === 0)" class="emr-no-content">
+          <span class="emr-no-content-icon">🎬</span>
+          <p class="emr-no-content-text">No videos available for this topic.</p>
+        </div>
+        <div *ngIf="!loadingVideos && videos.length > 0" class="emr-video-grid">
+          <div class="emr-video-card" *ngFor="let video of videos">
+            <div class="emr-video-wrapper">
+              <iframe [src]="getVideoUrl(video.id.videoId)" 
+                      frameborder="0" 
+                      allowfullscreen 
+                      class="emr-video-iframe"></iframe>
+            </div>
+            <div class="emr-video-content">
+              <h4 class="emr-video-title">{{ video.snippet.title }}</h4>
+              <p class="emr-video-description">{{ video.snippet.description }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Topics Tab -->
+      <div *ngIf="activeTab==='topics'" class="emr-tab-content">
+        <div class="emr-table-container">
+          <table class="emr-table">
+            <thead class="emr-table-header">
+              <tr>
+                <th class="emr-th">Description</th>
+                <th class="emr-th emr-th-actions">More</th>
+              </tr>
+            </thead>
+            <tbody class="emr-table-body">
+              <tr *ngFor="let topic of topics" class="emr-table-row">
+                <td class="emr-td">{{ topic.title || 'N/A' }}</td>
+                <td class="emr-td emr-td-actions">
+                  <a [href]="topic.Url" target="_blank" class="emr-btn emr-btn-secondary emr-btn-sm">
+                    <span class="emr-btn-icon">👁️</span> View
+                  </a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

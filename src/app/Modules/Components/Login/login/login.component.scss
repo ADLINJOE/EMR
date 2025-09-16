@@ -1,12 +1,11 @@
-/* login.component.scss */
 .auth-container {
   display: flex;
   min-height: 100vh;
   font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   align-items: stretch;
+  overflow: hidden; // Prevent scroll between image and form panel
 }
 
-/* left image with teal gradient */
 .auth-image {
   flex: 1;
   display: flex;
@@ -16,16 +15,17 @@
   padding: 40px;
 
   img {
-    width: 92%;
-    max-width: 760px;
+ 
+    max-width: 600px;
     height: auto;
     display: block;
     border-radius: 8px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+      
+    margin-left: 100px;
   }
 }
 
-/* right panel */
 .auth-panel {
   flex: 1;
   display: flex;
@@ -40,58 +40,108 @@
     background: #ffffff;
     border-radius: 14px;
     padding: 28px;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
-    border-top: 6px solid rgba(0,198,167,0.12);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    border-top: 6px solid rgba(0, 198, 167, 0.12);
+    overflow-y: auto; // Enable scroll within card if form is long
+    max-height: 100vh; // Limit card height to screen height
+  }
 
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
 
-      .logo { height: 36px; }
-
-      .toggle-btn {
-        border-radius: 20px;
-        background: #f6f7fb;
-        padding: 6px 14px;
-      }
+    .logo {
+      height: 36px;
     }
 
-    h2 {
-      color: #00695c;
-      font-size: 32px;
-      margin: 8px 0 20px;
+    .register-btn {
+      border-radius: 20px;
+      background: #f6f7fb;
+      padding: 6px 14px;
     }
+  }
 
-    mat-form-field { width: 100%; margin-bottom: 16px; }
+  h2 {
+    color: #00695c;
+    font-size: 32px;
+    margin: 8px 0 20px;
+  }
 
-    .options {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 18px;
+  mat-form-field {
+    width: 100%;
+    margin-bottom: 16px;
+  }
 
-      .forgot { color: #0288d1; text-decoration: none; }
+  .options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+
+    .forgot {
+      color: #0288d1;
+      text-decoration: none;
     }
+  }
 
-    .submit-btn {
-      width: 100%;
-      padding: 12px;
-      border-radius: 28px;
-      background: linear-gradient(90deg,#00c6a7,#00897b);
-      color: white;
-      font-weight: 700;
-    }
+  .submit-btn {
+    width: 100%;
+    padding: 12px;
+    border-radius: 28px;
+    background: linear-gradient(90deg, #00c6a7, #00897b);
+    color: white;
+    font-weight: 700;
+  }
 
-    .switch { text-align: center; margin-top: 12px; }
+  .switch {
+    text-align: center;
+    margin-top: 12px;
   }
 }
 
-/* responsive */
+/* Mobile responsiveness */
 @media (max-width: 900px) {
-  .auth-container { flex-direction: column; }
+  .auth-container {
+    flex-direction: column;
+    overflow-y: auto; // Allow scroll on mobile if needed
 
-  .auth-image { order: -1; padding: 20px; img { max-width: 340px; } }
-  .auth-panel { padding: 24px; .card { box-shadow: none; border-radius: 10px; } }
+  }
+
+ .auth-container img {
+        height: 132px;
+    width: 183px;
+          margin-left: 0px !important;
+  }
+
+ .auth-image {
+       height: 56px !important;
+        width: 80% !important;
+      
+  }
+  .setdesign{
+        height: 30px!important;
+  }
+
+  .auth-panel {
+    padding: 24px;
+
+    .card {
+      box-shadow: none;
+      border-radius: 10px;
+      max-height: none; // Allow content to expand as needed
+    }
+  }
 }
+
+@media (max-width: 600px) {
+  .auth-image {
+    height: 132px;
+    width: 183px;
+  }
+  .setdesign{
+        height: 83px!important;
+  }
+}
+

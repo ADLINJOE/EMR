@@ -3,7 +3,7 @@ import { Chart, registerables } from 'chart.js';
 import annotationPlugin from 'chartjs-plugin-annotation';
 import { CommonService } from '../../../../Service/common.service';
 import { SharedServiceService } from '../../../../Service/Sharedservice/shared-service.service';
-import { MatCardContent, MatCardModule } from "@angular/material/card";
+import { MatCardModule } from "@angular/material/card";
 import { MatTabGroup, MatTabsModule } from "@angular/material/tabs";
 
 
@@ -11,9 +11,10 @@ Chart.register(...registerables, annotationPlugin);
 
 @Component({
   selector: 'app-vitals-bp-monitor',
-  imports: [MatCardContent, MatTabGroup, MatTabsModule, MatCardModule],
+  standalone: true,
+  imports: [MatTabGroup, MatTabsModule, MatCardModule],
   templateUrl: './vitals-bp-monitor.component.html',
-  styleUrl: './vitals-bp-monitor.component.scss'
+  styleUrls: ['./vitals-bp-monitor.component.scss', '../../../Shared/styles/table-template.scss']
 })
 export class VitalsBpMonitorComponent {
   @ViewChild('bpTimeChart') bpTimeChartRef!: ElementRef<HTMLCanvasElement>;

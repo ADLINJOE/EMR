@@ -1,11 +1,11 @@
 import { Component, computed, effect } from '@angular/core';
 import { SharedServiceService } from '../../../../Service/Sharedservice/shared-service.service';
 import { CurrentmedicationComponent } from "../../PatientManagement/currentmedication/currentmedication.component";
-import { AllergyComponent } from "../../PatientManagement/allergy/allergy.component";
+import { PatientVitalsComponent } from "../../PatientManagement/patient-vitals/patient-vitals.component";
 
 @Component({
   selector: 'app-patient-management',
-  imports: [CurrentmedicationComponent, AllergyComponent],
+  imports: [CurrentmedicationComponent, PatientVitalsComponent],
   templateUrl: './patient-management.component.html',
   styleUrl: './patient-management.component.scss'
 })

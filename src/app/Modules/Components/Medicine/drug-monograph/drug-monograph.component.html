@@ -1,0 +1,338 @@
+<div class="container">
+  <div class="card">
+    <h2>Drug Monograph</h2>
+    
+    <!-- Search Section -->
+    <div class="search-section">
+      <div class="search-wrapper">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Search Drug</mat-label>
+          <input matInput 
+                 [(ngModel)]="searchTerm" 
+                 (input)="onSearchChange()"
+                 placeholder="Enter drug name..."
+                 autocomplete="off">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+        <button mat-raised-button color="primary" (click)="searchDrug()" [disabled]="!searchTerm.trim()">
+          <mat-icon>search</mat-icon>
+          Search
+        </button>
+      </div>
+      
+      <!-- Quick Access Buttons -->
+      <div class="quick-access" *ngIf="recentDrugs.length > 0">
+        <h4>Recent Searches:</h4>
+        <div class="recent-drugs">
+          <button *ngFor="let drug of recentDrugs" 
+                  class="recent-drug-btn"
+                  (click)="loadDrugMonograph(drug)">
+            {{drug}}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-container">
+      <div class="loading-spinner"></div>
+      <p>Loading drug information...</p>
+    </div>
+
+    <!-- Drug Monograph Display -->
+    <div *ngIf="selectedDrug && !isLoading" class="monograph-content">
+      
+      <!-- Drug Header -->
+      <div class="drug-header">
+        <div class="drug-title">
+          <h3>{{selectedDrug.genericName}}</h3>
+          <p class="brand-names" *ngIf="selectedDrug.brandNames?.length">
+            <!-- <strong>Brand Names:</strong> {{selectedDrug.brandNames.join(', ')}} -->
+          </p>
+          <div class="drug-classification">
+            <span class="classification-tag" *ngFor="let classification of selectedDrug.classifications">
+              {{classification}}
+            </span>
+          </div>
+        </div>
+        <div class="drug-actions">
+          <!-- <button mat-raised-button color="primary" (click)="showCurrentMedications()">
+            <mat-icon>medication</mat-icon>
+            Current Medications
+          </button> -->
+          <button mat-raised-button color="accent" (click)="printMonograph()">
+            <mat-icon>print</mat-icon>
+            Print
+          </button>
+          <!-- <button mat-raised-button (click)="exportToPDF()">
+            <mat-icon>picture_as_pdf</mat-icon>
+            Export PDF
+          </button> -->
+        </div>
+      </div>
+
+      <!-- Tabs for Different Sections -->
+      <mat-tab-group [(selectedIndex)]="selectedTabIndex" class="monograph-tabs">
+        
+        <!-- Overview Tab -->
+        <mat-tab label="Overview">
+          <div class="tab-content">
+            <div class="info-grid">
+              <div class="info-card">
+                <h4><mat-icon>info</mat-icon> General Information</h4>
+                <div class="info-item">
+                  <label>Generic Name:</label>
+                  <span>{{selectedDrug.genericName}}</span>
+                </div>
+                <div class="info-item" *ngIf="selectedDrug.strength">
+                  <label>Strength:</label>
+                  <span>{{selectedDrug.strength}}</span>
+                </div>
+                <div class="info-item" *ngIf="selectedDrug.dosageForm">
+                  <label>Dosage Form:</label>
+                  <span>{{selectedDrug.dosageForm}}</span>
+                </div>
+                <div class="info-item" *ngIf="selectedDrug.routeOfAdministration">
+                  <label>Route:</label>
+                  <span>{{selectedDrug.routeOfAdministration}}</span>
+                </div>
+              </div>
+
+              <div class="info-card">
+                <h4><mat-icon>science</mat-icon> Pharmacology</h4>
+                <div class="info-item" *ngIf="selectedDrug.mechanismOfAction">
+                  <label>Mechanism of Action:</label>
+                  <p>{{selectedDrug.mechanismOfAction}}</p>
+                </div>
+                <div class="info-item" *ngIf="selectedDrug.pharmacokinetics">
+                  <label>Pharmacokinetics:</label>
+                  <p>{{selectedDrug.pharmacokinetics}}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+
+        <!-- Indications Tab -->
+        <mat-tab label="Indications">
+          <div class="tab-content">
+            <div class="indication-section">
+              <h4><mat-icon>medical_services</mat-icon> Approved Indications</h4>
+              <ul class="indication-list" *ngIf="selectedDrug.indications?.length">
+                <li *ngFor="let indication of selectedDrug.indications" class="indication-item">
+                  <strong>{{indication.condition}}</strong>
+                  <p *ngIf="indication.description">{{indication.description}}</p>
+                  <span class="indication-type" [ngClass]="indication.type">{{indication.type}}</span>
+                </li>
+              </ul>
+              <p *ngIf="!selectedDrug.indications?.length" class="no-data">No indication data available</p>
+            </div>
+          </div>
+        </mat-tab>
+
+        <!-- Dosage Tab -->
+        <mat-tab label="Dosage & Administration">
+          <div class="tab-content">
+            <div class="dosage-section">
+              <h4><mat-icon>medication</mat-icon> Dosage Information</h4>
+              
+              <div class="dosage-groups" *ngIf="selectedDrug.dosageInfo?.length">
+                <div *ngFor="let dosage of selectedDrug.dosageInfo" class="dosage-group">
+                  <h5>{{dosage.population}} - {{dosage.indication}}</h5>
+                  <div class="dosage-details">
+                    <div class="dosage-item">
+                      <label>Initial Dose:</label>
+                      <span>{{dosage.initialDose}}</span>
+                    </div>
+                    <div class="dosage-item" *ngIf="dosage.maintenanceDose">
+                      <label>Maintenance Dose:</label>
+                      <span>{{dosage.maintenanceDose}}</span>
+                    </div>
+                    <div class="dosage-item" *ngIf="dosage.maxDose">
+                      <label>Maximum Dose:</label>
+                      <span>{{dosage.maxDose}}</span>
+                    </div>
+                    <div class="dosage-item" *ngIf="dosage.frequency">
+                      <label>Frequency:</label>
+                      <span>{{dosage.frequency}}</span>
+                    </div>
+                    <div class="dosage-item" *ngIf="dosage.duration">
+                      <label>Duration:</label>
+                      <span>{{dosage.duration}}</span>
+                    </div>
+                  </div>
+                  <div class="special-instructions" *ngIf="dosage.specialInstructions">
+                    <h6>Special Instructions:</h6>
+                    <p>{{dosage.specialInstructions}}</p>
+                  </div>
+                </div>
+              </div>
+              
+              <p *ngIf="!selectedDrug.dosageInfo?.length" class="no-data">No dosage information available</p>
+            </div>
+          </div>
+        </mat-tab>
+
+        <!-- Side Effects Tab -->
+        <mat-tab label="Side Effects">
+          <div class="tab-content">
+            <div class="side-effects-section">
+              <h4><mat-icon>warning</mat-icon> Adverse Effects</h4>
+              
+              <div class="effects-categories" *ngIf="selectedDrug.sideEffects">
+                <div class="effect-category" *ngIf="selectedDrug.sideEffects.common?.length">
+                  <h5 class="common-effects">Common Side Effects (>10%)</h5>
+                  <ul class="effects-list">
+                    <li *ngFor="let effect of selectedDrug.sideEffects.common" class="effect-item common">
+                      <span class="effect-name">{{effect.name}}</span>
+                      <span class="effect-frequency" *ngIf="effect.frequency">({{effect.frequency}})</span>
+                      <p *ngIf="effect.description" class="effect-description">{{effect.description}}</p>
+                    </li>
+                  </ul>
+                </div>
+
+                <div class="effect-category" *ngIf="selectedDrug.sideEffects.uncommon?.length">
+                  <h5 class="uncommon-effects">Uncommon Side Effects (1-10%)</h5>
+                  <ul class="effects-list">
+                    <li *ngFor="let effect of selectedDrug.sideEffects.uncommon" class="effect-item uncommon">
+                      <span class="effect-name">{{effect.name}}</span>
+                      <span class="effect-frequency" *ngIf="effect.frequency">({{effect.frequency}})</span>
+                      <p *ngIf="effect.description" class="effect-description">{{effect.description}}</p>
+                    </li>
+                  </ul>
+                </div>
+
+                <div class="effect-category" *ngIf="selectedDrug.sideEffects.rare?.length">
+                  <h5 class="rare-effects">Rare Side Effects (<1%)</h5>
+                  <ul class="effects-list">
+                    <li *ngFor="let effect of selectedDrug.sideEffects.rare" class="effect-item rare">
+                      <span class="effect-name">{{effect.name}}</span>
+                      <span class="effect-frequency" *ngIf="effect.frequency">({{effect.frequency}})</span>
+                      <p *ngIf="effect.description" class="effect-description">{{effect.description}}</p>
+                    </li>
+                  </ul>
+                </div>
+
+                <div class="effect-category" *ngIf="selectedDrug.sideEffects.serious?.length">
+                  <h5 class="serious-effects">Serious/Life-threatening Effects</h5>
+                  <ul class="effects-list">
+                    <li *ngFor="let effect of selectedDrug.sideEffects.serious" class="effect-item serious">
+                      <span class="effect-name">{{effect.name}}</span>
+                      <span class="effect-frequency" *ngIf="effect.frequency">({{effect.frequency}})</span>
+                      <p *ngIf="effect.description" class="effect-description">{{effect.description}}</p>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              
+              <p *ngIf="!selectedDrug.sideEffects" class="no-data">No side effect data available</p>
+            </div>
+          </div>
+        </mat-tab>
+
+        <!-- Warnings & Precautions Tab -->
+        <mat-tab label="Warnings & Precautions">
+          <div class="tab-content">
+            <div class="warnings-section">
+              
+              <!-- Black Box Warnings -->
+              <div class="warning-category black-box" *ngIf="selectedDrug.blackBoxWarnings?.length">
+                <h4><mat-icon>dangerous</mat-icon> Black Box Warnings</h4>
+                <div *ngFor="let warning of selectedDrug.blackBoxWarnings" class="warning-item black-box-item">
+                  <h5>{{warning.title}}</h5>
+                  <p>{{warning.description}}</p>
+                </div>
+              </div>
+
+              <!-- Contraindications -->
+              <div class="warning-category" *ngIf="selectedDrug.contraindications?.length">
+                <h4><mat-icon>block</mat-icon> Contraindications</h4>
+                <ul class="warning-list">
+                  <li *ngFor="let contraindication of selectedDrug.contraindications" class="warning-item">
+                    {{contraindication}}
+                  </li>
+                </ul>
+              </div>
+
+              <!-- Precautions -->
+              <div class="warning-category" *ngIf="selectedDrug.precautions?.length">
+                <h4><mat-icon>warning_amber</mat-icon> Precautions</h4>
+                <ul class="warning-list">
+                  <li *ngFor="let precaution of selectedDrug.precautions" class="warning-item">
+                    {{precaution}}
+                  </li>
+                </ul>
+              </div>
+
+              <!-- Drug Interactions -->
+              <div class="warning-category" *ngIf="selectedDrug.drugInteractions?.length">
+                <h4><mat-icon>merge_type</mat-icon> Drug Interactions</h4>
+                <div class="interaction-list">
+                  <div *ngFor="let interaction of selectedDrug.drugInteractions" class="interaction-item">
+                    <div class="interaction-header">
+                      <span class="interacting-drug">{{interaction.drug}}</span>
+                      <span class="interaction-severity" [ngClass]="interaction.severity.toLowerCase()">
+                        {{interaction.severity}}
+                      </span>
+                    </div>
+                    <p class="interaction-description">{{interaction.description}}</p>
+                    <p class="interaction-management" *ngIf="interaction.management">
+                      <strong>Management:</strong> {{interaction.management}}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+
+        <!-- Monitoring Tab -->
+        <mat-tab label="Monitoring">
+          <div class="tab-content">
+            <div class="monitoring-section">
+              <h4><mat-icon>monitor_heart</mat-icon> Monitoring Parameters</h4>
+              
+              <div class="monitoring-categories" *ngIf="selectedDrug.monitoring">
+                <div class="monitoring-category" *ngIf="selectedDrug.monitoring.laboratory?.length">
+                  <h5>Laboratory Monitoring</h5>
+                  <ul class="monitoring-list">
+                    <li *ngFor="let lab of selectedDrug.monitoring.laboratory" class="monitoring-item">
+                      <strong>{{lab.parameter}}</strong>
+                      <span class="monitoring-frequency" *ngIf="lab.frequency">- {{lab.frequency}}</span>
+                      <p *ngIf="lab.notes" class="monitoring-notes">{{lab.notes}}</p>
+                    </li>
+                  </ul>
+                </div>
+
+                <div class="monitoring-category" *ngIf="selectedDrug.monitoring.clinical?.length">
+                  <h5>Clinical Monitoring</h5>
+                  <ul class="monitoring-list">
+                    <li *ngFor="let clinical of selectedDrug.monitoring.clinical" class="monitoring-item">
+                      <strong>{{clinical.parameter}}</strong>
+                      <span class="monitoring-frequency" *ngIf="clinical.frequency">- {{clinical.frequency}}</span>
+                      <p *ngIf="clinical.notes" class="monitoring-notes">{{clinical.notes}}</p>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              
+              <p *ngIf="!selectedDrug.monitoring" class="no-data">No monitoring information available</p>
+            </div>
+          </div>
+        </mat-tab>
+
+      </mat-tab-group>
+    </div>
+
+    <!-- No Results -->
+    <div *ngIf="searchPerformed && !selectedDrug && !isLoading" class="no-results">
+      <mat-icon>search_off</mat-icon>
+      <h3>No Drug Information Found</h3>
+      <p>We couldn't find monograph information for "{{searchTerm}}". Please check the spelling or try a different drug name.</p>
+      <button mat-raised-button color="primary" (click)="clearSearch()">
+        Clear Search
+      </button>
+    </div>
+
+  </div>
+</div>

@@ -1,42 +1,73 @@
-<div class="vitals-dashboard-container">
-  <mat-tab-group>
-    <!-- Summary Tab -->
-    <mat-tab label="Summary">
-      <div class="summary-grid">
-        <mat-card class="summary-card" *ngFor="let card of summaryCards">
-          <h3>{{ card.title }}</h3>
-          <p class="value">{{ card.value }}</p>
-          <p class="sub">{{ card.subtext }}</p>
-        </mat-card>
-      </div>
+<div class="emr-container">
+  <div class="emr-card emr-dashboard-card">
+    <div class="emr-card-header emr-dashboard-header">
+      <h2 class="emr-card-title emr-dashboard-title">
+        <span class="emr-icon">📊</span> Vitals Dashboard
+      </h2>
+    </div>
 
-      <div class="alerts-section" *ngIf="criticalAlerts.length > 0">
-        <h3>Critical Alerts</h3>
-        <ul>
-          <li *ngFor="let alert of criticalAlerts">
-            ⚠️ {{ alert.message }}
-          </li>
-        </ul>
-      </div>
-    </mat-tab>
+    <div class="emr-card-content emr-dashboard-content">
+      <mat-tab-group class="emr-tab-group">
+        <!-- Summary Tab -->
+        <mat-tab class="emr-tab" label="Summary">
+          <div class="emr-tab-content">
+            <div class="emr-summary-grid">
+              <div class="emr-summary-card" *ngFor="let card of summaryCards">
+                <div class="emr-summary-header">
+                  <h3 class="emr-summary-title">{{ card.title }}</h3>
+                </div>
+                <div class="emr-summary-content">
+                  <p class="emr-summary-value">{{ card.value }}</p>
+                  <p class="emr-summary-subtext">{{ card.subtext }}</p>
+                </div>
+              </div>
+            </div>
 
-    <!-- Charts Tab -->
-    <mat-tab label="Charts">
-      <div class="chart-container">
-        <canvas baseChart
-          [data]="bpChartData"
-          [options]="chartOptions"
-          [type]="'line'">
-        </canvas>
-      </div>
+            <div class="emr-alerts-section" *ngIf="criticalAlerts.length > 0">
+              <div class="emr-alerts-header">
+                <h3 class="emr-alerts-title">
+                  <span class="emr-alert-icon">⚠️</span> Critical Alerts
+                </h3>
+              </div>
+              <div class="emr-alerts-list">
+                <div class="emr-alert-item" *ngFor="let alert of criticalAlerts">
+                  <span class="emr-alert-icon">⚠️</span>
+                  <span class="emr-alert-message">{{ alert.message }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
 
-      <div class="chart-container">
-        <canvas baseChart
-          [data]="sugarChartData"
-          [options]="chartOptions"
-          [type]="'line'">
-        </canvas>
-      </div>
-    </mat-tab>
-  </mat-tab-group>
+        <!-- Charts Tab -->
+        <mat-tab class="emr-tab" label="Charts">
+          <div class="emr-tab-content">
+            <div class="emr-charts-container">
+              <div class="emr-chart-section">
+                <div class="emr-chart-header">
+                  <h3 class="emr-chart-title">
+                    <span class="emr-chart-icon">🫀</span> Blood Pressure Trends
+                  </h3>
+                </div>
+                <div class="emr-chart-wrapper">
+                  <canvas #bpChart class="emr-chart-canvas"></canvas>
+                </div>
+              </div>
+
+              <div class="emr-chart-section">
+                <div class="emr-chart-header">
+                  <h3 class="emr-chart-title">
+                    <span class="emr-chart-icon">🩸</span> Blood Sugar Trends
+                  </h3>
+                </div>
+                <div class="emr-chart-wrapper">
+                  <canvas #sugarChart class="emr-chart-canvas"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </div>
+  </div>
 </div>

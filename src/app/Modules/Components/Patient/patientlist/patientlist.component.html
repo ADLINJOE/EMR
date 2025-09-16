@@ -19,7 +19,7 @@
     + Add Patient
   </button>
 </div>
-<div class="table-scroll-wrapper">
+<div class="table-scroll-wrapper" style="height: 68vh; overflow: auto">
   <table class="full-width-table ">
     <thead>
       <tr>
@@ -32,22 +32,60 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let p of patients | patientFilter:searchText; index as ID"   (click)="openPatientDetails(p)">
-        <td>{{ID + 1}}</td>
-        <td>{{ p.name }}</td>
-        <td>{{ p.gender }}</td>
-        <td>{{ p.age }}</td>
-        <td>{{p.email}}</td>
-     <td>
-  <ng-container *ngIf="p.sendInvite; else inviteBtn">
-    Invited
-  </ng-container>
-  <ng-template #inviteBtn>
-    <button style="cursor: pointer;" class="btn btn-primary" (click)="sendInvite(p.email); $event.stopPropagation()">Send Invite</button>
-  </ng-template>
-</td>
+<tr 
+  *ngFor="let p of patients | patientFilter:searchText; index as ID" 
+  [class.clickable-row]="p.isRegistered" 
+  (click)="p.isRegistered ? openPatientDetails(p) : null"
+>
 
-      </tr>
+
+  <!-- If patient is already invited -->
+  <ng-container *ngIf="p.sendInvite; else notInvited">
+    <!-- Check if registered -->
+    <ng-container *ngIf="p.isRegistered; else invitedNotRegistered">
+      <!-- Invited + Registered -->
+      <td>{{ ID + 1 }}</td>
+      <td>{{ p.name }}</td>
+      <td>{{ p.gender }}</td>
+      <td>{{ p.age }}</td>
+      <td>{{ p.email }}</td>
+      <td>Invited</td>
+    </ng-container>
+  </ng-container>
+
+  <!-- Invited but NOT Registered -->
+  <ng-template #invitedNotRegistered>
+    <td>{{ ID + 1 }}</td>
+    <td  colspan="3" style="color: rgb(205, 61, 61);font-weight: bolder;">
+      Patient not registered
+    </td>
+    <td>{{ p.email }}</td>
+    <td>
+      
+       Invited
+
+    </td>
+  </ng-template>
+
+  <!-- Not Invited at all -->
+  <ng-template #notInvited>
+    <td>{{ ID + 1 }}</td>
+    <td colspan="3" style="color: rgb(255, 193, 7);font-weight: bolder;">
+      Not invited
+    </td>
+    <td>{{ p.email }}</td>
+    <td>
+      <button style="cursor: pointer;" class="btn btn-primary float-end"
+              (click)="sendInvite(p.email); $event.stopPropagation()">
+        Send Invite
+      </button>
+    </td>
+  </ng-template>
+
+</tr>
+
+
+
     </tbody>
   </table>
   </div>

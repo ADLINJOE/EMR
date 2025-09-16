@@ -51,10 +51,11 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "4kB",
-                  "maximumError": "8kB"
+                  "maximumWarning": "800kB",
+                  "maximumError": "800kB"
                 }
               ],
+              "prerender": true,
               "outputHashing": "all"
             },
             "development": {

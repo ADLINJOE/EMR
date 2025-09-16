@@ -1,54 +1,326 @@
+<div style="overflow-y: auto;">
+
 <div class="container">
   <div class="card">
-    <h2 class="section-title">Current Medication</h2>
+    <h2>Current Medications</h2>
 
-    <form [formGroup]="form">
-      <div class="add-button-wrapper">
-        <button type="button" class="btn-primary" (click)="addMedication()">+ Add Medication</button>
+    <!-- Follow-up Notification Banner -->
+    <div *ngIf="showFollowUpNotification && nextFollowUp" class="follow-up-notification-banner">
+      <div class="notification-content">
+        <mat-icon class="notification-icon">schedule</mat-icon>
+        <div class="notification-text">
+          <span class="notification-title">Next Follow-up</span>
+          <span class="notification-date">{{ nextFollowUp.followUpDate | date:'MMM d, yyyy' }} {{ nextFollowUp.followUpDate | date:'HH:mm' }}</span>
+          <span *ngIf="nextFollowUp.notes" class="notification-notes">{{ nextFollowUp.notes }}</span>
+        </div>
+      </div>
+      <div class="notification-actions">
+        <!-- <button type="button" class="notification-btn" (click)="goToFollowUps()" title="View all follow-ups">
+          <mat-icon>visibility</mat-icon>
+        </button> -->
+        <button type="button" class="notification-btn close-btn" (click)="dismissFollowUpNotification()" title="Dismiss notification">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <form [formGroup]="medicationForm">
+      <!-- Follow-up Details Display -->
+      <div *ngIf="followUpDate" class="follow-up-display">
+        <div class="follow-up-info">
+          <mat-icon>schedule</mat-icon>
+          <span>Next Follow-up: {{followUpDate | date:'mediumDate'}}</span>
+          <span *ngIf="followUpNotes" class="follow-up-notes">- {{followUpNotes}}</span>
+        </div>
+      </div>
+
+      <div class="emr-flex emr-flex-end emr-flex-wrap emr-mb-md">
+        <div class="emr-btn-group emr-btn-group-horizontal">
+          <button type="button" class="btn-add" (click)="addMedication()" [disabled]="isLoading">
+            <mat-icon>add</mat-icon>
+            Add Medication
+          </button>
+          <button type="button" class="emr-btn emr-btn-secondary" (click)="printMedications()" [disabled]="isLoading">
+            <mat-icon>print</mat-icon>
+            Print
+          </button>
+          <button type="button" class="emr-btn emr-btn-secondary" (click)="showFollowUpOverlay()" [disabled]="isLoading">
+            <mat-icon>schedule</mat-icon>
+            <span class="emr-hide-mobile">Set Follow-up</span>
+            <span class="emr-hide-desktop">Follow-up</span>
+          </button>
+
+   
+
+          <button type="button" class="emr-btn emr-btn-secondary" (click)="openDrugMonograph('test')">
+            <mat-icon>info</mat-icon>
+            <span class="emr-hide-mobile">View Drug Monograph</span>
+            <span class="emr-hide-desktop">Drug Monograph</span>
+          </button>
+        </div>
       </div>
 
       <div class="tablefix">
-        <table class="full-width-table" formArrayName="Currentmedicine">
+        <table class="full-width-table">
           <thead>
             <tr>
-              <th>Sl.No</th>
-              <th>Medication</th>
-              <th>Dosage</th>
-              <th>Frequency</th>
-              <th>Start Date</th>
-              <th>Ongoing</th>
-              <th>Actions</th>
+              <th class="medication-name-col">Medication Name</th>
+              <th class="dosage-col">Dosage</th>
+              <th class="frequency-col">Frequency</th>
+              <th class="date-col">Start Date</th>
+              <th class="ongoing-col" style="width: 35%;">Ongoing</th>
+              <th class="actions-col">Actions</th>
             </tr>
           </thead>
-          <tbody>
-            <ng-container *ngFor="let med of getFormControls.controls; let i = index; trackBy: trackByIndex">
-              <tr [formGroupName]="i" [hidden]="med.get('isDeleted')?.value">
-                <td>{{ i + 1 }}</td>
-                <td><input class="plain-input" formControlName="medname" placeholder="Medication" /></td>
-                <td><input class="plain-input" formControlName="dosage" placeholder="Dosage" /></td>
-                <td><input class="plain-input" formControlName="frequency" placeholder="Frequency" /></td>
-                <td><input class="plain-input" type="date" formControlName="startDate" [max]="today" /></td>
-                <td class="center-checkbox">
-                  <input type="checkbox" formControlName="ongoing" />
+          <tbody formArrayName="medications">
+            <ng-container *ngFor="let medication of medicationsArray.controls; let i = index; trackBy: trackByFn">
+              <tr [formGroupName]="i" 
+                  class="medication-row" 
+                
+                  [class.editing]="medication.get('isEditable')?.value"
+                  [class.row-added]="medication.get('isNew')?.value"
+                  *ngIf="!medication.get('isDeleted')?.value">
+                <td class="medication-name-col">
+                         <mat-form-field appearance="outline" class="full">
+  <input type="text"
+         matInput
+         placeholder="Search medication..."
+         formControlName="medname"
+         [matAutocomplete]="drugAuto"
+         [readonly]="!medication.get('isEditable')?.value">
+
+  <mat-autocomplete #drugAuto="matAutocomplete" 
+                    [displayWith]="displayFn" 
+                    (optionSelected)="onDrugSelected($event.option.value, i)">
+ <mat-option *ngFor="let drug of (filteredDrugs[i] | async) || []"
+            [value]="drug.drugName">
+  <div>
+    <strong>{{ drug.drugName }}</strong>
+    <small *ngIf="drug.genericName"> ({{ drug.genericName }})</small>
+    <small *ngIf="drug.brandName"> - {{ drug.brandName }}</small>
+  </div>
+</mat-option>
+
+  </mat-autocomplete>
+
+  <mat-error *ngIf="medication.get('medname')?.invalid && medication.get('medname')?.touched">
+    Medication name is required
+  </mat-error>
+</mat-form-field>
+
                 </td>
-                <td>
-                  <button type="button" class="btn-danger" (click)="removeMedication(i)">Remove</button>
+
+                <td class="dosage-col">
+                  <mat-form-field appearance="outline" class="full">
+                    <input matInput formControlName="dosage" placeholder="e.g., 500mg" [readonly]="!medication.get('isEditable')?.value">
+                    <mat-error *ngIf="medication.get('dosage')?.invalid && medication.get('dosage')?.touched">
+                      Dosage is required
+                    </mat-error>
+                  </mat-form-field>
+                </td>
+
+                <td class="frequency-col">
+                  <mat-form-field appearance="outline" class="full">
+                    <mat-select formControlName="frequency" [disabled]="!medication.get('isEditable')?.value">
+                      <mat-option *ngFor="let freq of frequencyOptions" [value]="freq.value">
+                        {{ freq.label }}
+                      </mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="medication.get('frequency')?.invalid && medication.get('frequency')?.touched">
+                      Frequency is required
+                    </mat-error>
+                  </mat-form-field>
+                </td>
+
+                <td class="date-col">
+                <mat-form-field appearance="outline" class="date-field">
+  <mat-label>Start Date</mat-label>
+  <input 
+    matInput 
+    [matDatepicker]="picker" 
+    formControlName="startDate" 
+    [readonly]="!medication.get('isEditable')?.value">
+  <mat-datepicker-toggle matSuffix [for]="picker">
+    <mat-icon matDatepickerToggleIcon>event</mat-icon>
+  </mat-datepicker-toggle>
+  <mat-datepicker #picker></mat-datepicker>
+  <mat-error *ngIf="medication.get('startDate')?.invalid && medication.get('startDate')?.touched">
+    Start date is required
+  </mat-error>
+</mat-form-field>
+
+                </td>
+
+                <td class="center-checkbox ongoing-col" style="width: 35%;">
+                  <div class="checkbox-wrapper">
+                    <input type="checkbox" 
+                           formControlName="ongoing" 
+                           [disabled]="!medication.get('isEditable')?.value"
+                           id="ongoing-{{i}}">
+                    <label for="ongoing-{{i}}" class="checkbox-label" 
+                           [class.checked]="medication.get('ongoing')?.value">
+                      {{ medication.get('ongoing')?.value ? 'Yes' : 'No' }}
+                    </label>
+                  </div>
+                </td>
+
+                <td class="actions-col">
+                  <div class="emr-btn-group">
+                    <button type="button" class="emr-btn emr-btn-icon emr-btn-secondary emr-btn-sm"
+                            *ngIf="!medication.get('isEditable')?.value"
+                            (click)="editMedication(i)"
+                            [disabled]="isLoading"
+                            title="Edit medication">
+                      <mat-icon>edit</mat-icon>
+                    </button>
+
+                    <button type="button" class="emr-btn emr-btn-icon emr-btn-primary emr-btn-sm"
+                            *ngIf="medication.get('isEditable')?.value"
+                            (click)="saveMedication(i)"
+                            [disabled]="isLoading"
+                            title="Save and check interactions">
+                      <mat-icon>save</mat-icon>
+                    </button>
+
+                    <button type="button" class="emr-btn emr-btn-icon emr-btn-outline emr-btn-danger emr-btn-sm"
+                            *ngIf="medication.get('isEditable')?.value"
+                            (click)="cancelEdit(i)"
+                            [disabled]="isLoading"
+                            title="Cancel editing">
+                      <mat-icon>cancel</mat-icon>
+                    </button>
+<!-- 
+                    <button type="button" class="emr-btn emr-btn-icon emr-btn-secondary emr-btn-sm"
+                            *ngIf="!medication.get('isEditable')?.value && medication.get('medname')?.value"
+                            (click)="openDrugMonograph(medication.get('medname')?.value)"
+                            [disabled]="isLoading"
+                            title="View drug monograph">
+                      <mat-icon>description</mat-icon>
+                    </button> -->
+
+                    <button type="button" class="emr-btn emr-btn-icon emr-btn-danger emr-btn-sm"
+                            (click)="deleteMedication(i)"
+                            [disabled]="isLoading"
+                            title="Delete medication">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
                 </td>
               </tr>
             </ng-container>
 
+            <tr *ngIf="medicationsArray.length === 0 || allMedicationsDeleted()" class="no-data-row">
+              <td colspan="6" class="no-data">
+                <p>No medications added yet. Click "Add Medication" to get started.</p>
+              </td>
+            </tr>
           </tbody>
         </table>
-
-
       </div>
-      <div class="button-group button_end">
-        <button type="button" class="btn-primary margin_4px" (click)="saveAll()">Save</button>
-        <button type="button" class="btn-secondary margin_4px" (click)="cancel()">Cancel</button>
+
+      <div class="emr-flex emr-flex-end emr-mb-lg">
+        <div class="emr-btn-group">
+          <button type="button" class="btn-save-all"
+                  (click)="saveAllMedications()"
+                  [disabled]="!hasChanges() || isLoading"
+                  [class.loading]="isLoading"
+                  title="Save all changes">
+            <mat-icon>save</mat-icon>
+            Save All Changes
+          </button>
+          <button type="button" class="btn-reset"
+                  (click)="resetForm()"
+                  [disabled]="isLoading"
+                  title="Reset form to original state">
+            <mat-icon>refresh</mat-icon>
+            Reset
+          </button>
+        </div>
       </div>
     </form>
   </div>
 </div>
 
-<!-- Allergy section -->
+<!-- Follow-up Overlay -->
+<div class="follow-up-overlay" *ngIf="showFollowUp" (click)="hideFollowUpOverlay()">
+  <div class="follow-up-modal" (click)="$event.stopPropagation()">
+    <div class="follow-up-header">
+      <h3>Set Follow-up Reminder</h3>
+      <button class="close-btn" (click)="hideFollowUpOverlay()">×</button>
+    </div>
+    <div class="follow-up-content">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Follow-up Date</mat-label>
+        <input matInput [matDatepicker]="followUpPicker" [(ngModel)]="followUpDate" 
+               placeholder="Select follow-up date">
+        <mat-datepicker-toggle matIconSuffix [for]="followUpPicker"></mat-datepicker-toggle>
+        <mat-datepicker #followUpPicker></mat-datepicker>
+      </mat-form-field>
+      
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Reminder Notes</mat-label>
+        <textarea matInput [(ngModel)]="followUpNotes" rows="3" 
+                  placeholder="Enter follow-up notes or instructions"></textarea>
+      </mat-form-field>
+      
+      <div class="reminder-options">
+        <mat-checkbox [(ngModel)]="emailReminder">Send email reminder</mat-checkbox>
+        <mat-checkbox [(ngModel)]="reminderDaysBefore">Remind 2 days before</mat-checkbox>
+      </div>
+    </div>
+    <div class="follow-up-actions">
+      <button type="button" class="btn-secondary" (click)="hideFollowUpOverlay()">Cancel</button>
+      <button type="button" class="btn-primary" (click)="saveFollowUp()">Set Reminder</button>
+    </div>
+  </div>
+</div>
+
+<!-- AI Interaction Checker Modal -->
+<div *ngIf="showAiChecker" class="ai-checker-overlay">
+  <div class="ai-checker-modal" (click)="$event.stopPropagation()">
+    <div class="ai-checker-header">
+      <h3><mat-icon>psychology</mat-icon> Drug Interaction Analysis</h3>
+      <button class="close-btn" (click)="onAiCheckCancel()">×</button>
+    </div>
+    <div class="ai-checker-content">
+      <app-ai-interaction-checker 
+        (onComplete)="onAiCheckComplete()"
+        (onCancel)="onAiCheckCancel()">
+      </app-ai-interaction-checker>
+    </div>
+  </div>
+</div>
+
+<!-- Drug Monograph Modal -->
+<div *ngIf="showDrugMonograph" class="drug-monograph-overlay" (click)="closeDrugMonograph()">
+  <div class="drug-monograph-modal" (click)="$event.stopPropagation()">
+    <div class="drug-monograph-header">
+      <h3><mat-icon>description</mat-icon> Drug Monograph</h3>
+      <button class="close-btn" (click)="closeDrugMonograph()">×</button>
+    </div>
+    <div class="drug-monograph-content">
+      <app-drug-monograph></app-drug-monograph>
+    </div>
+  </div>
+</div>
+
+<!-- OCR Validation Modal -->
+<div *ngIf="showOcrValidation" class="ocr-validation-overlay">
+  <div class="ocr-validation-content">
+    <div class="ocr-header">
+      <h3>OCR Validation</h3>
+      <button mat-icon-button (click)="closeOcrValidation()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    <div class="ocr-body">
+      <pre>{{ocrValidationMessage}}</pre>
+    </div>
+    <div class="ocr-actions">
+      <button mat-button (click)="closeOcrValidation()">Cancel</button>
+      <button mat-raised-button color="primary" (click)="confirmOcrUpload()">Add Medications</button>
+    </div>
+  </div>
+</div>
+
 <app-allergy></app-allergy>

@@ -1,0 +1,271 @@
+<div class="emr-container">
+  <div class="emr-card">
+    <div class="emr-card-header">
+      <h2 class="emr-card-title">
+        <span class="emr-icon">📷</span> OCR Prescription Scanner
+      </h2>
+      <!-- <button type="button" class="emr-btn emr-btn-secondary" (click)="goBack()">
+        <span class="emr-btn-icon">←</span> Back to Form
+      </button> -->
+    </div>
+
+    <div class="emr-card-content">
+      <!-- Upload Section -->
+      <div class="emr-section">
+        <h3 class="emr-section-title">Upload Prescription Image</h3>
+        
+        <div class="emr-upload-area" 
+             [class.emr-upload-dragover]="isDragOver"
+             (dragover)="onDragOver($event)"
+             (dragleave)="onDragLeave($event)"
+             (drop)="onDrop($event)"
+             (click)="fileInput.click()">
+          
+          <div class="emr-upload-content" *ngIf="!selectedFile">
+            <span class="emr-upload-icon">📁</span>
+            <p class="emr-upload-text">
+              <strong>Click to upload</strong> or drag and drop<br>
+              Prescription image (JPG, PNG, PDF)
+            </p>
+            <p class="emr-upload-subtext">Maximum file size: 10MB</p>
+          </div>
+
+          <div class="emr-upload-preview" *ngIf="selectedFile">
+            <img [src]="imagePreview" 
+                 alt="Prescription preview" 
+                 class="emr-preview-image"
+                 *ngIf="imagePreview">
+            <div class="emr-file-info">
+              <span class="emr-file-name">{{ selectedFile.name }}</span>
+              <span class="emr-file-size">{{ getFileSize(selectedFile.size) }}</span>
+            </div>
+            <button type="button" 
+                    class="emr-btn emr-btn-danger emr-btn-sm emr-remove-file" 
+                    (click)="removeFile($event)">
+              <span class="emr-btn-icon">✕</span>
+            </button>
+          </div>
+
+          <input #fileInput 
+                 type="file" 
+                 accept="image/*,.pdf" 
+                 (change)="onFileSelected($event)"
+                 style="display: none;">
+        </div>
+
+        <div class="emr-upload-actions" *ngIf="selectedFile">
+          <button type="button" 
+                  class="emr-btn emr-btn-primary" 
+                  (click)="processOCR()"
+                  [disabled]="isProcessing">
+            <span class="emr-btn-icon" *ngIf="!isProcessing">🤖</span>
+            <mat-spinner diameter="20" *ngIf="isProcessing" class="emr-inline-spinner"></mat-spinner>
+            {{ isProcessing ? 'Processing...' : 'Extract Text with AI' }}
+          </button>
+          
+          <button type="button" 
+                  class="emr-btn emr-btn-secondary" 
+                  (click)="captureFromCamera()"
+                  [disabled]="isProcessing">
+            <span class="emr-btn-icon">📸</span> Use Camera
+          </button>
+        </div>
+      </div>
+
+      <!-- Camera Section -->
+      <div class="emr-section" *ngIf="showCamera">
+        <h3 class="emr-section-title">
+          Camera Capture
+          <button type="button" class="emr-btn emr-btn-sm emr-btn-secondary" (click)="closeCamera()">
+            <span class="emr-btn-icon">✕</span> Close
+          </button>
+        </h3>
+        
+        <div class="emr-camera-container">
+          <video #videoElement 
+                 autoplay 
+                 playsinline 
+                 class="emr-camera-video"
+                 [style.display]="showCamera ? 'block' : 'none'">
+          </video>
+          
+          <canvas #canvasElement 
+                  class="emr-camera-canvas" 
+                  style="display: none;">
+          </canvas>
+          
+          <div class="emr-camera-controls" *ngIf="showCamera">
+            <button type="button" 
+                    class="emr-btn emr-btn-primary emr-btn-lg" 
+                    (click)="capturePhoto()">
+              <span class="emr-btn-icon">📷</span> Capture
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- OCR Results Section -->
+      <div class="emr-section" *ngIf="ocrResults">
+        <h3 class="emr-section-title">Extracted Information</h3>
+        
+        <div class="emr-ocr-results">
+          <!-- Raw Text -->
+          <div class="emr-result-section">
+            <h4 class="emr-result-title">Raw Extracted Text</h4>
+            <div class="emr-raw-text">
+              {{ ocrResults.rawText }}
+            </div>
+          </div>
+
+          <!-- Structured Data -->
+          <div class="emr-result-section" *ngIf="structuredData">
+            <h4 class="emr-result-title">Structured Medication Data</h4>
+            
+            <!-- Patient Information -->
+            <div class="emr-data-group" *ngIf="structuredData.patientInfo">
+              <h5 class="emr-data-title">Patient Information</h5>
+              <div class="emr-data-grid">
+                <div class="emr-data-item" *ngIf="structuredData.patientInfo.name">
+                  <strong>Name:</strong> {{ structuredData.patientInfo.name }}
+                </div>
+                <div class="emr-data-item" *ngIf="structuredData.patientInfo.age">
+                  <strong>Age:</strong> {{ structuredData.patientInfo.age }}
+                </div>
+                <div class="emr-data-item" *ngIf="structuredData.patientInfo.id">
+                  <strong>ID:</strong> {{ structuredData.patientInfo.id }}
+                </div>
+              </div>
+            </div>
+
+            <!-- Doctor Information -->
+            <div class="emr-data-group" *ngIf="structuredData.doctorInfo">
+              <h5 class="emr-data-title">Doctor Information</h5>
+              <div class="emr-data-grid">
+                <div class="emr-data-item" *ngIf="structuredData.doctorInfo.name">
+                  <strong>Doctor:</strong> {{ structuredData.doctorInfo.name }}
+                </div>
+                <div class="emr-data-item" *ngIf="structuredData.doctorInfo.license">
+                  <strong>License:</strong> {{ structuredData.doctorInfo.license }}
+                </div>
+                <div class="emr-data-item" *ngIf="structuredData.doctorInfo.clinic">
+                  <strong>Clinic:</strong> {{ structuredData.doctorInfo.clinic }}
+                </div>
+              </div>
+            </div>
+
+            <!-- Medications -->
+            <div class="emr-data-group" *ngIf="structuredData.medications && structuredData.medications.length > 0">
+              <h5 class="emr-data-title">Medications</h5>
+              <div class="emr-medication-list">
+                <div class="emr-medication-item" *ngFor="let med of structuredData.medications; let i = index">
+                  <div class="emr-med-header">
+                    <span class="emr-med-number">{{ i + 1 }}.</span>
+                    <span class="emr-med-name">{{ med.name }}</span>
+                  </div>
+                  <div class="emr-med-details">
+                    <span class="emr-med-detail" *ngIf="med.dosage">
+                      <strong>Dosage:</strong> {{ med.dosage }}
+                    </span>
+                    <span class="emr-med-detail" *ngIf="med.frequency">
+                      <strong>Frequency:</strong> {{ med.frequency }}
+                    </span>
+                    <span class="emr-med-detail" *ngIf="med.duration">
+                      <strong>Duration:</strong> {{ med.duration }}
+                    </span>
+                  </div>
+                  <div class="emr-med-instructions" *ngIf="med.instructions">
+                    <strong>Instructions:</strong> {{ med.instructions }}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Notes -->
+            <div class="emr-data-group" *ngIf="structuredData.notes">
+              <h5 class="emr-data-title">Additional Notes</h5>
+              <div class="emr-notes-text">
+                {{ structuredData.notes }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Confidence Score -->
+          <div class="emr-confidence-section" *ngIf="ocrResults.confidence">
+            <div class="emr-confidence-bar">
+              <span class="emr-confidence-label">OCR Confidence: {{ ocrResults.confidence }}%</span>
+              <div class="emr-confidence-progress">
+                <div class="emr-confidence-fill" 
+                     [style.width.%]="ocrResults.confidence"
+                     [class.emr-confidence-high]="ocrResults.confidence >= 80"
+                     [class.emr-confidence-medium]="ocrResults.confidence >= 60 && ocrResults.confidence < 80"
+                     [class.emr-confidence-low]="ocrResults.confidence < 60">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="emr-result-actions">
+          <button type="button" 
+                  class="emr-btn emr-btn-primary" 
+                  (click)="applyToForm()"
+                  [disabled]="!structuredData">
+            <span class="emr-btn-icon">✓</span> Apply to Medication Form
+          </button>
+          
+          <button type="button" 
+                  class="emr-btn emr-btn-secondary" 
+                  (click)="editStructuredData()"
+                  [disabled]="!structuredData">
+            <span class="emr-btn-icon">✏️</span> Edit Data
+          </button>
+          
+          <button type="button" 
+                  class="emr-btn emr-btn-info" 
+                  (click)="reprocessOCR()">
+            <span class="emr-btn-icon">🔄</span> Reprocess
+          </button>
+        </div>
+      </div>
+
+      <!-- Error Section -->
+      <div class="emr-section emr-error-section" *ngIf="errorMessage">
+        <div class="emr-error-content">
+          <span class="emr-error-icon">⚠️</span>
+          <div class="emr-error-text">
+            <strong>Error:</strong> {{ errorMessage }}
+          </div>
+          <button type="button" 
+                  class="emr-btn emr-btn-sm emr-btn-secondary" 
+                  (click)="clearError()">
+            <span class="emr-btn-icon">✕</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Instructions Section -->
+      <div class="emr-section emr-instructions-section">
+        <h3 class="emr-section-title">📋 Instructions</h3>
+        <div class="emr-instructions-content">
+          <div class="emr-instruction-item">
+            <span class="emr-instruction-number">1</span>
+            <span class="emr-instruction-text">Upload a clear image of the prescription or use camera to capture</span>
+          </div>
+          <div class="emr-instruction-item">
+            <span class="emr-instruction-number">2</span>
+            <span class="emr-instruction-text">Click "Extract Text with AI" to process the image</span>
+          </div>
+          <div class="emr-instruction-item">
+            <span class="emr-instruction-number">3</span>
+            <span class="emr-instruction-text">Review the extracted information and edit if necessary</span>
+          </div>
+          <div class="emr-instruction-item">
+            <span class="emr-instruction-number">4</span>
+            <span class="emr-instruction-text">Click "Apply to Medication Form" to populate the prescription form</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

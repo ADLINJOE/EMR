@@ -1,0 +1,392 @@
+<div class="container">
+  <div class="card">
+    <h2>ADR Report Generator</h2>
+    <p class="subtitle">Adverse Drug Reaction Reporting System for Pharmacists</p>
+    
+    <!-- Report Form -->
+    <div class="report-form-section">
+      <form [formGroup]="adrForm" (ngSubmit)="submitReport()">
+        
+        <!-- Patient Information -->
+        <div class="form-section">
+          <h3><mat-icon>person</mat-icon> Patient Information</h3>
+          <div class="form-grid">
+            <mat-form-field appearance="outline">
+              <mat-label>Patient ID</mat-label>
+              <input matInput formControlName="patientId" placeholder="Enter patient ID">
+              <button mat-icon-button matSuffix type="button" (click)="searchPatient()" 
+                      [disabled]="!adrForm.get('patientId')?.value">
+                <mat-icon>search</mat-icon>
+              </button>
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline">
+              <mat-label>Patient Name</mat-label>
+              <input matInput formControlName="patientName" placeholder="Full name">
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline">
+              <mat-label>Age</mat-label>
+              <input matInput type="number" formControlName="age" placeholder="Age">
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline">
+              <mat-label>Gender</mat-label>
+              <mat-select formControlName="gender">
+                <mat-option value="male">Male</mat-option>
+                <mat-option value="female">Female</mat-option>
+                <mat-option value="other">Other</mat-option>
+              </mat-select>
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline">
+              <mat-label>Weight (kg)</mat-label>
+              <input matInput type="number" formControlName="weight" placeholder="Weight in kg">
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline">
+              <mat-label>Height (cm)</mat-label>
+              <input matInput type="number" formControlName="height" placeholder="Height in cm">
+            </mat-form-field>
+          </div>
+        </div>
+
+        <!-- Suspected Medication -->
+        <div class="form-section">
+          <h3><mat-icon>medication</mat-icon> Suspected Medication</h3>
+          <div class="form-grid">
+            <mat-form-field appearance="outline">
+              <mat-label>Drug Name</mat-label>
+              <input matInput formControlName="suspectedDrug" placeholder="Generic or brand name" 
+                     [matAutocomplete]="drugAuto">
+              <mat-autocomplete #drugAuto="matAutocomplete" [displayWith]="displayDrug">
+                <mat-option *ngFor="let drug of filteredDrugs | async" [value]="drug">
+                  {{drug.name}} ({{drug.strength}})
+                </mat-option>
+              </mat-autocomplete>
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline">
+              <mat-label>Batch Number</mat-label>
+              <input matInput formControlName="batchNumber" placeholder="Batch/Lot number">
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline">
+              <mat-label>Dosage</mat-label>
+              <input matInput formControlName="dosage" placeholder="e.g., 10mg">
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline">
+              <mat-label>Route of Administration</mat-label>
+              <mat-select formControlName="route">
+                <mat-option value="oral">Oral</mat-option>
+                <mat-option value="iv">Intravenous</mat-option>
+                <mat-option value="im">Intramuscular</mat-option>
+                <mat-option value="sc">Subcutaneous</mat-option>
+                <mat-option value="topical">Topical</mat-option>
+                <mat-option value="inhalation">Inhalation</mat-option>
+                <mat-option value="other">Other</mat-option>
+              </mat-select>
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline">
+              <mat-label>Frequency</mat-label>
+              <input matInput formControlName="frequency" placeholder="e.g., Twice daily">
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline">
+              <mat-label>Start Date</mat-label>
+              <input matInput [matDatepicker]="startPicker" formControlName="startDate">
+              <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+              <mat-datepicker #startPicker></mat-datepicker>
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline">
+              <mat-label>Stop Date (if applicable)</mat-label>
+              <input matInput [matDatepicker]="stopPicker" formControlName="stopDate">
+              <mat-datepicker-toggle matSuffix [for]="stopPicker"></mat-datepicker-toggle>
+              <mat-datepicker #stopPicker></mat-datepicker>
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline">
+              <mat-label>Indication</mat-label>
+              <input matInput formControlName="indication" placeholder="Reason for prescription">
+            </mat-form-field>
+          </div>
+        </div>
+
+        <!-- Adverse Reaction Details -->
+        <div class="form-section">
+          <h3><mat-icon>warning</mat-icon> Adverse Reaction Details</h3>
+          
+          <div class="form-grid">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Description of Adverse Reaction</mat-label>
+              <textarea matInput formControlName="reactionDescription" rows="4" 
+                        placeholder="Describe the adverse reaction in detail..."></textarea>
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline">
+              <mat-label>Onset Date</mat-label>
+              <input matInput [matDatepicker]="onsetPicker" formControlName="onsetDate">
+              <mat-datepicker-toggle matSuffix [for]="onsetPicker"></mat-datepicker-toggle>
+              <mat-datepicker #onsetPicker></mat-datepicker>
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline">
+              <mat-label>Severity</mat-label>
+              <mat-select formControlName="severity">
+                <mat-option value="mild">Mild</mat-option>
+                <mat-option value="moderate">Moderate</mat-option>
+                <mat-option value="severe">Severe</mat-option>
+                <mat-option value="life-threatening">Life-threatening</mat-option>
+              </mat-select>
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline">
+              <mat-label>Outcome</mat-label>
+              <mat-select formControlName="outcome">
+                <mat-option value="recovered">Recovered/Resolved</mat-option>
+                <mat-option value="recovering">Recovering/Resolving</mat-option>
+                <mat-option value="not-recovered">Not yet recovered/resolved</mat-option>
+                <mat-option value="recovered-sequelae">Recovered/resolved with sequelae</mat-option>
+                <mat-option value="fatal">Fatal</mat-option>
+                <mat-option value="unknown">Unknown</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <!-- Reaction Categories -->
+          <div class="reaction-categories">
+            <h4>Reaction Categories (Select all that apply)</h4>
+            <div class="checkbox-grid">
+              <mat-checkbox formControlName="categoryAllergic">Allergic/Immunologic</mat-checkbox>
+              <mat-checkbox formControlName="categoryGI">Gastrointestinal</mat-checkbox>
+              <mat-checkbox formControlName="categoryCardiac">Cardiac</mat-checkbox>
+              <mat-checkbox formControlName="categoryNeurologic">Neurologic</mat-checkbox>
+              <mat-checkbox formControlName="categoryRespiratory">Respiratory</mat-checkbox>
+              <mat-checkbox formControlName="categoryDermatologic">Dermatologic</mat-checkbox>
+              <mat-checkbox formControlName="categoryHematologic">Hematologic</mat-checkbox>
+              <mat-checkbox formControlName="categoryHepatic">Hepatic</mat-checkbox>
+              <mat-checkbox formControlName="categoryRenal">Renal</mat-checkbox>
+              <mat-checkbox formControlName="categoryOther">Other</mat-checkbox>
+            </div>
+          </div>
+        </div>
+
+        <!-- Causality Assessment -->
+        <div class="form-section">
+          <h3><mat-icon>psychology</mat-icon> Causality Assessment</h3>
+          
+          <div class="causality-questions">
+            <div class="question-item">
+              <label>Did the adverse event appear after the suspected drug was given?</label>
+              <mat-radio-group formControlName="causalityTiming">
+                <mat-radio-button value="yes">Yes (+2)</mat-radio-button>
+                <mat-radio-button value="no">No (-1)</mat-radio-button>
+                <mat-radio-button value="unknown">Unknown (0)</mat-radio-button>
+              </mat-radio-group>
+            </div>
+            
+            <div class="question-item">
+              <label>Did the adverse event improve when the drug was discontinued or a specific antagonist was given?</label>
+              <mat-radio-group formControlName="causalityDechallenge">
+                <mat-radio-button value="yes">Yes (+1)</mat-radio-button>
+                <mat-radio-button value="no">No (-1)</mat-radio-button>
+                <mat-radio-button value="unknown">Unknown (0)</mat-radio-button>
+              </mat-radio-group>
+            </div>
+            
+            <div class="question-item">
+              <label>Did the adverse event reappear when the drug was re-administered?</label>
+              <mat-radio-group formControlName="causalityRechallenge">
+                <mat-radio-button value="yes">Yes (+2)</mat-radio-button>
+                <mat-radio-button value="no">No (-1)</mat-radio-button>
+                <mat-radio-button value="unknown">Unknown (0)</mat-radio-button>
+              </mat-radio-group>
+            </div>
+            
+            <div class="question-item">
+              <label>Are there alternative causes that could explain the reaction?</label>
+              <mat-radio-group formControlName="causalityAlternative">
+                <mat-radio-button value="yes">Yes (-1)</mat-radio-button>
+                <mat-radio-button value="no">No (+2)</mat-radio-button>
+                <mat-radio-button value="unknown">Unknown (0)</mat-radio-button>
+              </mat-radio-group>
+            </div>
+          </div>
+          
+          <div class="causality-result" *ngIf="causalityScore !== null">
+            <div class="score-display" [ngClass]="getCausalityClass()">
+              <h4>Causality Score: {{causalityScore}}</h4>
+              <p class="causality-interpretation">{{getCausalityInterpretation()}}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Concomitant Medications -->
+        <div class="form-section">
+          <h3><mat-icon>list</mat-icon> Concomitant Medications</h3>
+          
+          <div class="concomitant-meds">
+            <div *ngFor="let med of concomitantMeds.controls; let i = index" class="med-row" [formGroupName]="i">
+              <mat-form-field appearance="outline">
+                <mat-label>Medication Name</mat-label>
+                <input matInput formControlName="name" placeholder="Drug name">
+              </mat-form-field>
+              
+              <mat-form-field appearance="outline">
+                <mat-label>Dosage</mat-label>
+                <input matInput formControlName="dosage" placeholder="Dose">
+              </mat-form-field>
+              
+              <mat-form-field appearance="outline">
+                <mat-label>Start Date</mat-label>
+                <input matInput [matDatepicker]="concomitantPicker" formControlName="startDate">
+                <mat-datepicker-toggle matSuffix [for]="concomitantPicker"></mat-datepicker-toggle>
+                <mat-datepicker #concomitantPicker></mat-datepicker>
+              </mat-form-field>
+              
+              <button mat-icon-button color="warn" type="button" (click)="removeConcomitantMed(i)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+            
+            <button mat-raised-button type="button" (click)="addConcomitantMed()" class="add-med-btn">
+              <mat-icon>add</mat-icon>
+              Add Concomitant Medication
+            </button>
+          </div>
+        </div>
+
+        <!-- Reporter Information -->
+        <div class="form-section">
+          <h3><mat-icon>person_outline</mat-icon> Reporter Information</h3>
+          <div class="form-grid">
+            <mat-form-field appearance="outline">
+              <mat-label>Reporter Name</mat-label>
+              <input matInput formControlName="reporterName" placeholder="Your name">
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline">
+              <mat-label>Professional Title</mat-label>
+              <mat-select formControlName="reporterTitle">
+                <mat-option value="pharmacist">Pharmacist</mat-option>
+                <mat-option value="physician">Physician</mat-option>
+                <mat-option value="nurse">Nurse</mat-option>
+                <mat-option value="other">Other Healthcare Professional</mat-option>
+              </mat-select>
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline">
+              <mat-label>Institution</mat-label>
+              <input matInput formControlName="institution" placeholder="Hospital/Clinic name">
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline">
+              <mat-label>Contact Email</mat-label>
+              <input matInput type="email" formControlName="contactEmail" placeholder="email@example.com">
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline">
+              <mat-label>Phone Number</mat-label>
+              <input matInput formControlName="phoneNumber" placeholder="Contact number">
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline">
+              <mat-label>Report Date</mat-label>
+              <input matInput [matDatepicker]="reportPicker" formControlName="reportDate">
+              <mat-datepicker-toggle matSuffix [for]="reportPicker"></mat-datepicker-toggle>
+              <mat-datepicker #reportPicker></mat-datepicker>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <!-- Additional Information -->
+        <div class="form-section">
+          <h3><mat-icon>note</mat-icon> Additional Information</h3>
+          
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Additional Comments</mat-label>
+            <textarea matInput formControlName="additionalComments" rows="4" 
+                      placeholder="Any additional relevant information..."></textarea>
+          </mat-form-field>
+          
+          <div class="checkbox-section">
+            <mat-checkbox formControlName="followUpRequired">Follow-up required</mat-checkbox>
+            <mat-checkbox formControlName="reportedToAuthority">Reported to regulatory authority</mat-checkbox>
+            <mat-checkbox formControlName="literatureReported">Similar reactions reported in literature</mat-checkbox>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button mat-raised-button type="button" (click)="saveDraft()" [disabled]="isSubmitting">
+            <mat-icon>save</mat-icon>
+            Save Draft
+          </button>
+          
+          <button mat-raised-button type="button" (click)="previewReport()" [disabled]="!adrForm.valid">
+            <mat-icon>preview</mat-icon>
+            Preview Report
+          </button>
+          
+          <button mat-raised-button color="primary" type="submit" 
+                  [disabled]="!adrForm.valid || isSubmitting">
+            <mat-icon>send</mat-icon>
+            {{isSubmitting ? 'Submitting...' : 'Submit Report'}}
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Report Preview Modal -->
+    <div *ngIf="showPreview" class="preview-overlay">
+      <div class="preview-content">
+        <div class="preview-header">
+          <h3>ADR Report Preview</h3>
+          <button mat-icon-button (click)="closePreview()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+        
+        <div class="preview-body" [innerHTML]="previewHtml"></div>
+        
+        <div class="preview-actions">
+          <button mat-raised-button (click)="printReport()">
+            <mat-icon>print</mat-icon>
+            Print
+          </button>
+          <button mat-raised-button (click)="exportToPDF()">
+            <mat-icon>picture_as_pdf</mat-icon>
+            Export PDF
+          </button>
+          <button mat-raised-button color="primary" (click)="submitFromPreview()">
+            <mat-icon>send</mat-icon>
+            Submit Report
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Success Message -->
+    <div *ngIf="reportSubmitted" class="success-message">
+      <div class="success-content">
+        <mat-icon>check_circle</mat-icon>
+        <h3>Report Submitted Successfully</h3>
+        <p>Report ID: <strong>{{submittedReportId}}</strong></p>
+        <p>Your ADR report has been submitted to the pharmacovigilance database.</p>
+        <div class="success-actions">
+          <button mat-raised-button (click)="createNewReport()">
+            <mat-icon>add</mat-icon>
+            Create New Report
+          </button>
+          <button mat-raised-button color="primary" (click)="viewSubmittedReports()">
+            <mat-icon>list</mat-icon>
+            View All Reports
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

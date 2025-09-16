@@ -1,6 +1,8 @@
 import { Component, OnInit, computed, inject } from '@angular/core';
 import { CommonModule, NgFor } from '@angular/common';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { CommonService } from '../../../../Service/common.service';
 import { SharedServiceService } from '../../../../Service/Sharedservice/shared-service.service';
 import { AllergyDto } from '../../../Interface/PatientFile';
@@ -12,9 +14,11 @@ import { AllergyDto } from '../../../Interface/PatientFile';
     CommonModule,
     ReactiveFormsModule,
     NgFor,
+    MatInputModule,
+    MatFormFieldModule
   ],
   templateUrl: './allergy.component.html',
-  styleUrls: ['./allergy.component.scss']
+  styleUrls: ['./allergy.component.scss', '../../../Shared/styles/table-template.scss']
 })
 export class AllergyComponent implements OnInit {
   private fb = inject(FormBuilder);
@@ -39,7 +43,8 @@ createAllergy(data?: any, isNew = true): FormGroup {
     lastEditedBy: [data?.lastEditedBy || ''],
     isNew: [isNew],
     isEdited: [false],
-    isDeleted: [false]
+    isDeleted: [false],
+    isEditable: [isNew]
   });
 
   group.valueChanges.subscribe(() => {
@@ -65,8 +70,31 @@ addAllergy(data?: any, isNew = true) {
       return;
     }
     meds.push(this.createAllergy());
+    setTimeout(() => {
+      this.scrollToNewRow(meds.length - 1);
+    }, 100);
 }
-
+private scrollToNewRow(index: number) {
+    const tableContainer = document.querySelector('.emr-table-container');
+    if (tableContainer) {
+      const rows = tableContainer.querySelectorAll('tbody tr:not([style*="display: none"])');
+      const targetRow = rows[index] as HTMLElement;
+      if (targetRow) {
+        // Calculate the position to scroll to show the new row
+        const containerHeight = tableContainer.clientHeight;
+        const rowHeight = targetRow.offsetHeight;
+        const rowTop = targetRow.offsetTop;
+        const headerHeight = 50; // Approximate header height
+        
+        // Scroll to show the new row at the bottom of visible area
+        const scrollTop = Math.max(0, rowTop - containerHeight + rowHeight + headerHeight);
+        tableContainer.scrollTo({
+          top: scrollTop,
+          behavior: 'smooth'
+        });
+      }
+    }
+  }
   ngOnInit(): void {
      this.loadMedicationsFromAPI();
   }
@@ -167,7 +195,7 @@ addAllergy(data?: any, isNew = true) {
     }
 
     Promise.all(allRequests)
-      .then(() => {  this.sharedService.Messages('success', 'Current Medication', 'Saved Successfully', 3000);this.loadMedicationsFromAPI()})
+      .then(() => {  this.sharedService.Messages('success', 'Allergy', 'Saved Successfully', 3000);this.loadMedicationsFromAPI()})
       .catch(err => console.error('Save failed', err));
   }
 cancel(){
@@ -179,18 +207,61 @@ removeAllergy(index: number) {
   const ctrl = meds.at(index) as FormGroup;
   if (!ctrl) return;
 
-  // Mark as deleted
-  ctrl.patchValue({
-    isDeleted: true,
-    isEdited: false
-  });
+  const description = ctrl.get('description')?.value?.trim();
 
-  
-
+  if (!description) {
+    // If description is empty → remove control
+    meds.removeAt(index);
+  } else {
+    // If description has value → just mark deleted
+    ctrl.patchValue({
+      isDeleted: true,
+      isEdited: false
+    });
+  }
 }
+
 
 
   trackByIndex(index: number): number {
     return index;
+  }
+
+  editAllergy(index: number) {
+    const allergy = this.getFormControls.at(index) as FormGroup;
+    if (allergy) {
+      allergy.patchValue({ isEditable: true });
+    }
+  }
+
+  saveAllergy(index: number) {
+    const allergy = this.getFormControls.at(index) as FormGroup;
+    if (allergy && allergy.valid) {
+      allergy.patchValue({ 
+        isEditable: false,
+        isNew: false,
+        isEdited: !allergy.get('isNew')?.value
+      });
+    } else {
+      allergy?.markAllAsTouched();
+    }
+  }
+
+  cancelEdit(index: number) {
+    const allergy = this.getFormControls.at(index) as FormGroup;
+    if (allergy) {
+      if (allergy.get('isNew')?.value) {
+        this.getFormControls.removeAt(index);
+      } else {
+        allergy.patchValue({ isEditable: false });
+        // Reset to original values if needed
+      }
+    }
+  }
+
+  allAllergiesDeleted(): boolean {
+    return this.getFormControls.controls.every(ctrl => 
+      (ctrl as FormGroup).get('isDeleted')?.value === true
+    );
   }
 }

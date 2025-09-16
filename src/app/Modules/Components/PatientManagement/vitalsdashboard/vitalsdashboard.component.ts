@@ -15,65 +15,21 @@ interface VitalReading {
 }
 @Component({
   selector: 'app-vitalsdashboard',
-  imports: [MatTabsModule, MatCardModule,CommonModule],
-    template: `
-    <div class="dashboard-container">
-      <h2>Vitals Dashboard</h2>
-
-      <div class="charts">
-        <div>
-          <h3>Time Series (BP & Sugar)</h3>
-          <canvas #timeSeriesChart></canvas>
-        </div>
-        <div>
-          <h3>Daily Trends</h3>
-          <canvas #dailyTrendChart></canvas>
-        </div>
-      </div>
-
-      <div class="alerts" *ngIf="alerts.length > 0">
-        <h3>Critical Alerts</h3>
-        <ul>
-          <li *ngFor="let alert of alerts">⚠️ {{ alert }}</li>
-        </ul>
-      </div>
-    </div>
-  `,
-  styles: [`
-    .dashboard-container {
-      padding: 20px;
-     
-      margin: auto;
-      font-family: Arial, sans-serif;
-    }
-    .charts {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-    }
-    canvas {
-      background: #fff;
-      border: 1px solid #ddd;
-      padding: 8px;
-      border-radius: 8px;
-    }
-    .alerts {
-      margin-top: 20px;
-      background: #ffebee;
-      padding: 12px;
-      border-radius: 6px;
-      border: 1px solid #d32f2f;
-    }
-    .alerts h3 {
-      margin-top: 0;
-    }
-  `]
+  standalone: true,
+  imports: [MatTabsModule, MatCardModule, CommonModule],
+  templateUrl: './vitalsdashboard.component.html',
+  styleUrls: ['./vitalsdashboard.component.scss', '../../../Shared/styles/table-template.scss']
 })
 export class VitalsdashboardComponent {
  @ViewChild('timeSeriesChart') timeSeriesChartRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('dailyTrendChart') dailyTrendChartRef!: ElementRef<HTMLCanvasElement>;
 
   alerts: string[] = [];
+  criticalAlerts: any[] = [];
+  summaryCards: any[] = [];
+  bpChartData: any = {};
+  sugarChartData: any = {};
+  chartOptions: any = {};
 
   // Dummy data - replace with API results
   readings: VitalReading[] = [

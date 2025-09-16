@@ -1,0 +1,357 @@
+<div class="container-fluid">
+  <div class="card-fullview">
+    <!-- Header Section -->
+    <div class="header-section">
+      <h2>
+        <mat-icon>psychology</mat-icon>
+        AI-Powered Medication Interaction Checker
+      </h2>
+      <div class="header-actions">
+        <!-- <button mat-raised-button color="primary" (click)="exportToPDF()" [disabled]="!analysisResults">
+          <mat-icon>picture_as_pdf</mat-icon>
+          Export PDF
+        </button> -->
+        <button mat-raised-button color="accent" (click)="printAnalysis()" [disabled]="!analysisResults">
+          <mat-icon>print</mat-icon>
+          Print Report
+        </button>
+      </div>
+    </div>
+  
+  <!-- Patient Selection -->
+  <div class="patient-selection-section" *ngIf="!selectedPatient">
+    <div class="patient-selector">
+      <div class="custom-select-wrapper">
+        <label for="patientSelect" class="select-label">
+          <i class="icon-person">👤</i>
+          Select Patient
+        </label>
+        <select 
+          id="patientSelect" 
+          class="custom-select" 
+          [(ngModel)]="selectedPatientId" 
+          (change)="onPatientSelectChange($event)" 
+          [disabled]="loadingPatients">
+          <option value="" disabled>Choose a patient...</option>
+          <option *ngFor="let patient of patients" [value]="patient.patientId">
+            {{ patient.name }} (Age: {{ patient.age }}, ID: {{ patient.patientId }})
+          </option>
+        </select>
+        <div class="select-arrow">
+          <i class="arrow-down">▼</i>
+        </div>
+      </div>
+      
+      <button class="refresh-btn" (click)="loadPatients()" [disabled]="loadingPatients">
+        <i class="icon-refresh">🔄</i>
+        Refresh Patients
+      </button>
+    </div>
+    
+    <div class="loading-patients" *ngIf="loadingPatients">
+      <div class="loading-spinner"></div>
+      <p>Loading patients...</p>
+    </div>
+  </div>
+
+  <!-- Main Content Area (shown when patient is selected) -->
+  <div class="main-content-area" *ngIf="selectedPatient">
+    <!-- Patient Info Section -->
+    <div class="patient-info-section">
+      <div class="patient-header">
+        <div class="patient-details">
+          <div class="patient-name-section">
+            <mat-chip-set>
+              <mat-chip color="primary" selected>
+                <mat-icon matChipAvatar>person</mat-icon>
+                {{ selectedPatient.name }} {{ selectedPatient.lastName }}
+              </mat-chip>
+            </mat-chip-set>
+          </div>
+          
+          <div class="patient-info-grid">
+            <div class="info-item">
+              <mat-icon>badge</mat-icon>
+              <div class="info-content">
+                <span class="label">Patient ID</span>
+                <span class="value">{{ selectedPatient.patientId }}</span>
+              </div>
+            </div>
+            <div class="info-item">
+              <mat-icon>cake</mat-icon>
+              <div class="info-content">
+                <span class="label">Age</span>
+                <span class="value">{{ calculateAge(selectedPatient.dateOfBirth) }} years</span>
+              </div>
+            </div>
+            <div class="info-item">
+              <mat-icon>wc</mat-icon>
+              <div class="info-content">
+                <span class="label">Gender</span>
+                <span class="value">{{ selectedPatient.gender }}</span>
+              </div>
+            </div>
+            <div class="info-item" *ngIf="selectedPatient.email">
+              <mat-icon>email</mat-icon>
+              <div class="info-content">
+                <span class="label">Email</span>
+                <span class="value">{{ selectedPatient.email }}</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="medical-conditions" *ngIf="selectedPatient.conditions && selectedPatient.conditions.length > 0">
+            <h4><mat-icon>medical_services</mat-icon> Medical Conditions</h4>
+            <mat-chip-set>
+              <mat-chip *ngFor="let condition of selectedPatient.conditions" color="accent">
+                {{ condition }}
+              </mat-chip>
+            </mat-chip-set>
+          </div>
+        </div>
+        
+        <!-- <div class="patient-actions">
+          <button mat-raised-button color="warn" (click)="clearPatientSelection()">
+            <mat-icon>close</mat-icon>
+            Change Patient
+          </button>
+        </div> -->
+      </div>
+    </div>
+    
+    <!-- Content Grid Layout -->
+    <div class="content-grid">
+      <!-- Medications Column -->
+      <div class="medications-column">
+        <div class="section-header">
+          <h3><mat-icon>medication</mat-icon> Current Medications</h3>
+          <!-- <button class="add-medication-btn" (click)="onAddMedicationClick()">
+            <mat-icon>{{ showAddMedicationForm ? 'close' : 'add' }}</mat-icon>
+            {{ showAddMedicationForm ? 'Cancel' : 'Add Medication' }}
+          </button> -->
+        </div>
+        
+        <div class="medications-section">
+          <!-- Add Medication Form -->
+          <div class="add-medication-form" *ngIf="showAddMedicationForm">
+            <h4><mat-icon>add</mat-icon> Add New Medication</h4>
+            <div class="form-grid">
+              <mat-form-field appearance="outline">
+                <mat-label>Medication Name</mat-label>
+                <input matInput [(ngModel)]="newMedication.medname" placeholder="Enter medication name">
+                <mat-icon matSuffix>medication</mat-icon>
+              </mat-form-field>
+              
+              <mat-form-field appearance="outline">
+                <mat-label>Dosage</mat-label>
+                <input matInput [(ngModel)]="newMedication.dosage" placeholder="e.g., 10mg">
+                <mat-icon matSuffix>straighten</mat-icon>
+              </mat-form-field>
+              
+              <mat-form-field appearance="outline">
+                <mat-label>Frequency</mat-label>
+                <input matInput [(ngModel)]="newMedication.frequency" placeholder="e.g., Twice daily">
+                <mat-icon matSuffix>schedule</mat-icon>
+              </mat-form-field>
+              
+              <mat-form-field appearance="outline">
+                <mat-label>Start Date</mat-label>
+                <input matInput type="date" [(ngModel)]="newMedication.startDate">
+                <mat-icon matSuffix>calendar_today</mat-icon>
+              </mat-form-field>
+            </div>
+            
+            <div class="form-actions">
+              <button class="save-medication-btn" (click)="saveNewMedication()" 
+                      [disabled]="!newMedication.medname || !newMedication.dosage">
+                <mat-icon>save</mat-icon>
+                Save Medication
+              </button>
+              <button class="cancel-btn" (click)="cancelAddMedication()">
+                <mat-icon>cancel</mat-icon>
+                Cancel
+              </button>
+            </div>
+          </div>
+
+          <!-- Current Medications List -->
+          <div class="medications-list" *ngIf="currentMedications.length > 0">
+            <div class="medication-item" *ngFor="let medication of currentMedications; let i = index">
+              <div class="medication-info">
+                <h5>{{ medication.medname }}</h5>
+                <p><strong>Dosage:</strong> {{ medication.dosage }}</p>
+                <p><strong>Frequency:</strong> {{ medication.frequency }}</p>
+                <p><strong>Start Date:</strong> {{ medication.startDate | date:'shortDate' }}</p>
+              </div>
+              <!-- <div class="medication-actions">
+                <button class="action-btn edit-btn" (click)="onEditMedication(medication, i)">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button class="action-btn monograph-btn" (click)="onMonographClick(medication)">
+                  <mat-icon>description</mat-icon>
+                </button>
+                <button class="action-btn cancel-btn" (click)="onCancelMedication(medication, i)">
+                  <mat-icon>cancel</mat-icon>
+                </button>
+                <button class="action-btn delete-btn" (click)="onDeleteMedication(medication, i)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div> -->
+            </div>
+          </div>
+
+          <!-- No Medications Message -->
+          <div class="no-medications" *ngIf="currentMedications.length === 0">
+            <mat-icon>medication</mat-icon>
+            <p>No medications loaded. Add medications to begin analysis.</p>
+          </div>
+
+          <!-- Analysis Button -->
+          <div class="analysis-trigger" *ngIf="currentMedications.length > 0">
+            <button mat-raised-button color="primary" (click)="analyzeInteractions()" 
+                    [disabled]="isAnalyzing" class="analyze-btn">
+              <mat-icon>psychology</mat-icon>
+              {{isAnalyzing ? 'Analyzing...' : 'Analyze Interactions'}}
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Analysis Column -->
+      <div class="analysis-column">
+        <div class="section-header">
+          <h3><mat-icon>analytics</mat-icon> AI Analysis Results</h3>
+          <div class="analysis-actions" *ngIf="analysisResults">
+            <button mat-raised-button (click)="shareAnalysis()" [disabled]="sharingAnalysis">
+              <mat-icon>share</mat-icon>
+              {{ sharingAnalysis ? 'Sharing...' : 'Share' }}
+            </button>
+          </div>
+        </div>
+        
+        <div class="analysis-section">
+          <!-- Analysis Results Display -->
+          <div class="analysis-results" *ngIf="analysisResults; else noAnalysisTemplate">
+            <!-- Analysis content here -->
+            <div class="interactions-summary">
+              <div class="summary-card high-risk" *ngIf="analysisResults.highRiskInteractions > 0">
+                <mat-icon>dangerous</mat-icon>
+                <div class="summary-content">
+                  <h4>High Risk Interactions</h4>
+                  <span class="count">{{ analysisResults.highRiskInteractions }}</span>
+                </div>
+              </div>
+              
+              <div class="summary-card medium-risk" *ngIf="analysisResults.mediumRiskInteractions > 0">
+                <mat-icon>warning</mat-icon>
+                <div class="summary-content">
+                  <h4>Medium Risk Interactions</h4>
+                  <span class="count">{{ analysisResults.mediumRiskInteractions }}</span>
+                </div>
+              </div>
+              
+              <div class="summary-card low-risk" *ngIf="analysisResults.lowRiskInteractions > 0">
+                <mat-icon>info</mat-icon>
+                <div class="summary-content">
+                  <h4>Low Risk Interactions</h4>
+                  <span class="count">{{ analysisResults.lowRiskInteractions }}</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Detailed Interactions -->
+            <div class="detailed-interactions" *ngIf="analysisResults.interactions && analysisResults.interactions.length > 0">
+              <h4>Detailed Analysis</h4>
+              <div class="interaction-item" *ngFor="let interaction of analysisResults.interactions" 
+                   [ngClass]="'severity-' + interaction.severity.toLowerCase()">
+                <div class="interaction-header">
+                  <mat-icon [ngClass]="getSeverityIcon(interaction.severity)">{{ getSeverityIcon(interaction.severity) }}</mat-icon>
+                  <h5>{{ interaction.drug1 }} + {{ interaction.drug2 }}</h5>
+                  <mat-chip [ngClass]="'severity-chip-' + interaction.severity.toLowerCase()">
+                    {{ interaction.severity }}
+                  </mat-chip>
+                </div>
+                <p class="interaction-description">{{ interaction.description }}</p>
+                <div class="clinical-significance" *ngIf="interaction.clinicalSignificance">
+                  <strong>Clinical Significance:</strong> {{ interaction.clinicalSignificance }}
+                </div>
+                <div class="recommendations" *ngIf="interaction.recommendations">
+                  <strong>Recommendations:</strong> {{ interaction.recommendations }}
+                </div>
+              </div>
+            </div>
+            
+            <!-- Overall Recommendations -->
+            <div class="overall-recommendations" *ngIf="analysisResults.overallRecommendations">
+              <h4><mat-icon>lightbulb</mat-icon> Overall Recommendations</h4>
+              <div class="recommendations-content">
+                <p>{{ analysisResults.overallRecommendations }}</p>
+              </div>
+            </div>
+          </div>
+          
+          <ng-template #noAnalysisTemplate>
+            <div class="analysis-placeholder">
+              <mat-icon>psychology</mat-icon>
+              <h4>Ready for AI Analysis</h4>
+              <p *ngIf="currentMedications.length === 0">Add medications to begin interaction analysis.</p>
+              <p *ngIf="currentMedications.length === 1">Add one more medication to enable interaction analysis.</p>
+              <p *ngIf="currentMedications.length >= 2 && !isAnalyzing">Click "Analyze Interactions" to start AI analysis.</p>
+              
+              <div class="analysis-progress" *ngIf="isAnalyzing">
+                <mat-progress-bar mode="indeterminate" color="primary"></mat-progress-bar>
+                <p class="progress-text">{{ analysisProgressMessage }}</p>
+                
+                <div class="progress-steps">
+                  <div class="step" [ngClass]="{active: currentAnalysisStep >= 1, completed: currentAnalysisStep > 1}">
+                    <mat-icon>{{ currentAnalysisStep > 1 ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+                    <span>Preparing medications data</span>
+                  </div>
+                  <div class="step" [ngClass]="{active: currentAnalysisStep >= 2, completed: currentAnalysisStep > 2}">
+                    <mat-icon>{{ currentAnalysisStep > 2 ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+                    <span>Analyzing drug interactions</span>
+                  </div>
+                  <div class="step" [ngClass]="{active: currentAnalysisStep >= 3, completed: currentAnalysisStep > 3}">
+                    <mat-icon>{{ currentAnalysisStep > 3 ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+                    <span>Generating recommendations</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Help Section (shown when no patient is selected) -->
+  <div class="help-section" *ngIf="!selectedPatient">
+    <div class="help-content">
+      <mat-icon>info</mat-icon>
+      <h3>Welcome to AI Medication Interaction Checker</h3>
+      <p>This advanced tool helps healthcare professionals identify potential drug interactions and assess medication safety using AI-powered analysis.</p>
+      <div class="features-grid">
+        <div class="feature-item">
+          <mat-icon>person_search</mat-icon>
+          <h4>Patient Selection</h4>
+          <p>Choose a patient to load their current medications automatically</p>
+        </div>
+        <div class="feature-item">
+          <mat-icon>auto_awesome</mat-icon>
+          <h4>AI Analysis</h4>
+          <p>Automatic interaction analysis when 2+ medications are present</p>
+        </div>
+        <div class="feature-item">
+          <mat-icon>warning</mat-icon>
+          <h4>Severity Assessment</h4>
+          <p>Detailed severity levels and clinical recommendations</p>
+        </div>
+        <div class="feature-item">
+          <mat-icon>description</mat-icon>
+          <h4>Export Options</h4>
+          <p>Generate PDF reports or print analysis results</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

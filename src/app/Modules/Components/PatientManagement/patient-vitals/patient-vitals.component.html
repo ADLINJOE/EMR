@@ -1,72 +1,143 @@
+
+
 <div class="container">
-  <div class="card">
-    <h2>Patient Vitals</h2>
+  <div class="emr-card">
+    <div class="emr-card-header">
+      <h2 class="emr-card-title">Patient Vitals</h2>
 
-    <form [formGroup]="form">
-      <!-- Add button -->
-      <div class="add-button-wrapper">
-        <button type="button" class="btn-primary" (click)="addVital()">+ Add Vitals</button>
-      </div>
+    
 
-      <!-- Scrollable table -->
-      <div class="tablefix">
-        <table class="full-width-table" formArrayName="vitalList">
-        <thead>
-  <tr>
-    <th rowspan="2">Sl.No</th>
-    <th rowspan="2">Date & Time</th>
-    <th>BP</th>
-    <th>Sugar</th>
-    <th rowspan="2">Actions</th>
-  </tr>
-  <tr>
-    <th>
-      <div class="vital-header">
-        <span>Sys (90–140)</span> / <span>Dia (60–90)</span> mmHg
+    <form [formGroup]="form" class="emr-form">
+         <div class="emr-add-button-wrapper">
+        <button type="button" class="emr-btn-add" (click)="addVital()">+ Add Vitals</button>
       </div>
-    </th>
-    <th>
-      <div class="vital-header">
-        <span>Fasting (70–100)</span> / <span>PP (100–140)</span> mg/dL
-      </div>
-    </th>
-  </tr>
-</thead>
-
-          <tbody>
+      <div class="emr-table-container">
+        <table class="emr-table" formArrayName="vitalList">
+          <thead class="emr-table-header">
+            <tr>
+              <th class="emr-th emr-th-serial">Sl.No</th>
+              <th class="emr-th emr-th-datetime">Date & Time</th>
+              <th class="emr-th emr-th-bp">
+                <div class="emr-vital-header">
+                  <div class="emr-vital-title">Blood Pressure</div>
+                  <div class="emr-vital-range">
+                    <span class="emr-range-label">Sys (90–140)</span> / 
+                    <span class="emr-range-label">Dia (60–90)</span> mmHg
+                  </div>
+                </div>
+              </th>
+              <th class="emr-th emr-th-sugar">
+                <div class="emr-vital-header">
+                  <div class="emr-vital-title">Blood Sugar</div>
+                  <div class="emr-vital-range">
+                    <span class="emr-range-label">Fasting (70–100)</span> / 
+                    <span class="emr-range-label">PP (100–140)</span> mg/dL
+                  </div>
+                </div>
+              </th>
+              <th class="emr-th emr-th-actions">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="emr-table-body">
             <ng-container *ngFor="let vital of getFormControls.controls; let i = index; trackBy: trackByIndex">
-              <tr [formGroupName]="i" [hidden]="vital.get('isDeleted')?.value">
-                <td>{{ i + 1 }}</td>
-                <td>
-                  <input class="plain-input" style="width:92%" type="datetime-local" formControlName="readingDateTime">
+              <tr [formGroupName]="i" 
+                  class="emr-table-row"
+                  [class.emr-row-deleted]="vital.get('isDeleted')?.value"
+                  [class.emr-row-new]="vital.get('isNew')?.value"
+                  [hidden]="vital.get('isDeleted')?.value">
+                <td class="emr-td emr-td-serial">
+                  <span class="emr-serial-number">{{ i + 1 }}</span>
                 </td>
-                <td>
-                  <div class="vital-row">
-                    <input class="plain-input" type="number" formControlName="systolic">
-                    /
-                    <input class="plain-input" type="number" formControlName="diastolic">
+                <td class="emr-td emr-td-datetime">
+                  <div class="emr-datetime-container">
+                    <mat-form-field class="emr-form-field emr-form-field-date" appearance="outline">
+                      <mat-label>Date</mat-label>
+                      <input matInput [matDatepicker]="datePicker" formControlName="readingDate" 
+                             placeholder="Select date" class="emr-input">
+                      <mat-datepicker-toggle matIconSuffix [for]="datePicker"></mat-datepicker-toggle>
+                      <mat-datepicker #datePicker></mat-datepicker>
+                      <mat-error *ngIf="vital.get('readingDate')?.errors?.['required']">
+                        Date is required
+                      </mat-error>
+                    </mat-form-field>
+                    <mat-form-field class="emr-form-field emr-form-field-time" appearance="outline">
+                      <mat-label>Time</mat-label>
+                      <input matInput type="time" formControlName="readingTime" 
+                             placeholder="Select time" class="emr-input">
+                      <mat-error *ngIf="vital.get('readingTime')?.errors?.['required']">
+                        Time is required
+                      </mat-error>
+                    </mat-form-field>
                   </div>
                 </td>
-                <td>
-                  <div class="vital-row">
-                    <input class="plain-input" type="number" formControlName="sugarFasting">
-                    /
-                    <input class="plain-input" type="number" formControlName="sugarPP">
+                <td class="emr-td emr-td-bp">
+                  <div class="emr-vital-inputs emr-bp-container">
+                    <mat-form-field class="emr-form-field emr-form-field-vital emr-form-field-sys" appearance="outline">
+                      <mat-label>Sys</mat-label>
+                      <input matInput type="number" formControlName="systolic" 
+                             placeholder="90-140" class="emr-input emr-input-vital">
+                      <mat-error *ngIf="vital.get('systolic')?.errors?.['required']">
+                        Required
+                      </mat-error>
+                    </mat-form-field>
+                    <span class="emr-vital-separator">/</span>
+                    <mat-form-field class="emr-form-field emr-form-field-vital emr-form-field-dia" appearance="outline">
+                      <mat-label>Dia</mat-label>
+                      <input matInput type="number" formControlName="diastolic" 
+                             placeholder="60-90" class="emr-input emr-input-vital">
+                      <mat-error *ngIf="vital.get('diastolic')?.errors?.['required']">
+                        Required
+                      </mat-error>
+                    </mat-form-field>
                   </div>
                 </td>
-                <td>
-                  <button type="button" class="btn-danger" (click)="removeVital(i)">Remove</button>
+                <td class="emr-td emr-td-sugar">
+                  <div class="emr-vital-inputs emr-sugar-container">
+                    <mat-form-field class="emr-form-field emr-form-field-vital emr-form-field-fasting" appearance="outline">
+                      <mat-label>Fasting</mat-label>
+                      <input matInput type="number" formControlName="sugarFasting" 
+                             placeholder="70-100" class="emr-input emr-input-vital">
+                      <mat-error *ngIf="vital.get('sugarFasting')?.errors?.['required']">
+                        Required
+                      </mat-error>
+                    </mat-form-field>
+                    <span class="emr-vital-separator">/</span>
+                    <mat-form-field class="emr-form-field emr-form-field-vital emr-form-field-pp" appearance="outline">
+                      <mat-label>PP</mat-label>
+                      <input matInput type="number" formControlName="sugarPP" 
+                             placeholder="100-140" class="emr-input emr-input-vital">
+                      <mat-error *ngIf="vital.get('sugarPP')?.errors?.['required']">
+                        Required
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                </td>
+                <td class="emr-td-actions">
+                   <div class="emr-action-buttons">
+                            <button type="button" 
+                            class="emr-btn emr-btn-danger emr-btn-compact" 
+                            (click)="removeVital(i)">Remove</button>
+        
+</div>
                 </td>
               </tr>
             </ng-container>
+            <tr *ngIf="getFormControls.length === 0" class="emr-empty-row">
+              <td colspan="5" class="emr-empty-message">
+                No vitals recorded. Click "Add Vitals" to start.
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
 
-      <!-- Buttons -->
-      <div class="button-group button_end">
-        <button type="button" class="btn-primary margin_4px" (click)="saveAll()">Save</button>
-        <button type="button" class="btn-secondary margin_4px" (click)="cancel()">Cancel</button>
+      <div class="button_end">
+        <button type="button" class="btn-primary margin_4px" (click)="saveAll()">
+          <span class="emr-btn-icon"></span> Save All changes
+        </button>
+        <button type="button" class="btn-secondary margin_4px" (click)="cancel()">
+          <span class="emr-btn-icon"></span> Reset
+        </button>
       </div>
     </form>
   </div>

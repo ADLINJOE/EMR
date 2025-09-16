@@ -1,112 +1,147 @@
-<!-- <div class="container">
-  <div class="card">
-    <h2>Adverse Drug Reaction (ADR) Records</h2>
+<div class="emr-container">
+  <div class="emr-card">
+    <div class="emr-card-header">
+      <h2 class="emr-card-title">
+        <span class="emr-icon">⚠️</span> Adverse Drug Reaction (ADR) Records
+      </h2>
+       <mat-form-field appearance="outline" class="emr-form-field emr-form-field-full" style="width: 38% !important;">
+  <input type="text"
+         matInput
+         placeholder="Search patient..."
+         [formControl]="searchPatientControl"
+         [matAutocomplete]="patientAuto">
 
-    <form [formGroup]="adrForm" (ngSubmit)="submit()" class="margin_4px">
-      <input class="plain-input margin_4px" formControlName="patientName" placeholder="Patient Name">
-      <input class="plain-input margin_4px" formControlName="drugName" placeholder="Drug Name">
-      <input class="plain-input margin_4px" formControlName="reaction" placeholder="Reaction">
-      <input class="plain-input margin_4px" formControlName="severity" placeholder="Severity">
+  <mat-autocomplete #patientAuto="matAutocomplete"
+                    [displayWith]="displayPatient"
+                    (optionSelected)="patientselect($event.option.value.patientId)">
+    <mat-option *ngFor="let patient of (filteredPatients | async) || []"
+                [value]="patient">
+      <div>
+        <strong>{{ patient.name }}</strong>
+        <small *ngIf="patient.patientId"> (ID: {{ patient.patientId }})</small>
+        <small *ngIf="patient.email"> (Email: {{ patient.email }})</small>
+      </div>
+    </mat-option>
+  </mat-autocomplete>
+</mat-form-field>
 
-      <label class="center-checkbox margin_4px">
-        <input type="checkbox" formControlName="isSerious"> Serious?
-      </label>
-
-      <button type="submit" class="btn-primary margin_4px">
-        {{ isEditing ? 'Update' : 'Add' }} ADR
+      <button type="button" class="btn btn-primary add-btn" (click)="addReaction()">
+        <span class="emr-btn-icon">+</span> Add Reaction
       </button>
-      <button type="button" class="btn-secondary margin_4px" (click)="resetForm()">Reset</button>
-    </form>
-
-    <div class="tablefix">
-      <table class="full-width-table">
-        <thead>
-          <tr>
-            <th>Patient</th>
-            <th>Drug</th>
-            <th>Reaction</th>
-            <th>Severity</th>
-            <th>Serious</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let adr of adrs">
-            <td>{{ adr.patientName }}</td>
-            <td>{{ adr.drugName }}</td>
-            <td>{{ adr.reaction }}</td>
-            <td>{{ adr.severity }}</td>
-            <td>{{ adr.isSerious ? 'Yes' : 'No' }}</td>
-            <td>
-              <button class="btn-primary margin_4px" (click)="edit(adr)">Edit</button>
-              <button class="btn-danger margin_4px" (click)="delete(adr.id)">Delete</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
     </div>
+<div *ngIf="selectedPatient" class="patient-header">
+  <h3>Patient: {{ selectedPatient.name }} (ID: {{ selectedPatient.patientId }})</h3>
+  <p *ngIf="selectedPatient.email">Email: {{ selectedPatient.email }}</p>
+</div>
+
+    <form [formGroup]="adrForm" class="emr-form">
+      <div class="emr-table-container">
+        <table class="emr-table" formArrayName="reactions">
+          <thead class="emr-table-header">
+            <tr>
+              <th class="emr-th emr-th-serial">Sl.No</th>
+              <!-- <th class="emr-th">Patient Name</th> -->
+              <!-- <th class="emr-th">Email</th> -->
+              <th class="emr-th emr-th-severity">Reaction Description</th>
+              <th class="emr-th">Drug Name</th>
+              <th class="emr-th emr-th-date">Date Occurred</th>
+              <th class="emr-th emr-th-description">AI Severity Assessment</th>
+              <!-- <th class="emr-th emr-th-actions">Actions</th> -->
+            </tr>
+          </thead>
+
+          <tbody class="emr-table-body">
+            <ng-container *ngFor="let reaction of reactions.controls; let i=index; trackBy: trackByIndex">
+              <tr [formGroupName]="i" class="emr-table-row">
+                <!-- Serial -->
+                <td class="emr-td emr-td-serial">
+                  <span class="emr-serial-number">{{ i + 1 }}</span>
+                </td>
+
+                
+
+                <!-- Reaction -->
+                <td class="emr-td emr-td-description">
+                  <mat-form-field appearance="outline" class="emr-form-field emr-form-field-full">
+                    <textarea matInput rows="2"
+                              placeholder="Describe the adverse reaction..."
+                              formControlName="description"
+                              class="emr-input emr-textarea"></textarea>
+                  </mat-form-field>
+                </td>
+   <td class="emr-td emr-td-description">
+                  <mat-form-field appearance="outline" class="emr-form-field emr-form-field-full">
+                    <textarea matInput rows="2"
+                              placeholder="Drug Name.."
+                              formControlName="drugname"
+                              class="emr-input emr-textarea"></textarea>
+                  </mat-form-field>
+                </td>
+                <!-- Date -->
+                <td class="emr-td emr-td-date">
+                  <mat-form-field class="emr-form-field emr-form-field-date" appearance="outline">
+                    <input matInput 
+                           [matDatepicker]="picker" 
+                           formControlName="dateOccurred"
+                           placeholder="Select date"
+                           class="emr-input emr-input-date">
+                    <mat-datepicker-toggle matSuffix [for]="picker" class="emr-datepicker-toggle"></mat-datepicker-toggle>
+                    <mat-datepicker #picker></mat-datepicker>
+                    <mat-error *ngIf="reaction.get('dateOccurred')?.errors?.['required']">
+                      Date is required
+                    </mat-error>
+                  </mat-form-field>
+                </td>
+
+                <!-- AI Severity -->
+                    <!-- <td class="emr-td emr-td-description">
+                  <mat-form-field appearance="outline" class="emr-form-field emr-form-field-full">
+                    <textarea matInput rows="2"
+                              placeholder="Describe the adverse reaction..."
+                              formControlName="description"
+                              class="emr-input emr-textarea"></textarea>
+                  </mat-form-field>
+                </td> -->
+                <td class="emr-td emr-td-description">
+                  <!-- <div class="emr-severity-container"> -->
+                    <mat-form-field appearance="outline" class="emr-form-field emr-form-field-full">
+                      <textarea matInput rows="2"
+                                placeholder="AI Assessment"
+                                formControlName="aiSeveritySuggestion"
+                                class="emr-input emr-textarea"
+                                readonly></textarea>
+                    </mat-form-field>
+                    <button type="button"
+                            class="emr-btn emr-btn-ai emr-btn-sm"
+                            (click)="checkSeverity(i)"
+                            [disabled]="!reaction.get('description')?.value">
+                      🤖 Check AI
+                    </button>
+                  <!-- </div> -->
+                </td>
+
+                <!-- Actions -->
+                <!-- <td class="emr-td emr-td-actions">
+                  <button type="button"
+                          class="emr-btn emr-btn-danger emr-btn-sm"
+                          (click)="removeReaction(i)">
+                    🗑️
+                  </button>
+                </td> -->
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="emr-form-actions">
+        <button type="button" class="emr-btn emr-btn-primary" (click)="saveForm()">
+          💾 Save ADR Records
+        </button>
+        <button type="button" class="emr-btn emr-btn-secondary" (click)="resetForm()">
+          ↩️ Reset Form
+        </button>
+      </div>
+    </form>
   </div>
-</div> -->
-<mat-card class="p-4">
-      <h2 class="text-xl font-bold mb-4">Adverse Drug Reaction Cases</h2>
-      <form (ngSubmit)="submitADR()">
-  <h3>ADR Report Form</h3>
-
-  <label for="reaction">Reaction:</label>
-  <input id="reaction" [(ngModel)]="adrPayload.reaction[0].reactionmeddrapt" name="reaction" required />
-
-  <label for="drug">Drug:</label>
-  <input id="drug" [(ngModel)]="adrPayload.drug[0].openfda.brand_name[0]" name="drug" required />
-
-  <button type="submit">Submit ADR</button>
-</form>
-
-      <table mat-table [dataSource]="reports" class="mat-elevation-z8 w-full">
-        
-        <!-- Patient Info -->
-        <ng-container matColumnDef="patient">
-          <th mat-header-cell *matHeaderCellDef> Patient Info </th>
-          <td mat-cell *matCellDef="let report">
-            Age: {{report.patient?.patientonsetage || 'N/A'}}, 
-            Gender: {{mapSex(report.patient?.patientsex)}}, 
-            Weight: {{report.patient?.patientweight || 'N/A'}}
-          </td>
-        </ng-container>
-
-        <!-- Drugs -->
-        <ng-container matColumnDef="drugs">
-          <th mat-header-cell *matHeaderCellDef> Drugs </th>
-          <td mat-cell *matCellDef="let report">
-            <ul>
-              <li *ngFor="let d of report.patientdrug">
-                {{d.medicinalproduct}} ({{d.drugadministrationroute || 'N/A'}})
-              </li>
-            </ul>
-          </td>
-        </ng-container>
-
-        <!-- Reactions -->
-        <ng-container matColumnDef="reactions">
-          <th mat-header-cell *matHeaderCellDef> Reactions </th>
-          <td mat-cell *matCellDef="let report">
-            <ul>
-              <li *ngFor="let r of report.patientreaction">
-                {{r.reactionmeddrapt}}
-              </li>
-            </ul>
-          </td>
-        </ng-container>
-
-        <!-- Outcome -->
-        <ng-container matColumnDef="outcome">
-          <th mat-header-cell *matHeaderCellDef> Outcome </th>
-          <td mat-cell *matCellDef="let report">
-            {{report.seriousnessdeath ? 'Death' : report.serious ? 'Serious' : 'Non-serious'}}
-          </td>
-        </ng-container>
-
-        <tr mat-header-row *matHeaderRowDef="columns"></tr>
-        <tr mat-row *matRowDef="let row; columns: columns;"></tr>
-      </table>
-      <button type="button" class="btn-primary" (click)="submitADR()"></button>
-    </mat-card>
+</div>

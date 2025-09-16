@@ -13,10 +13,10 @@ import { MatDialogModule } from '@angular/material/dialog';
 })
 export class AddPatientDialogComponent {
  patient: any = {
-    name: '',
-    gender: '',
-    age: null,
+    // name: '',
+    // gender: '',
+    // age: null,
     email: '',
-    sendInvite: false
+    // sendInvite: false
   };
 }

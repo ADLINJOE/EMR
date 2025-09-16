@@ -1,3 +1,5 @@
+@import '../currentmedication/currentmedication.component.scss';
+
 .container {
   display: flex;
   justify-content: center;
@@ -29,11 +31,34 @@ h2 {
   margin-bottom: 16px;
 }
 
-.tablefix {
-  height: 20rem;
+.emr-table-container {
+  max-height: 450px;
   overflow-y: auto;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  overflow-x: auto;
+  border-radius: 12px;
+  position: relative;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  scroll-behavior: smooth;
+  
+  /* Custom scrollbar */
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: #00796b;
+    border-radius: 4px;
+    
+    &:hover {
+      background: #004d40;
+    }
+  }
 }
 
 .full-width-table {
@@ -89,6 +114,40 @@ table tr:hover {
   box-shadow: 0 0 4px rgba(0, 121, 107, 0.3);
 }
 
+// Unified EMR button styling with subtle enhancements
+.emr-btn-add {
+  background-color: #00796b;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  
+  &:hover {
+    background-color: #00695c;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 121, 107, 0.2);
+  }
+  
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 4px rgba(0, 121, 107, 0.3);
+  }
+  
+  &:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+}
+
 .btn-primary,
 .btn-secondary,
 .btn-danger {
@@ -98,31 +157,28 @@ table tr:hover {
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
-  transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
 }
 
-.btn-primary {
-  background-color: #00796b;
-  color: white;
-}
-.btn-primary:hover {
-  background-color: #00594d;
-}
-
-.btn-secondary {
-  background-color: #607d8b;
-  color: white;
-}
-.btn-secondary:hover {
-  background-color: #455a64;
-}
-
+.btn-primary,
+.btn-secondary,
 .btn-danger {
-  background-color: #d32f2f;
+  background-color: #4caf50;
   color: white;
-}
-.btn-danger:hover {
-  background-color: #b71c1c;
+  
+  &:hover {
+    background-color: #45a049;
+    box-shadow: 0 2px 6px rgba(76, 175, 80, 0.3);
+  }
 }
 
 .margin_4px {
@@ -130,7 +186,7 @@ table tr:hover {
 }
 
 .button_end {
-  justify-content: end;
+  justify-content: flex-end;
   display: flex;
   margin-top: 12px;
 }
@@ -146,4 +202,141 @@ table tr:hover {
   top: 34px; /* Height of first header row */
   background-color: #00695c; /* Slightly darker for sub-header */
   z-index: 2;
+}
+.emr-datetime-container {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  flex-wrap: nowrap;
+  min-width: 220px;
+
+  .emr-form-field-date,
+  .emr-form-field-time {
+    flex: 1;
+    min-width: 100px;
+  }
+
+  .emr-form-field-date {
+    flex: 1.2; // Slightly wider for date picker
+  }
+
+  .emr-form-field-time {
+    flex: 0.8; // Narrower for time input
+  }
+}
+
+// Ensure table cells don't break the layout
+.emr-td-datetime {
+  min-width: 220px;
+  padding: 6px 2px;
+}
+
+// Blood pressure and sugar input containers - Digit-based width
+.emr-bp-container,
+.emr-sugar-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: nowrap;
+  min-width: 120px; // Reduced for digit-based sizing
+
+  .emr-form-field-vital {
+    flex: 1;
+    min-width: 90px; // Smaller for 2-3 digit numbers
+    max-width: 60px;
+  }
+
+  .emr-vital-separator {
+    font-weight: bold;
+    color: #00796b;
+    font-size: 14px;
+    margin: 0 2px;
+    flex-shrink: 0;
+  }
+}
+
+// Ensure table cells maintain proper width - Digit-based
+.emr-td-bp,
+.emr-td-sugar {
+  min-width: 120px; // Reduced width for digit-based inputs
+  max-width: 140px;
+  padding: 6px 2px;
+}
+
+// Serial number column
+.emr-td-serial {
+  min-width: 50px;
+  padding: 6px 2px;
+  text-align: center;
+}
+
+// Actions column
+.emr-td-actions {
+  min-width: 80px;
+  padding: 6px 2px;
+}
+
+// Override Material form field styles for compact layout
+.emr-form-field-date,
+.emr-form-field-time,
+.emr-form-field-vital {
+  .mat-mdc-form-field-wrapper {
+    padding-bottom: 0;
+  }
+  
+  .mat-mdc-form-field-subscript-wrapper {
+    display: none; // Hide subscript to save space
+  }
+}
+
+// Specific styling for vital input fields - Compact digit-based
+.emr-form-field-sys,
+.emr-form-field-dia,
+.emr-form-field-fasting,
+.emr-form-field-pp {
+  .mat-mdc-text-field-wrapper {
+    height: 35px; // Consistent compact height
+  }
+  
+  .mat-mdc-input-element {
+    text-align: center; // Center align numbers
+    font-weight: 500;
+    font-size: 14px;
+  }
+  
+  // Limit input width for 2-3 digit numbers
+  input {
+    max-width: 50px;
+  }
+}
+
+// Simple row highlighting without animations
+.emr-row-new {
+  background-color: #e8f5e9 !important;
+}
+
+// Compact button styling
+.emr-btn-compact {
+  padding: 4px 8px;
+  font-size: 12px;
+  min-width: 60px;
+}
+.row-added {
+  background-color: #e8f5e9 !important;
+  border-left: 4px solid #4caf50;
+  animation: slideInNewMedRow 1s ease-out, highlightMedRow 3s ease-in-out, glowEffect 2s ease-in-out;
+  transform-origin: top;
+  position: relative;
+  overflow: hidden;
+}
+
+.row-added::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0, 121, 107, 0.3), transparent);
+  animation: medicationShimmer 1.5s ease-in-out;
 }

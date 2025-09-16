@@ -1,23 +1,21 @@
 import { Component, HostListener, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectModule } from '@angular/material/select';
+import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { MatNativeDateModule } from '@angular/material/core';
-import { MatTabsModule } from '@angular/material/tabs';
-import { MatIconModule } from "@angular/material/icon";
+import { MatSelectModule } from '@angular/material/select';
+import { MatOptionModule } from '@angular/material/core';
+import { MatIconModule } from '@angular/material/icon';
+import { MatDialog } from '@angular/material/dialog';
 import { CommonService } from '../../../../Service/common.service';
 import { SharedServiceService } from '../../../../Service/Sharedservice/shared-service.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ForgotPasswordDialogComponent } from '../../Shared/forgot-password-dialog/forgot-password-dialog.component';
 
 @Component({
   selector: 'app-patient-registrationlink',
-  imports: [MatInputModule, ReactiveFormsModule, MatSelectModule, MatNativeDateModule, MatTabsModule,
-    CommonModule, MatDatepickerModule, MatFormFieldModule, MatButtonModule, MatIconModule],
+  imports: [MatInputModule, ReactiveFormsModule, MatSelectModule, CommonModule, MatFormFieldModule, MatButtonModule, MatIconModule, MatOptionModule],
   templateUrl: './patient-registrationlink.component.html',
   styleUrl: './patient-registrationlink.component.scss'
 })
@@ -49,7 +47,7 @@ export class PatientRegistrationlinkComponent implements OnInit {
     // Clear beforeunload when leaving
     window.onbeforeunload = null;
   }
-  constructor(private router: Router, private fb: FormBuilder, private route: ActivatedRoute, private Commonservice: CommonService, private Sharedservice: SharedServiceService) {
+  constructor(private router: Router, private fb: FormBuilder, private route: ActivatedRoute, private Commonservice: CommonService, private Sharedservice: SharedServiceService, private dialog: MatDialog) {
     this.PatientEmail = this.route.snapshot.queryParamMap.get('email');
     this.CheckPatientRegister()
     this.loginForm = this.fb.group({
@@ -137,7 +135,7 @@ this.registerForm.get('email')?.disable();
         next: (response) => {
           if (response.success) {
             this.Sharedservice.Messages('success', 'Login', response.message, 3000);
-            //this.toggleForm();
+            this.toggleForm();
             // this.UserType = true;
           } else {
             this.Sharedservice.Messages('error', 'Login', response.message, 3000);
@@ -164,6 +162,18 @@ this.registerForm.get('email')?.disable();
 
   resetLogin() {
     this.loginForm.reset();
+  }
+
+  openForgotPasswordDialog() {
+    const dialogRef = this.dialog.open(ForgotPasswordDialogComponent, {
+      width: '450px',
+      disableClose: false,
+      panelClass: 'forgot-password-dialog-container'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      // Handle any post-dialog actions if needed
+    });
   }
 
 }

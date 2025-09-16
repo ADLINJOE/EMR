@@ -13,7 +13,8 @@ import { VitalDto } from '../../../Interface/PatientFile';
 
 @Component({
   selector: 'app-patient-vitals',
-   imports: [
+  standalone: true,
+  imports: [
     CommonModule,
     ReactiveFormsModule,
     MatFormFieldModule,
@@ -21,10 +22,11 @@ import { VitalDto } from '../../../Interface/PatientFile';
     MatButtonModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    MatIconModule
+    MatIconModule,
+
   ],
   templateUrl: './patient-vitals.component.html',
-  styleUrl: './patient-vitals.component.scss'
+  styleUrls: ['./patient-vitals.component.scss', '../../../Shared/styles/table-template.scss']
 })
 export class PatientVitalsComponent {
   private fb = inject(FormBuilder);
@@ -32,6 +34,7 @@ export class PatientVitalsComponent {
   private sharedService = inject(SharedServiceService);
 
   patientDetails = computed(() => this.sharedService.patientDetails());
+  patientglobal =  computed(() => this.sharedService.patient());
 
   form: FormGroup;
 
@@ -43,13 +46,20 @@ export class PatientVitalsComponent {
 
   // Create a new vital form group
   createVital(data?: any, isNew = true): FormGroup {
-    const dateOnly = data?.readingDateTime
-  ? data.readingDateTime.replace(' ', 'T').substring(0, 16)
-  : '';
+    let readingDate = null;
+    let readingTime = '';
+    
+    if (data?.readingDateTime) {
+      const dateTime = new Date(data.readingDateTime);
+      readingDate = dateTime;
+      readingTime = dateTime.toTimeString().substring(0, 5); // HH:MM format
+    }
+    
     const group = this.fb.group({
       id: [data?.id || null],
       patientId: [data?.patientId || ''],
-      readingDateTime: [dateOnly, Validators.required],
+      readingDate: [readingDate, Validators.required],
+      readingTime: [readingTime, Validators.required],
       systolic: [data?.systolic || null, [Validators.required,]],
       diastolic: [data?.diastolic || null, [Validators.required, ]],
       sugarFasting: [data?.sugarFasting || null, [Validators.required, ]],
@@ -84,8 +94,22 @@ export class PatientVitalsComponent {
       return;
     }
     vitals.push(this.createVital(data, isNew));
+    
+    // Scroll to the new row after DOM update with longer delay
+    setTimeout(() => {
+      this.scrollToNewRow(vitals.length +1);
+    }, 600);
   }
-
+// private scrollToNewRow(index: number) {
+//     const tableContainer = document.querySelector('.emr-table-container');
+//     if (tableContainer) {
+//       // Simple scroll to bottom to show new row
+//       tableContainer.scrollTo({
+//         top: tableContainer.scrollHeight,
+//         behavior: 'smooth'
+//       });
+//     }
+//   }
   ngOnInit(): void {
     this.loadVitalsFromAPI();
   }
@@ -95,12 +119,12 @@ export class PatientVitalsComponent {
     const vitals = this.getFormControls;
     vitals.clear();
 
-    const details = this.patientDetails();
-    if (!details) return;
+    var details = this.patientDetails();
+    var ptDetails  = this.patientglobal()
 
     const payload = {
       mode: 'GET',
-      patientId: details.patientID
+      patientId: details?.patientID??ptDetails.patientId
     };
 
     this.commonService.Post("CurrentMedication/Vitals", payload).subscribe({
@@ -125,8 +149,8 @@ export class PatientVitalsComponent {
   // Save vitals
   saveAll(): void {
     const vitalsArray = this.getFormControls;
-    const details = this.patientDetails();
-    if (!details?.patientID) return console.error('Patient ID missing.');
+     var details = this.patientDetails();
+    var ptDetails  = this.patientglobal()
 
     let hasInvalid = false;
     vitalsArray.controls.forEach(ctrl => {
@@ -150,17 +174,17 @@ export class PatientVitalsComponent {
     if (toSave.length > 0) {
       const savePayload: VitalDto = {
         Mode: 'SAVE',
-        PatientId: details.patientID,
+        PatientId: details?.patientID?? ptDetails.patientId,
         VitalList: toSave.map(v => ({
           Id: v.id,
-          PatientId: details.patientID,
-          ReadingDateTime: v.readingDateTime,
+          PatientId: details?.patientID?? ptDetails.patientId,
+          ReadingDateTime: this.combineDateAndTime(v.readingDate, v.readingTime),
           Systolic: v.systolic,
           Diastolic: v.diastolic,
           SugarFasting: v.sugarFasting,
           SugarPP: v.sugarPP,
           Deleted: v.deleted,
-          LastEditedBy: details.email
+          LastEditedBy: details?.email?? ptDetails.email
         }))
       };
       allRequests.push(this.commonService.Post("CurrentMedication/Vitals", savePayload).toPromise());
@@ -169,17 +193,17 @@ export class PatientVitalsComponent {
     if (toDelete.length > 0) {
       const deletePayload: VitalDto = {
         Mode: 'DELETE',
-        PatientId: details.patientID,
+        PatientId: details?.patientID?? ptDetails.patientId,
         VitalList: toDelete.map(v => ({
           Id: v.id,
-          PatientId: details.patientID,
-          ReadingDateTime: v.readingDateTime,
+          PatientId:  details?.patientID?? ptDetails.patientId,
+          ReadingDateTime: this.combineDateAndTime(v.readingDate, v.readingTime),
           Systolic: v.systolic,
           Diastolic: v.diastolic,
           SugarFasting: v.sugarFasting,
           SugarPP: v.sugarPP,
           Deleted: v.deleted,
-          LastEditedBy: details.email
+          LastEditedBy: details?.email?? ptDetails.email
         }))
       };
       allRequests.push(this.commonService.Post("CurrentMedication/Vitals", deletePayload).toPromise());
@@ -205,6 +229,38 @@ export class PatientVitalsComponent {
       isDeleted: true,
       isEdited: false
     });
+  }
+private scrollToNewRow(index: number) {
+    const tableContainer = document.querySelector('.emr-table-container');
+    if (tableContainer) {
+      const rows = tableContainer.querySelectorAll('tbody tr:not([style*="display: none"])');
+      const targetRow = rows[index] as HTMLElement;
+     if (targetRow) {
+        // Add highlight animation to the new row
+        targetRow.classList.add('row-added');
+        
+        // Simple scroll to bottom to show new row
+        tableContainer.scrollTo({
+          top: tableContainer.scrollHeight,
+          behavior: 'smooth'
+        });
+        
+        // Remove row highlight after animation completes
+        setTimeout(() => {
+          targetRow.classList.remove('row-added');
+        }, 4000);
+      }
+    }
+  }
+  // Helper method to combine date and time into Date object
+  private combineDateAndTime(date: Date | null, time: string): Date {
+    if (!date || !time) {
+      return new Date();
+    }
+    
+    const dateStr = date.toISOString().split('T')[0]; // YYYY-MM-DD
+    const dateTimeStr = `${dateStr}T${time}:00`; // YYYY-MM-DDTHH:MM:SS
+    return new Date(dateTimeStr);
   }
 
   // TrackBy for ngFor

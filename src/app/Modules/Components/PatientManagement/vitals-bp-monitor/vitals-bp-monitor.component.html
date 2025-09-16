@@ -1,36 +1,72 @@
-<mat-card class="dashboard-card">
-  <mat-card-header>
-    <mat-card-title>🫀 Patient Vitals Dashboard</mat-card-title>
-    <mat-card-subtitle>{{ patientDetails()?.patientID || 'Unknown Patient' }}</mat-card-subtitle>
-  </mat-card-header>
+<div class="emr-container">
+  <div class="emr-card emr-dashboard-card">
+    <div class="emr-card-header emr-dashboard-header">
+      <div class="emr-dashboard-title-section">
+        <h2 class="emr-card-title emr-dashboard-title">
+          <span class="emr-icon">🫀</span> Patient Vitals Dashboard
+        </h2>
+        <p class="emr-card-subtitle emr-patient-id">
+          Patient ID: {{ patientDetails()?.patientID || 'Unknown Patient' }}
+        </p>
+      </div>
+    </div>
 
-  <mat-card-content>
-    <mat-tab-group [(selectedIndex)]="selectedTab" (selectedIndexChange)="updateCharts()">
-      <mat-tab label="Blood Pressure">
-        <div class="charts-grid">
-          <div>
-            <h3>📈 BP Time Series</h3>
-            <canvas #bpTimeChart></canvas>
+    <div class="emr-card-content emr-dashboard-content">
+      <mat-tab-group class="emr-tab-group" [(selectedIndex)]="selectedTab" (selectedIndexChange)="updateCharts()">
+        <mat-tab class="emr-tab" label="Blood Pressure">
+          <div class="emr-tab-content">
+            <div class="emr-charts-grid">
+              <div class="emr-chart-container">
+                <div class="emr-chart-header">
+                  <h3 class="emr-chart-title">
+                    <span class="emr-chart-icon">📈</span> BP Time Series
+                  </h3>
+                </div>
+                <div class="emr-chart-wrapper">
+                  <canvas #bpTimeChart class="emr-chart-canvas"></canvas>
+                </div>
+              </div>
+              <div class="emr-chart-container">
+                <div class="emr-chart-header">
+                  <h3 class="emr-chart-title">
+                    <span class="emr-chart-icon">📊</span> BP Daily Trends
+                  </h3>
+                </div>
+                <div class="emr-chart-wrapper">
+                  <canvas #bpTrendChart class="emr-chart-canvas"></canvas>
+                </div>
+              </div>
+            </div>
           </div>
-          <div>
-            <h3>📊 BP Daily Trends</h3>
-            <canvas #bpTrendChart></canvas>
-          </div>
-        </div>
-      </mat-tab>
+        </mat-tab>
 
-      <mat-tab label="Blood Sugar">
-        <div class="charts-grid">
-          <div>
-            <h3>📈 Sugar Time Series</h3>
-            <canvas #sugarTimeChart></canvas>
+        <mat-tab class="emr-tab" label="Blood Sugar">
+          <div class="emr-tab-content">
+            <div class="emr-charts-grid">
+              <div class="emr-chart-container">
+                <div class="emr-chart-header">
+                  <h3 class="emr-chart-title">
+                    <span class="emr-chart-icon">📈</span> Sugar Time Series
+                  </h3>
+                </div>
+                <div class="emr-chart-wrapper">
+                  <canvas #sugarTimeChart class="emr-chart-canvas"></canvas>
+                </div>
+              </div>
+              <div class="emr-chart-container">
+                <div class="emr-chart-header">
+                  <h3 class="emr-chart-title">
+                    <span class="emr-chart-icon">📊</span> Sugar Daily Trends
+                  </h3>
+                </div>
+                <div class="emr-chart-wrapper">
+                  <canvas #sugarTrendChart class="emr-chart-canvas"></canvas>
+                </div>
+              </div>
+            </div>
           </div>
-          <div>
-            <h3>📊 Sugar Daily Trends</h3>
-            <canvas #sugarTrendChart></canvas>
-          </div>
-        </div>
-      </mat-tab>
-    </mat-tab-group>
-  </mat-card-content>
-</mat-card>
+        </mat-tab>
+      </mat-tab-group>
+    </div>
+  </div>
+</div>

@@ -1,39 +1,74 @@
 <div class="container">
-  <div class="card">
-    <h2>Allergy Details</h2>
+  <div class="emr-card">
+    <h2 class="emr-title">Allergy Details</h2>
 
     <form [formGroup]="form">
-      <div class="add-button-wrapper">
-        <button type="button" class="btn-primary" (click)="addAllergy()">+ Add Allergy</button>
+      <div class="emr-add-button-wrapper">
+        <button type="button" class="emr-btn-add" (click)="addAllergy()">+ Add Allergy</button>
       </div>
-<div class="tablefix">
-      <table class="full-width-table" formArrayName="allergyList">
-        <thead>
-          <tr>
-            <th>Sl.No</th>
-            <th>Allergy Description</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-              <ng-container *ngFor="let allergy of getFormControls.controls; let i = index; trackBy: trackByIndex">
-          <tr  [formGroupName]="i" [hidden]="allergy.get('isDeleted')?.value">
-        
-            <td>{{ i + 1 }}</td>
-            <td>
-              <textarea class="textarea-input" formControlName="description" rows="3" placeholder="Enter allergy details..."></textarea>
-            </td>
-            <td>
-              <button type="button" class="btn-danger" (click)="removeAllergy(i)">Remove</button>
-            </td>
-          </tr>
-          </ng-container>
-        </tbody>
-      </table>
+
+      <div class="emr-table-container">
+        <table class="emr-table" formArrayName="allergyList">
+          <thead>
+            <tr>
+              <th style="width: 10%;">Sl.No</th>
+              <th style="width: 70%;">Allergy Description</th>
+              <th style="width: 20%;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let allergy of getFormControls.controls; let i = index; trackBy: trackByIndex">
+              <tr [formGroupName]="i" 
+                  class="medication-row"
+                  [class.emr-new-row]="allergy.get('isNew')?.value"
+                  *ngIf="!allergy.get('isDeleted')?.value">
+                <td style="text-align: center; font-weight: 600;">{{ i + 1 }}</td>
+                <td>
+                  <mat-form-field appearance="outline" class="full">
+                    <textarea matInput 
+                              formControlName="description" 
+                              rows="3" 
+                              placeholder="Enter allergy details..."
+                              [readonly]="!allergy.get('isEditable')?.value"></textarea>
+                    <mat-error *ngIf="allergy.get('description')?.invalid && allergy.get('description')?.touched">
+                      Allergy description is required
+                    </mat-error>
+                  </mat-form-field>
+                </td>
+                <td>
+                  <div class="emr-action-buttons">
+                    <button type="button" 
+                            class="emr-btn emr-btn-primary"
+                            *ngIf="!allergy.get('isEditable')?.value"
+                            (click)="editAllergy(i)">Edit</button>
+                    <button type="button" 
+                            class="emr-btn emr-btn-primary"
+                            *ngIf="allergy.get('isEditable')?.value"
+                            (click)="saveAllergy(i)">Save</button>
+                    <button type="button" 
+                            class="emr-btn emr-btn-secondary"
+                            *ngIf="allergy.get('isEditable')?.value"
+                            (click)="cancelEdit(i)">Cancel</button>
+                    <button type="button" 
+                            class="emr-btn emr-btn-danger" 
+                            (click)="removeAllergy(i)">Remove</button>
+                  </div>
+                </td>
+              </tr>
+            </ng-container>
+            
+            <tr *ngIf="getFormControls.length === 0 || allAllergiesDeleted()" class="no-data-row">
+              <td colspan="3" class="emr-no-data">
+                <p>No allergies added yet. Click "Add Allergy" to get started.</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
-         <div class="button-group button_end">
-        <button type="button" class="btn-primary margin_4px" (click)="saveAll()">Save</button>
-        <button type="button" class="btn-secondary margin_4px" (click)="cancel()">Cancel</button>
+
+      <div class="emr-bottom-actions">
+        <button type="button" class="btn-primary margin_4px" (click)="saveAll()">Save All Changes</button>
+        <button type="button" class="btn-secondary margin_4px" (click)="cancel()">Reset</button>
       </div>
     </form>
   </div>

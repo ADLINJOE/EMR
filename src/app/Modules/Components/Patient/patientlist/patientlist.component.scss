@@ -53,43 +53,43 @@
     }
   }
 }
-.table-scroll-wrapper {
-  width: 100%;
-  max-height: 50vh;       // vertical scroll limit
-  overflow-x: auto;       // horizontal scroll
-  overflow-y: auto;       // vertical scroll
-  border: 1px solid #dee2e6;
-  border-radius: 8px;
+// .table-scroll-wrapper {
+//   width: 100%;
+//   max-height: 50vh;       // vertical scroll limit
+//   overflow-x: auto;       // horizontal scroll
+//   overflow-y: auto;       // vertical scroll
+//   border: 1px solid #dee2e6;
+//   border-radius: 8px;
 
-  // Optional: make the container scrollable smoothly
-  -webkit-overflow-scrolling: touch;
+//   // Optional: make the container scrollable smoothly
+//   -webkit-overflow-scrolling: touch;
 
-  table.full-width-table {
-    width: 100%;
-    min-width: 800px;     // forces horizontal scroll if screen < table width
-    border-collapse: collapse;
+//   table.full-width-table {
+//     width: 100%;
+//     min-width: 800px;     // forces horizontal scroll if screen < table width
+//     border-collapse: collapse;
 
-    thead {
-      position: sticky;
-      top: 0;
-      background: #f8f9fa;
-      z-index: 10;
-    }
+//     thead {
+//       position: sticky;
+//       top: 0;
+//       background: #f8f9fa;
+//       z-index: 10;
+//     }
 
-    th, td {
-      padding: 12px 16px;
-      text-align: left;
-      border-bottom: 1px solid #dee2e6;
-      white-space: nowrap;   // prevent wrapping
-    }
-tr {
-    transition: background-color 0.3s ease; // smooth hover effect
-    cursor: pointer; // makes it feel clickable
+//     th, td {
+//       padding: 12px 16px;
+//       text-align: left;
+//       border-bottom: 1px solid #dee2e6;
+//       white-space: nowrap;   // prevent wrapping
+//     }
+// tr {
+//     transition: background-color 0.3s ease; // smooth hover effect
+//     cursor: pointer; // makes it feel clickable
 
-    &:hover {
-      background-color: #4fe8ed; // light blue highlight
-    }
-  }
+//     &:hover {
+//       background-color: #4fe8ed; // light blue highlight
+//     }
+//   }
 
-  }
-}
+//   }
+// }

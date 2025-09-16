@@ -1,34 +1,54 @@
 <div class="container">
-  <div class="card">
+  <div class="card" style="max-width: 1650px !important;">
     <h2 class="section-title">Drug Master</h2>
-
-    <form [formGroup]="form">
       <div class="add-button-wrapper">
-        <button type="button" class="btn-primary" (click)="addDrug()">+ Add Drug</button>
-      </div>
+  <div class="search-container">
+    <i class="bi bi-search search-icon"></i>
+    <input 
+      type="text" 
+      style="width: 55%"
+      class="form-control search-box" 
+      placeholder="Search Drugs..." 
+      [(ngModel)]="searchText"
+    />
+  </div>
+  <button class="btn btn-primary add-btn" (click)="addDrug()">
+    + Add Drug
+  </button>
+</div>
+    <form [formGroup]="form">
+
+
+ 
+
 
       <div class="tablefix">
         <table class="full-width-table" formArrayName="drugs">
-          <thead>
-            <tr>
-              <th>Sl.No</th>
-              <th>Drug Name</th>
-              <th>Generic Name</th>
-              <th>Brand Name</th>
-              <th>Drug Code</th>
-      
-              <th>Strength</th>
-              <th>Dosage Form</th>
-        <th>Type</th>
-              <th>Unit Price</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
+       <thead>
+  <tr>
+    <th style="width: 4%;">Sl.No</th>
+    <th style="width: 12%;">Drug Name</th>
+    <th style="width: 12%;">Generic Name</th>
+    <th style="width: 9%;">Brand Name</th>
+    <th style="width: 6%;">Drug Code</th>
+    <th style="width: 5%;">Strength</th>
+    <th style="width: 8%;">Dosage Form</th>
+    <th style="width: 7%;">Type</th>
+    <th style="width: 6%;">Drug Category</th>
+    <th style="width: 5%;">Unit Price</th>
+    <th style="width: 6%;">Status</th>
+    <th style="width: 1%;">Actions</th>
+  </tr>
+</thead>
+
           <tbody>
-         <ng-container *ngFor="let drug of getFormControls.controls; let i = index; trackBy: trackByIndex">
-  <tr [formGroupName]="i" [hidden]="drug.get('isDeleted')?.value">
-    <td>{{ i + 1 }}</td>
+<ng-container 
+  *ngFor="let drug of getFormControls.controls | drugfilter:searchText; let i = index; trackBy: trackByIndex">
+  <tr [formGroupName]="i" 
+      class="drug-table-row"
+      [class.drug-row-new]="drug.get('isNew')?.value"
+      [hidden]="drug.get('isDeleted')?.value">
+    <td class="drug-td-serial">{{ i + 1 }}</td>
     <td><input class="plain-input" formControlName="drugName" placeholder="Drug Name" /></td>
     <td><input class="plain-input" formControlName="genericName" placeholder="Generic Name" /></td>
     <td><input class="plain-input" formControlName="brandName" placeholder="Brand Name" /></td>
@@ -48,7 +68,16 @@
         <option value="Inhaler">Inhaler</option>
       </select>
     </td>
+<td>
 
+  <select class="plain-input" formControlName="drugCategory">
+        <option value="Antibiotic">Antibiotic</option>
+        <option value="Vitamin">Vitamin</option>
+        <option value="Analgesic">Analgesic</option>
+      </select>
+
+
+</td>
     <td><input class="plain-input" type="number" formControlName="unitPrice" placeholder="Unit Price" /></td>
 
     <td>

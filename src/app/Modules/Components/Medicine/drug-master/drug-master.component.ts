@@ -1,13 +1,14 @@
 import { Component, OnInit, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormArray, FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { CommonService } from '../../../../Service/common.service';
 import { SharedServiceService } from '../../../../Service/Sharedservice/shared-service.service';
+import { drugfilter } from '../../../pipes/drugfilter.pipe';
 
 @Component({
   selector: 'app-drug-master',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, drugfilter, FormsModule],
   templateUrl: './drug-master.component.html',
   styleUrls: ['./drug-master.component.scss']
 })
@@ -19,7 +20,7 @@ export class DrugMasterComponent implements OnInit {
   form: FormGroup;
   today = new Date().toISOString().split('T')[0];
   patientDetails = computed(() => this.sharedService.patientDetails());
-
+searchText: string = '';
   medicineTypes = ['Tablet', 'Injection', 'Syrup', 'Capsule', 'Ointment', 'Powder'];
 
   constructor() {
@@ -46,6 +47,7 @@ drugCode: [data?.drugCode ?? ''],
 strength: [data?.strength ?? ''],
 dosageForm: [data?.dosageForm ?? ''],
 medicineType: [data?.medicineType ?? '', Validators.required],
+drugCategory : [data?.drugCategory?? ''],
 unitPrice: [data?.unitPrice ?? null],
 status: [data?.status ?? 'Active'],
 lastEditedBy: [data?.lastEditedBy ?? ''],

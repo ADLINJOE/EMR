@@ -1,0 +1,274 @@
+<div class="emr-container">
+  <div class="emr-card">
+    <div class="emr-card-header">
+      <h2 class="emr-card-title">
+        <span class="emr-icon">💊</span> Medication Print Form
+      </h2>
+      <div class="emr-header-actions">
+        <button type="button" class="emr-btn emr-btn-secondary" (click)="printForm()">
+          <span class="emr-btn-icon">🖨️</span> Print Form
+        </button>
+        <button type="button" class="emr-btn emr-btn-primary" (click)="openOcrScanner()">
+          <span class="emr-btn-icon">📷</span> Scan Prescription
+        </button>
+      </div>
+    </div>
+
+    <form [formGroup]="medicationForm" class="emr-form">
+      <!-- Patient Information Section -->
+      <div class="emr-section">
+        <h3 class="emr-section-title">Patient Information</h3>
+        <div class="emr-form-grid">
+          <mat-form-field class="emr-form-field" appearance="outline">
+            <mat-label>Patient Name</mat-label>
+            <input matInput formControlName="patientName" class="emr-input">
+            <mat-error *ngIf="medicationForm.get('patientName')?.errors?.['required']">
+              Patient name is required
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field class="emr-form-field" appearance="outline">
+            <mat-label>Patient ID</mat-label>
+            <input matInput formControlName="patientId" class="emr-input">
+          </mat-form-field>
+
+          <mat-form-field class="emr-form-field" appearance="outline">
+            <mat-label>Date of Birth</mat-label>
+            <input matInput [matDatepicker]="dobPicker" formControlName="dateOfBirth" class="emr-input">
+            <mat-datepicker-toggle matSuffix [for]="dobPicker"></mat-datepicker-toggle>
+            <mat-datepicker #dobPicker></mat-datepicker>
+          </mat-form-field>
+
+          <mat-form-field class="emr-form-field" appearance="outline">
+            <mat-label>Age</mat-label>
+            <input matInput type="number" formControlName="age" class="emr-input">
+          </mat-form-field>
+
+          <mat-form-field class="emr-form-field" appearance="outline">
+            <mat-label>Weight (kg)</mat-label>
+            <input matInput type="number" formControlName="weight" class="emr-input">
+          </mat-form-field>
+
+          <mat-form-field class="emr-form-field" appearance="outline">
+            <mat-label>Allergies</mat-label>
+            <textarea matInput formControlName="allergies" rows="2" class="emr-input"></textarea>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Doctor Information Section -->
+      <div class="emr-section">
+        <h3 class="emr-section-title">Doctor Information</h3>
+        <div class="emr-form-grid">
+          <mat-form-field class="emr-form-field" appearance="outline">
+            <mat-label>Doctor Name</mat-label>
+            <input matInput formControlName="doctorName" class="emr-input">
+          </mat-form-field>
+
+          <mat-form-field class="emr-form-field" appearance="outline">
+            <mat-label>License Number</mat-label>
+            <input matInput formControlName="licenseNumber" class="emr-input">
+          </mat-form-field>
+
+          <mat-form-field class="emr-form-field" appearance="outline">
+            <mat-label>Clinic/Hospital</mat-label>
+            <input matInput formControlName="clinic" class="emr-input">
+          </mat-form-field>
+
+          <mat-form-field class="emr-form-field" appearance="outline">
+            <mat-label>Contact Number</mat-label>
+            <input matInput formControlName="contactNumber" class="emr-input">
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Medications Section -->
+      <div class="emr-section">
+        <h3 class="emr-section-title">
+          Prescribed Medications
+          <button type="button" class="emr-btn emr-btn-sm emr-btn-primary" (click)="addMedication()">
+            <span class="emr-btn-icon">+</span> Add Medication
+          </button>
+        </h3>
+
+        <div class="emr-table-container">
+          <table class="emr-table" formArrayName="medications">
+            <thead class="emr-table-header">
+              <tr>
+                <th class="emr-th">Sl.No</th>
+                <th class="emr-th">Medication Name</th>
+                <th class="emr-th">Dosage</th>
+                <th class="emr-th">Frequency</th>
+                <th class="emr-th">Duration</th>
+                <th class="emr-th">Instructions</th>
+                <th class="emr-th">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="emr-table-body">
+              <ng-container *ngFor="let medication of medications.controls; let i=index; trackBy: trackByIndex">
+                <tr [formGroupName]="i" class="emr-table-row">
+                  <td class="emr-td">
+                    <span class="emr-serial-number">{{ i + 1 }}</span>
+                  </td>
+                  <td class="emr-td">
+                    <mat-form-field class="emr-form-field-table" appearance="outline">
+                      <input matInput formControlName="name" placeholder="Medication name" class="emr-input">
+                      <mat-error *ngIf="medication.get('name')?.errors?.['required']">
+                        Medication name is required
+                      </mat-error>
+                    </mat-form-field>
+                  </td>
+                  <td class="emr-td">
+                    <mat-form-field class="emr-form-field-table" appearance="outline">
+                      <input matInput formControlName="dosage" placeholder="e.g., 500mg" class="emr-input">
+                    </mat-form-field>
+                  </td>
+                  <td class="emr-td">
+                    <mat-form-field class="emr-form-field-table" appearance="outline">
+                      <mat-select formControlName="frequency" class="emr-select">
+                        <mat-option value="once-daily">Once Daily</mat-option>
+                        <mat-option value="twice-daily">Twice Daily</mat-option>
+                        <mat-option value="thrice-daily">Thrice Daily</mat-option>
+                        <mat-option value="four-times">Four Times Daily</mat-option>
+                        <mat-option value="as-needed">As Needed</mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </td>
+                  <td class="emr-td">
+                    <mat-form-field class="emr-form-field-table" appearance="outline">
+                      <input matInput formControlName="duration" placeholder="e.g., 7 days" class="emr-input">
+                    </mat-form-field>
+                  </td>
+                  <td class="emr-td">
+                    <mat-form-field class="emr-form-field-table" appearance="outline">
+                      <textarea matInput formControlName="instructions" 
+                               placeholder="Special instructions" 
+                               rows="2" 
+                               class="emr-input"></textarea>
+                    </mat-form-field>
+                  </td>
+                  <td class="emr-td">
+                    <button type="button" 
+                            class="emr-btn emr-btn-danger emr-btn-sm" 
+                            (click)="removeMedication(i)">
+                      <span class="emr-btn-icon">🗑️</span>
+                    </button>
+                  </td>
+                </tr>
+              </ng-container>
+              <tr *ngIf="medications.length === 0" class="emr-empty-row">
+                <td colspan="7" class="emr-empty-message">
+                  <div class="emr-empty-content">
+                    <span class="emr-empty-icon">💊</span>
+                    <p class="emr-empty-text">No medications added. Click "Add Medication" to start.</p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Additional Notes Section -->
+      <div class="emr-section">
+        <h3 class="emr-section-title">Additional Notes</h3>
+        <mat-form-field class="emr-form-field-full" appearance="outline">
+          <mat-label>Doctor's Notes</mat-label>
+          <textarea matInput formControlName="notes" 
+                   rows="4" 
+                   placeholder="Any additional instructions or notes..."
+                   class="emr-input"></textarea>
+        </mat-form-field>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="emr-form-actions">
+        <button type="button" class="emr-btn emr-btn-primary" (click)="savePrescription()">
+          <span class="emr-btn-icon">💾</span> Save Prescription
+        </button>
+        <button type="button" class="emr-btn emr-btn-secondary" (click)="printForm()">
+          <span class="emr-btn-icon">🖨️</span> Print Form
+        </button>
+        <button type="button" class="emr-btn emr-btn-info" (click)="previewForm()">
+          <span class="emr-btn-icon">👁️</span> Preview
+        </button>
+        <button type="button" class="emr-btn emr-btn-warning" (click)="resetForm()">
+          <span class="emr-btn-icon">↩️</span> Reset
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Print Template (Hidden) -->
+<div id="printTemplate" class="print-template" style="display: none;">
+  <div class="print-header">
+    <h1>MEDICAL PRESCRIPTION</h1>
+    <div class="print-date">Date: {{ currentDate | date:'dd/MM/yyyy' }}</div>
+  </div>
+
+  <div class="print-section">
+    <h3>PATIENT INFORMATION</h3>
+    <div class="print-grid">
+      <div><strong>Name:</strong> {{ medicationForm.get('patientName')?.value }}</div>
+      <div><strong>ID:</strong> {{ medicationForm.get('patientId')?.value }}</div>
+      <div><strong>Age:</strong> {{ medicationForm.get('age')?.value }}</div>
+      <div><strong>Weight:</strong> {{ medicationForm.get('weight')?.value }} kg</div>
+      <div><strong>DOB:</strong> {{ medicationForm.get('dateOfBirth')?.value | date:'dd/MM/yyyy' }}</div>
+      <div><strong>Allergies:</strong> {{ medicationForm.get('allergies')?.value || 'None' }}</div>
+    </div>
+  </div>
+
+  <div class="print-section">
+    <h3>DOCTOR INFORMATION</h3>
+    <div class="print-grid">
+      <div><strong>Doctor:</strong> {{ medicationForm.get('doctorName')?.value }}</div>
+      <div><strong>License:</strong> {{ medicationForm.get('licenseNumber')?.value }}</div>
+      <div><strong>Clinic:</strong> {{ medicationForm.get('clinic')?.value }}</div>
+      <div><strong>Contact:</strong> {{ medicationForm.get('contactNumber')?.value }}</div>
+    </div>
+  </div>
+
+  <div class="print-section">
+    <h3>PRESCRIBED MEDICATIONS</h3>
+    <table class="print-table">
+      <thead>
+        <tr>
+          <th>S.No</th>
+          <th>Medication</th>
+          <th>Dosage</th>
+          <th>Frequency</th>
+          <th>Duration</th>
+          <th>Instructions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let med of medications.controls; let i=index">
+          <td>{{ i + 1 }}</td>
+          <td>{{ med.get('name')?.value }}</td>
+          <td>{{ med.get('dosage')?.value }}</td>
+          <td>{{ med.get('frequency')?.value }}</td>
+          <td>{{ med.get('duration')?.value }}</td>
+          <td>{{ med.get('instructions')?.value }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="print-section" *ngIf="medicationForm.get('notes')?.value">
+    <h3>ADDITIONAL NOTES</h3>
+    <p>{{ medicationForm.get('notes')?.value }}</p>
+  </div>
+
+  <div class="print-footer">
+    <div class="signature-section">
+      <div class="signature-line">
+        <div>Doctor's Signature</div>
+        <div class="signature-box"></div>
+      </div>
+      <div class="signature-line">
+        <div>Date: _______________</div>
+      </div>
+    </div>
+  </div>
+</div>

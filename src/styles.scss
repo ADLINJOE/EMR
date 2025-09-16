@@ -1,7 +1,72 @@
 /* You can add global styles to this file, and also import other style files */
 
+// Import global design system
+@import './styles/global-buttons.scss';
+@import './styles/responsive-layout.scss';
+
 html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+body { 
+  margin: 0; 
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background-color: #f8f9fa;
+  color: #333;
+  line-height: 1.6;
+}
+
+// Global responsive typography
+h1, h2, h3, h4, h5, h6 {
+  margin: 0 0 1rem 0;
+  font-weight: 600;
+  line-height: 1.2;
+  color: #333;
+}
+
+h1 { font-size: clamp(1.75rem, 4vw, 2.5rem); }
+h2 { font-size: clamp(1.5rem, 3.5vw, 2rem); }
+h3 { font-size: clamp(1.25rem, 3vw, 1.75rem); }
+h4 { font-size: clamp(1.125rem, 2.5vw, 1.5rem); }
+h5 { font-size: clamp(1rem, 2vw, 1.25rem); }
+h6 { font-size: clamp(0.875rem, 1.5vw, 1rem); }
+
+p {
+  margin: 0 0 1rem 0;
+  font-size: clamp(0.875rem, 2vw, 1rem);
+}
+
+// Global form styling
+.mat-form-field {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.mat-form-field-appearance-outline .mat-form-field-outline-thick {
+  color: #00796b;
+}
+
+.mat-form-field-appearance-outline.mat-focused .mat-form-field-outline-thick {
+  color: #00796b;
+}
+
+.mat-form-field.mat-focused .mat-form-field-label {
+  color: #00796b;
+}
+
+// Global table styling for mobile
+@media (max-width: 768px) {
+  .mat-table {
+    display: none;
+  }
+  
+  .mobile-card-view {
+    display: block;
+  }
+}
+
+@media (min-width: 769px) {
+  .mobile-card-view {
+    display: none;
+  }
+}
 /* styles.css or global styles file */
 
 ///---------------------------------Six month calendar design------End-----------------------
@@ -13,7 +78,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   margin-top: 5px;
   color: black;
   background-color: white;
-  width: 400px;
+  width: 280px;
   box-shadow: 2px 1px 1px 1px lightgrey;
   background-image: url(../src/assets/Message_Icon/Sucess.svg);
 
@@ -35,7 +100,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   margin-top: 5px;
   color: black;
   background-color: white;
-  width: 400px;
+  width: 280px;
   box-shadow: 2px 1px 1px 1px lightgrey;
   background-image: url(../src/assets/Message_Icon//Error.svg);
 
@@ -57,7 +122,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   margin-top: 5px;
   color: black;
   background-color: white;
-  width: 400px;
+  width: 280px;
   box-shadow: 2px 1px 1px 1px lightgrey;
   background-image: url(../src/assets/Message_Icon/Info.svg);
 
@@ -79,7 +144,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   margin-top: 5px;
   color: black;
   background-color: white;
-  width: 400px;
+  width: 280px;
   box-shadow: 2px 1px 1px 1px lightgrey;
   background-image: url(../src/assets/Message_Icon/Warning.svg);
 

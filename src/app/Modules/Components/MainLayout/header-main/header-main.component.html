@@ -5,18 +5,21 @@
       <span class="material-icons">menu</span>
     </button>
 
-    <div class="logo-section">
-      <h1 class="title">MediCare Portal</h1>
-    </div>
+   <div class="logo-section">
+  <img src="assets/logo/rx-logo.svg" alt="Company Logo" class="company-logo" />
+  <!-- <h1 class="title">RX Smart</h1> -->
+</div>
+
 
     <div class="user-section">
-      <span class="welcome">Welcome, Admin</span>
+      <span class="welcome">Welcome, {{ this.UserSetGlobal.name }}</span>
       <button aria-label="Account">
         <span class="material-icons">account_circle</span>
       </button>
-      <button aria-label="Logout">
-        <span class="material-icons">logout</span>
-      </button>
+    <button aria-label="Logout" (click)="logout()">
+  <span class="material-icons">logout</span>
+</button>
+
     </div>
   </div>
 </header>

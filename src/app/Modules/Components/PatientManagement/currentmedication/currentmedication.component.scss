@@ -1,4 +1,7 @@
 .container {
+  overflow-y: hidden;
+  overflow-x: auto;
+  height: 100vh;
   display: flex;
   justify-content: center;
   padding: 32px;
@@ -7,44 +10,355 @@
 }
 
 .card {
+    height: 65vh;
   background: #ffffff;
   padding: 24px;
   border-radius: 16px;
   box-shadow: 0 8px 24px rgba(0, 128, 128, 0.1);
   width: 100%;
-  max-width: 1200px;
+  max-width: 1400px;
   border-top: 6px solid #00796b;
 }
 
 h2 {
   text-align: center;
   color: #00796b;
-  margin-bottom: 24px;
+  margin: 0px;
 }
 
 .add-button-wrapper {
   display: flex;
   justify-content: flex-end;
+  gap: 10px;
   margin-bottom: 16px;
 }
 
-.full-width-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 24px;
+.btn-print {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #5a6268;
+  }
+
+  &:disabled {
+    background-color: #adb5bd;
+    cursor: not-allowed;
+  }
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
 }
 
-table th,
-table td {
-  padding: 10px;
-  border: 1px solid #ccc;
-  text-align: center;
+.btn-followup {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  &:hover {
+    background-color: #45a049;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(76, 175, 80, 0.3);
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 4px rgba(76, 175, 80, 0.4);
+  }
+
+  &:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.btn-interaction-check {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  &:hover {
+    background-color: #45a049;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(76, 175, 80, 0.3);
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 4px rgba(76, 175, 80, 0.4);
+  }
+
+  &:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.btn-info {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  &:hover {
+    background-color: #45a049;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(76, 175, 80, 0.3);
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 4px rgba(76, 175, 80, 0.4);
+  }
+
+  &:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+// Enhanced smooth animation for new medication rows
+.row-added {
+  background-color: #e8f5e9 !important;
+  border-left: 4px solid #4caf50;
+  animation: slideInNewMedRow 1s ease-out, highlightMedRow 3s ease-in-out, glowEffect 2s ease-in-out;
+  transform-origin: top;
+  position: relative;
+  overflow: hidden;
+}
+
+// .row-added::before {
+//   content: '';
+//   position: absolute;
+//   top: 0;
+//   left: -100%;
+//   width: 100%;
+//   height: 100%;
+//   background: linear-gradient(90deg, transparent, rgba(0, 121, 107, 0.3), transparent);
+//   // animation: medicationShimmer 1.5s ease-in-out;
+// }
+
+@keyframes slideInNewMedRow {
+  0% {
+    opacity: 0;
+    transform: translateY(-30px) scale(0.9) rotateX(10deg);
+    background-color: #c8e6c9;
+  }
+  30% {
+    opacity: 0.7;
+    transform: translateY(-10px) scale(1.05) rotateX(0deg);
+    background-color: #a5d6a7;
+  }
+  70% {
+    opacity: 0.9;
+    transform: translateY(5px) scale(1.02) rotateX(0deg);
+    background-color: #81c784;
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotateX(0deg);
+    background-color: #e8f5e9;
+  }
+}
+
+@keyframes highlightMedRow {
+  0%, 100% {
+    background-color: #e8f5e9;
+    border-left-width: 4px;
+  }
+  20% {
+    background-color: #c8e6c9;
+    border-left-width: 6px;
+  }
+  40% {
+    background-color: #a5d6a7;
+    border-left-width: 5px;
+  }
+}
+
+@keyframes glowEffect {
+  0%, 100% {
+    box-shadow: 0 0 0 rgba(0, 121, 107, 0);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(0, 121, 107, 0.5), inset 0 0 10px rgba(0, 121, 107, 0.1);
+  }
+}
+
+@keyframes medicationShimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+// Pulse effect for acknowledgment
+.new-row {
+  position: relative;
+}
+
+.new-row::after {
+  content: '✓ New';
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #4caf50;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: bold;
+  animation: fadeInOut 3s ease-in-out;
+}
+
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0; }
+  20%, 80% { opacity: 1; }
+}
+
+/* Modern Table Design */
+.full-width-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-bottom: 0;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Table Header Styling */
+table thead {
+  background: linear-gradient(135deg, #00796b, #004d40);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 table th {
-  background-color: #287477;
-  color: white;
+  padding: 16px 12px;
+  color: #ffffff;
   font-weight: 600;
+  font-size: 14px;
+  text-align: left;
+  border: none;
+  position: relative;
+  
+  &:first-child {
+    border-top-left-radius: 12px;
+  }
+  
+  &:last-child {
+    border-top-right-radius: 12px;
+  }
+}
+
+/* Table Body Styling */
+table tbody tr {
+  background: #fff;
+  transition: all 0.2s ease;
+  border-bottom: 1px solid #e9ecef;
+  
+  &:hover {
+    background: #f8f9fa;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+  
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+table td {
+  padding: 16px 12px;
+  vertical-align: middle;
+  border: none;
+  font-size: 14px;
+  
+  &:first-child {
+    font-weight: 500;
+  }
+}
+
+/* Column Specific Styling */
+.medication-name-col { width: 28%; }
+.dosage-col { width: 15%; }
+.frequency-col { width: 18%; }
+.date-col { width: 16%; }
+.ongoing-col { 
+  width: 10%; 
+  text-align: center;
+  background: rgba(0, 121, 107, 0.02);
+}
+.actions-col { 
+  width: 13%; 
+  text-align: center;
 }
 
 table th:first-child {
@@ -65,10 +379,367 @@ table th:last-child {
   font-size: 14px;
 }
 
+/* Ongoing Column Styling */
 .center-checkbox {
   display: flex;
   justify-content: center;
   align-items: center;
+  
+  .checkbox-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      background: rgba(0, 121, 107, 0.05);
+    }
+    
+    input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: #00796b;
+      cursor: pointer;
+      border-radius: 4px;
+      
+      &:disabled {
+        cursor: not-allowed;
+        opacity: 0.7;
+      }
+    }
+    
+    .checkbox-label {
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 12px;
+      transition: all 0.2s ease;
+      min-width: 35px;
+      text-align: center;
+      
+      &.checked {
+        color: #fff;
+        background: linear-gradient(135deg, #00796b, #004d40);
+        box-shadow: 0 2px 4px rgba(0, 121, 107, 0.3);
+      }
+      
+      &:not(.checked) {
+        color: #666;
+        background: #f5f5f5;
+        border: 1px solid #ddd;
+      }
+    }
+  }
+}
+
+// Follow-up Display
+.follow-up-display {
+  background: linear-gradient(135deg, #e8f5e9, #f3e5f5);
+  border: 2px solid #00796b;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+  animation: slideInFromTop 0.5s ease-out;
+  
+  .follow-up-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #00796b;
+    font-weight: 600;
+    
+    mat-icon {
+      color: #00796b;
+    }
+    
+    .follow-up-notes {
+      font-style: italic;
+      color: #666;
+      font-weight: 400;
+    }
+  }
+}
+
+@keyframes slideInFromTop {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Upload Button
+.btn-upload {
+  background-color: #ff9800;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+  
+  &:hover {
+    background-color: #f57c00;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(255, 152, 0, 0.3);
+  }
+  
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+// AI Checker Overlay
+.ai-checker-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  backdrop-filter: blur(4px);
+}
+
+.ai-checker-modal {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  width: 95vw;
+  height: 95vh;
+  max-width: 1400px;
+  max-height: 95vh;
+  overflow: hidden;
+  animation: modalSlideIn 0.3s ease-out;
+  display: flex;
+  flex-direction: column;
+}
+
+.ai-checker-header {
+  background: linear-gradient(135deg, #ff9800, #f57c00);
+  color: white;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #e0e0e0;
+  flex-shrink: 0;
+
+  h3 {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 18px;
+    font-weight: 600;
+
+    mat-icon {
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  .close-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+  }
+}
+
+.ai-checker-content {
+  padding: 0;
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+// Drug Monograph Overlay
+.drug-monograph-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  backdrop-filter: blur(4px);
+}
+
+.drug-monograph-modal {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  max-width: 95vw;
+  max-height: 95vh;
+  overflow: hidden;
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+.drug-monograph-header {
+  background: linear-gradient(135deg, #2196f3, #1976d2);
+  color: white;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #e0e0e0;
+
+  h3 {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 18px;
+    font-weight: 600;
+
+    mat-icon {
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  .close-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+  }
+}
+
+.drug-monograph-content {
+  padding: 0;
+  min-height: 500px;
+  overflow-y: auto;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+// OCR Validation Overlay
+.ocr-validation-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-in-out;
+  
+  .ocr-validation-content {
+    background: white;
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    animation: slideIn 0.3s ease-in-out;
+    
+    .ocr-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 24px;
+      border-bottom: 1px solid #e0e0e0;
+      
+      h3 {
+        margin: 0;
+        color: #00796b;
+        font-size: 20px;
+        font-weight: 600;
+      }
+      
+      button {
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
+      }
+    }
+    
+    .ocr-body {
+      flex: 1;
+      padding: 24px;
+      overflow-y: auto;
+      
+      pre {
+        white-space: pre-wrap;
+        font-family: 'Segoe UI', sans-serif;
+        font-size: 14px;
+        line-height: 1.6;
+        color: #333;
+        margin: 0;
+        background: #f8f9fa;
+        padding: 16px;
+        border-radius: 8px;
+        border-left: 4px solid #00796b;
+      }
+    }
+    
+    .ocr-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      padding: 20px 24px;
+      border-top: 1px solid #e0e0e0;
+      
+      button {
+        padding: 8px 16px;
+        font-size: 14px;
+      }
+    }
+  }
 }
 
 .btn-primary {
@@ -97,9 +768,64 @@ table th:last-child {
   background-color: #b71c1c;
 }
 
+/* Enhanced Table Container with smooth scrolling */
 .tablefix {
-  height: 20rem;
-  overflow: auto;
+  max-height: 420px; /* Approximately 5 rows + header */
+  overflow-y: auto;
+  overflow-x: auto;
+  border-radius: 12px;
+  position: relative;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  scroll-behavior: smooth;
+  scroll-padding-top: 60px; /* Account for sticky header */
+  
+  /* Enhanced custom scrollbar */
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: linear-gradient(180deg, #f1f1f1, #e9ecef);
+    border-radius: 4px;
+    box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.1);
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #00796b, #004d40);
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    
+    &:hover {
+      background: linear-gradient(180deg, #004d40, #00251a);
+      transform: scale(1.1);
+    }
+  }
+  
+  /* Scroll indicator animation */
+  &.scrolling {
+    &::-webkit-scrollbar-thumb {
+      animation: scrollPulse 0.3s ease-in-out;
+    }
+  }
+}
+
+@keyframes scrollPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+}
+
+/* Row height consistency */
+.tablefix tbody tr {
+  min-height: 70px;
+}
+
+.tablefix .full-width-table {
+  margin-bottom: 0;
 }
 
 .btn-secondary {
@@ -122,4 +848,730 @@ table th:last-child {
 .button_end {
   justify-content: end;
   display: flex;
+}
+
+// Enhanced datepicker styling
+.date-field {
+  .mat-mdc-form-field-subscript-wrapper {
+    display: none;
+  }
+  
+  .mat-mdc-form-field-infix {
+    min-height: 40px;
+  }
+  
+  .mat-mdc-input-element {
+    color: #333;
+    font-size: 14px;
+  }
+  
+  .mat-mdc-form-field-label {
+    color: #00796b;
+    font-weight: 500;
+  }
+  
+  .mat-icon {
+    color: #00796b;
+    cursor: pointer;
+  }
+  
+  &.mat-focused {
+    .mat-mdc-form-field-outline-thick {
+      border-color: #00796b;
+    }
+  }
+}
+
+/* Row State Styling */
+.medication-row {
+  transition: all 0.3s ease;
+  
+  &.new-row {
+    background: linear-gradient(90deg, rgba(0, 121, 107, 0.1), rgba(0, 121, 107, 0.02));
+    border-left: 4px solid #00796b;
+    animation: slideInNewRow 0.5s ease-out;
+  }
+  
+  &.editing {
+    background: linear-gradient(90deg, rgba(0, 121, 107, 0.05), rgba(0, 121, 107, 0.01));
+    border-left: 3px solid #00796b;
+    box-shadow: inset 0 0 0 1px rgba(0, 121, 107, 0.2);
+  }
+}
+
+@keyframes slideInNewRow {
+  0% {
+    opacity: 0;
+    transform: translateX(-20px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+/* Form Fields in Table */
+table td {
+  .mat-mdc-form-field {
+    width: 100%;
+    margin: 0;
+    
+    .mat-mdc-form-field-wrapper {
+      padding-bottom: 0;
+    }
+    
+    .mat-mdc-form-field-infix {
+      min-height: 40px;
+      padding: 8px 0;
+    }
+    
+    .mat-mdc-input-element {
+      font-size: 14px;
+      color: #333;
+      
+      &::placeholder {
+        color: #999;
+        font-size: 13px;
+      }
+    }
+    
+    .mat-mdc-form-field-outline {
+      .mat-mdc-notch-piece {
+        border-color: #e0e0e0;
+      }
+    }
+    
+    &.mat-focused {
+      .mat-mdc-form-field-outline {
+        .mat-mdc-notch-piece {
+          border-color: #00796b;
+          border-width: 2px;
+        }
+      }
+    }
+  }
+  
+  .mat-mdc-form-field-subscript-wrapper {
+    display: none;
+  }
+}
+
+/* Unified EMR button styling with subtle enhancements */
+.emr-btn-add {
+  background-color: #00796b;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  
+  &:hover {
+    background-color: #00695c;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 121, 107, 0.2);
+  }
+  
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 4px rgba(0, 121, 107, 0.3);
+  }
+  
+  &:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+/* Action Button Styles (matching medications interface image) */
+.action-btn {
+  border: none;
+  padding: 4px 8px;
+  border-radius: 3px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  margin: 0 1px;
+  min-width: 28px;
+  height: 24px;
+  font-size: 11px;
+  font-weight: 500;
+  
+  mat-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+  }
+  
+  &:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+  }
+  
+  &:active {
+    transform: translateY(1px);
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+.edit-btn {
+  background: #28a745;
+  color: white;
+  
+  &:hover:not(:disabled) {
+    background: #218838;
+  }
+}
+
+.save-btn {
+  background: #20b2aa;
+  color: white;
+  
+  &:hover:not(:disabled) {
+    background: #1a9999;
+  }
+}
+
+.monograph-btn {
+  background: #20b2aa;
+  color: white;
+  
+  &:hover:not(:disabled) {
+    background: #1a9999;
+  }
+}
+
+.cancel-btn {
+  background: #f39c12;
+  color: white;
+  
+  &:hover:not(:disabled) {
+    background: #e08e0b;
+  }
+}
+
+.delete-btn {
+  background: #dc3545;
+  color: white;
+  
+  &:hover:not(:disabled) {
+    background: #c82333;
+  }
+}
+
+.action-buttons {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+/* No data styling */
+.no-data {
+  text-align: center;
+  padding: 60px 20px;
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  
+  p {
+    margin: 0;
+    font-size: 16px;
+    color: #6c757d;
+    font-weight: 500;
+    
+    &::before {
+      content: '📊';
+      display: block;
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+  }
+}
+
+// Loading overlay
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  border-radius: 16px;
+
+  .loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #e0e0e0;
+    border-top: 4px solid #00796b;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 16px;
+  }
+
+  p {
+    color: #00796b;
+    font-weight: 500;
+    margin: 0;
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+// Disabled button styling
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  
+  &:hover {
+    background-color: inherit !important;
+  }
+}
+
+// Disabled form field styling - make text more visible
+.mat-mdc-form-field {
+  &.mat-form-field-disabled {
+    .mat-mdc-input-element {
+      color: #333 !important;
+      opacity: 0.8 !important;
+    }
+    
+    .mat-mdc-form-field-label {
+      color: #555 !important;
+    }
+  }
+}
+
+// Readonly input styling
+input[readonly] {
+  color: #333 !important;
+  background-color: #f8f9fa !important;
+  opacity: 0.9 !important;
+}
+
+// Disabled select styling
+.mat-mdc-select.mat-mdc-select-disabled {
+  .mat-mdc-select-value {
+    color: #333 !important;
+  }
+  
+  .mat-mdc-select-arrow {
+    color: #666 !important;
+  }
+}
+
+// Disabled checkbox styling
+input[type="checkbox"]:disabled {
+  opacity: 0.8 !important;
+  
+  &:checked {
+    background-color: #00796b !important;
+    border-color: #00796b !important;
+  }
+}
+.mat-autocomplete-panel {
+  position: fixed !important;
+  width: 300px !important; /* set your fixed width */
+  z-index: 10000 !important; /* keep overlay on top */
+}
+
+// Follow-up notification banner styles
+.follow-up-notification-banner {
+  background: linear-gradient(135deg, #2196f3, #1976d2);
+  color: white;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
+  animation: slideInDown 0.3s ease-out;
+
+  .notification-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    .notification-icon {
+      font-size: 20px;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .notification-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+
+      .notification-title {
+        font-weight: 600;
+        font-size: 14px;
+        opacity: 0.9;
+      }
+
+      .notification-date {
+        font-weight: 500;
+        font-size: 16px;
+      }
+
+      .notification-notes {
+        font-size: 12px;
+        opacity: 0.8;
+        font-style: italic;
+      }
+    }
+  }
+
+  .notification-actions {
+    display: flex;
+    gap: 8px;
+
+    .notification-btn {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: scale(1.05);
+      }
+
+      mat-icon {
+        font-size: 18px;
+        color: white;
+      }
+
+      &.close-btn:hover {
+        background: rgba(244, 67, 54, 0.8);
+      }
+    }
+  }
+}
+
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Follow-up overlay styles
+.follow-up-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.follow-up-content {
+  background: white;
+  padding: 24px;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  width: 90%;
+  max-width: 500px;
+  max-height: 80vh;
+  overflow-y: auto;
+  animation: slideIn 0.3s ease-in-out;
+}
+
+.follow-up-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e0e0e0;
+
+  h3 {
+    margin: 0;
+    color: #333;
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .close-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: #f5f5f5;
+    }
+  }
+}
+
+.follow-up-form {
+  .form-group {
+    margin-bottom: 16px;
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 500;
+      color: #555;
+      font-size: 14px;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+      transition: border-color 0.2s;
+
+      &:focus {
+        outline: none;
+        border-color: #2196f3;
+        box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1);
+      }
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+  }
+
+  .checkbox-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+
+    input[type="checkbox"] {
+      width: auto;
+      margin-right: 8px;
+    }
+
+    label {
+      margin-bottom: 0;
+      font-weight: normal;
+      cursor: pointer;
+    }
+  }
+}
+
+.follow-up-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #e0e0e0;
+
+  button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+
+    &.btn-cancel {
+      background-color: #f5f5f5;
+      color: #666;
+
+      &:hover {
+        background-color: #e0e0e0;
+      }
+    }
+
+    &.btn-save {
+      background-color: #4caf50;
+      color: white;
+
+      &:hover {
+        background-color: #45a049;
+      }
+
+      &:disabled {
+        background-color: #cccccc;
+        cursor: not-allowed;
+      }
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Confirmation popup styles for medication update
+.confirmation-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  backdrop-filter: blur(2px);
+}
+
+.confirmation-popup {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  max-width: 450px;
+  width: 90%;
+  max-height: 90vh;
+  overflow: hidden;
+  animation: popupSlideIn 0.3s ease-out;
+}
+
+@keyframes popupSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.popup-header {
+  background: linear-gradient(135deg, #26a69a, #00695c);
+  color: white;
+  padding: 20px 24px;
+  border-bottom: none;
+
+  h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    text-align: center;
+  }
+}
+
+.popup-content {
+  padding: 24px;
+  text-align: center;
+
+  p {
+    margin: 0 0 12px 0;
+    font-size: 16px;
+    line-height: 1.5;
+    color: #333;
+
+    strong {
+      color: #26a69a;
+      font-weight: 600;
+    }
+  }
+
+  .popup-subtitle {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 0;
+  }
+}
+
+.popup-actions {
+  padding: 0 24px 24px 24px;
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.popup-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 120px;
+
+  &.cancel-btn {
+    background: #f5f5f5;
+    color: #666;
+    border: 1px solid #ddd;
+
+    &:hover {
+      background: #e0e0e0;
+      color: #333;
+    }
+  }
+
+  &.confirm-btn {
+    background: linear-gradient(135deg, #26a69a, #00695c);
+    color: white;
+
+    &:hover {
+      background: linear-gradient(135deg, #00695c, #004d40);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(38, 166, 154, 0.3);
+    }
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
 }

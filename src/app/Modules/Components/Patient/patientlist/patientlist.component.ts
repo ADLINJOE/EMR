@@ -12,7 +12,7 @@ import { Route, Router } from '@angular/router';
 
 @Component({
   selector: 'app-patientlist',
-  imports: [PatientInviteComponent, CommonModule, ReactiveFormsModule, FormsModule, ADRComponent, PatientFilterPipe],
+  imports: [PatientInviteComponent, CommonModule, ReactiveFormsModule, FormsModule, PatientFilterPipe],
   templateUrl: './patientlist.component.html',
   styleUrl: './patientlist.component.scss'
 })
@@ -78,11 +78,11 @@ export class PatientlistComponent {
         // enrich with backend-required fields
         let user = this.userinfo();
         const payload = {
-          Name: result.name,
-          Gender: result.gender,
-          Age: result.age,
+          // Name: result.name,
+          // Gender: result.gender,
+          // Age: result.age,
           Email: result.email,
-          Address: result.address,
+          // Address: result.address,
           CreatedBy: this.UserSetGlobal.name ?? 'Admin',
           CreatedTime: new Date().toISOString(),
           CreateUserId: this.UserSetGlobal.userID,
@@ -96,6 +96,7 @@ export class PatientlistComponent {
           next: (res: any) => {
             if (res.success) {
               // this.patients.push(res.patient);
+            //  this.sendInvite(result.email)
               this.ngOnInit();
             }
           },

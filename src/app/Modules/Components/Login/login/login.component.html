@@ -1,32 +1,25 @@
 <!-- login.component.html -->
 <div class="auth-container">
   <div class="auth-image" aria-hidden="true">
-    <img src="assets/logo/medical-illustration.svg" alt="Medical Illustration" />
+    <div class="setdesign">
+    <!--<img src="assets/medical-login/rx-logo.svg" alt="rx_logo" />-->
+    <img src="assets/logo/rx-logo.svg" alt="Medical Illustration" />
+    </div>
   </div>
 
   <div class="auth-panel">
     <div class="card">
       <header class="card-header">
-     <svg width="200" height="60" viewBox="0 0 300 60"fill="none">
-  <!-- White background for contrast on green forms -->
-  <circle cx="30" cy="30" r="28" fill="#ffffff" stroke="#004d40" stroke-width="2"/>
-  <rect x="25" y="15" width="10" height="30" fill="#00796b" rx="1"/>
-  <rect x="15" y="25" width="30" height="10" fill="#00796b" rx="1"/>
-
-  <!-- White or light text if form is dark -->
-  <text x="70" y="38" font-family="Segoe UI, sans-serif" font-size="24" fill="#ffffff" font-weight="bold">
-    MedCare+
-  </text>
-
-  <text x="70" y="52" font-family="Segoe UI, sans-serif" font-size="12" fill="#c8e6c9">
-    Your Health, Our Priority
-  </text>
-</svg>
-        <!-- <button mat-button class="toggle-btn" (click)="toggleLoginForm()">{{ showLogin ? 'Signup' : 'Login' }}</button> -->
+        <!-- <img src="assets/logo/rx-logo.svg" alt="Logo" class="logo" /> -->
+        <!-- <button class="register-btn" mat-button (click)="toggleLoginForm()">
+          {{ showLogin ? 'Register' : 'Login' }}
+        </button> -->
       </header>
 
-      <ng-container *ngIf="showLogin; else signupBlock">
-        <h2>Login</h2>
+      <div *ngIf="showLogin; else signupTemplate">
+        <h2 style="    justify-content: space-around;
+    display: flex
+;">Login</h2>
         <form [formGroup]="loginForm" (ngSubmit)="onLoginSubmit()">
           <mat-form-field appearance="outline">
             <mat-label>Email</mat-label>
@@ -40,15 +33,15 @@
 
           <div class="options">
             <mat-checkbox >Remember me</mat-checkbox>
-            <a class="forgot" href="#">Forgot Password?</a>
+            <a class="forgot" (click)="openForgotPasswordDialog()" style="cursor: pointer;">Forgot Password?</a>
           </div>
 
           <button mat-flat-button color="primary" class="submit-btn" type="submit">Login</button>
         </form>
         <!-- <p class="switch">Don't have an account? <a (click)="toggleLoginForm()">Sign up</a></p> -->
-      </ng-container>
+      </div>
 
-      <ng-template #signupBlock>
+      <ng-template #signupTemplate>
         <h2>Sign up</h2>
         <form [formGroup]="signupForm" (ngSubmit)="onSignupSubmit()">
           <mat-form-field appearance="outline">
@@ -60,10 +53,7 @@
             <mat-label>Email</mat-label>
             <input matInput formControlName="Email" autocomplete="email" />
           </mat-form-field>
-        <mat-form-field appearance="outline">
-            <mat-label>Mobile</mat-label>
-            <input matInput formControlName="Mobile" autocomplete="mobile" />
-          </mat-form-field>
+
           <mat-form-field appearance="outline">
             <mat-label>Password</mat-label>
             <input matInput type="password" formControlName="Password" autocomplete="new-password" />

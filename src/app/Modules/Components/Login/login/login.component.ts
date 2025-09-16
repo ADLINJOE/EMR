@@ -6,11 +6,13 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
+import { MatDialog } from '@angular/material/dialog';
 import { CommonService } from '../../../../Service/common.service';
 import { SharedServiceService } from '../../../../Service/Sharedservice/shared-service.service';
 import { Router } from '@angular/router';
 import { MatCheckbox } from "@angular/material/checkbox";
 import { MatTab, MatTabsModule } from "@angular/material/tabs";
+import { ForgotPasswordDialogComponent } from '../../Shared/forgot-password-dialog/forgot-password-dialog.component';
 
 @Component({
   selector: 'app-login',
@@ -26,7 +28,7 @@ export class LoginComponent {
   ShowRegister = false;
   // UserType = false;
 
-  constructor(private fb: FormBuilder, private Http: CommonService, private Sharedservice: SharedServiceService, private router: Router) {
+  constructor(private fb: FormBuilder, private Http: CommonService, private Sharedservice: SharedServiceService, private router: Router, private dialog: MatDialog) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       //  email: ['', [Validators.required, Validators.email]],
@@ -36,7 +38,7 @@ export class LoginComponent {
     this.signupForm = this.fb.group(
       {
         Name: ['', Validators.required],
-         Mobile: ['', [Validators.required, Validators.pattern('[0-9]{10}')]],
+         Mobile: [1234567890, [Validators.required, Validators.pattern('[0-9]{10}')]],
         Email: ['', [Validators.required, Validators.email]],
         Password: ['', Validators.required],
         ConfirmPassword: ['', Validators.required]
@@ -83,10 +85,12 @@ export class LoginComponent {
     this.Http.Post("Login/Login/", this.loginForm.value).subscribe({
       next: (response) => {
         if (response.success) {
+
+
           if (response.patient) {
             this.Sharedservice.setPatientDetails(response.patient)
           }
-          this.Sharedservice.Messages('success', 'Login', response.message, 3000);
+          this.Sharedservice.Messages('success', 'Login', 'Login Successfully', 3000);
           this.showUserTypeSelection = true;
           this.onLoginSuccess(response.components);
           this.UserinfosetGlobal(response.userInfo)
@@ -119,6 +123,8 @@ UserinfosetGlobal(data:any){
     }
   }
   onSignupSubmit() {
+   this.signupForm.patchValue({ Mobile: '9876543210' });
+
     if (this.signupForm.valid) {
       this.Http.Post("Login/Register/", this.signupForm.value).subscribe({
         next: (response) => {
@@ -140,5 +146,16 @@ UserinfosetGlobal(data:any){
     }
   }
 
+  openForgotPasswordDialog() {
+    const dialogRef = this.dialog.open(ForgotPasswordDialogComponent, {
+      width: '450px',
+      disableClose: false,
+      panelClass: 'forgot-password-dialog-container'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      // Handle any post-dialog actions if needed
+    });
+  }
 
 }

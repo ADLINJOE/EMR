@@ -25,12 +25,15 @@ get showBackdrop() {
 }
 
  ngOnInit() {
-  const items = this.sharedService.menuItems().map(item => ({
-    title: item.componentName.replace('Component', ''),
-    icon: item.icon || 'medical_services',
-    path: item.componentPath,
-    startpage: item.startPage,
-  }));
+ const items = this.sharedService.menuItems().map(item => {
+      const title = item.componentName.replace('Component', '');
+      return {
+        title,
+        icon: item.icon || this.getIconForTitle(title),
+        path: item.componentPath,
+        startpage: item.startPage,
+      };
+    });
   this.menuItems.set(items);
 
   // ✅ Select the first menu item initially if exists
@@ -40,6 +43,25 @@ get showBackdrop() {
       this.router.navigate(['MainLayout', firstPath]);
     }
   }
+}
+ getIconForTitle(title: string): string {
+  const iconMap: Record<string, string> = {
+    "Patients Details": "monitor_heart",
+    "Drug Details": "science",
+    "Medicines Compare Price": "vaccines",
+    "ocr": "document_scanner",
+    "drugcompare": "compare_arrows",
+    "vitals dashboard": "favorite",
+    "ADR": "warning",
+    "learning": "menu_book",
+    "Appointments": "event",
+    "Prescriptions": "vaccines",
+    "Reports": "insert_chart",
+    "Settings": "settings",
+    "Default": "medical_services",
+  };
+
+  return iconMap[title] || iconMap["Default"];
 }
 
 

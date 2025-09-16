@@ -1,0 +1,519 @@
+// Responsive Layout System for EMR Application
+// Mobile-first responsive design with desktop and tablet breakpoints
+
+// Breakpoint Variables
+:root {
+  --mobile-max: 480px;
+  --tablet-min: 481px;
+  --tablet-max: 768px;
+  --desktop-min: 769px;
+  --desktop-large-min: 1200px;
+  
+  // Spacing system
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-xxl: 48px;
+  
+  // Container widths
+  --container-mobile: 100%;
+  --container-tablet: 100%;
+  --container-desktop: 1200px;
+  --container-padding: var(--spacing-md);
+}
+
+// Base Container
+.emr-container {
+  width: 100%;
+  max-width: var(--container-desktop);
+  margin: 0 auto;
+  padding: 0 var(--container-padding);
+  box-sizing: border-box;
+}
+
+// Grid System
+.emr-grid {
+  display: grid;
+  gap: var(--spacing-md);
+  width: 100%;
+  
+  // Mobile-first: single column
+  grid-template-columns: 1fr;
+  
+  &.emr-grid-2 {
+    @media (min-width: 769px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  &.emr-grid-3 {
+    @media (min-width: 769px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    @media (min-width: 1200px) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  
+  &.emr-grid-4 {
+    @media (min-width: 769px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    @media (min-width: 1200px) {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+}
+
+// Flex Utilities
+.emr-flex {
+  display: flex;
+  gap: var(--spacing-md);
+  
+  &.emr-flex-column {
+    flex-direction: column;
+  }
+  
+  &.emr-flex-wrap {
+    flex-wrap: wrap;
+  }
+  
+  &.emr-flex-center {
+    justify-content: center;
+    align-items: center;
+  }
+  
+  &.emr-flex-between {
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  &.emr-flex-end {
+    justify-content: flex-end;
+    align-items: center;
+  }
+}
+
+// Card Components
+.emr-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+  
+  .emr-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 1px solid #e0e0e0;
+    
+    h2, h3 {
+      margin: 0;
+      color: #333;
+    }
+  }
+  
+  .emr-card-content {
+    flex: 1;
+  }
+  
+  .emr-card-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    justify-content: flex-end;
+    margin-top: var(--spacing-md);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid #f0f0f0;
+  }
+}
+
+// Form Layout
+.emr-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  
+  .emr-form-row {
+    display: flex;
+    gap: var(--spacing-md);
+    flex-wrap: wrap;
+    
+    .emr-form-field {
+      flex: 1;
+      min-width: 200px;
+      
+      &.emr-form-field-full {
+        flex-basis: 100%;
+      }
+      
+      &.emr-form-field-half {
+        flex-basis: calc(50% - var(--spacing-sm));
+      }
+      
+      &.emr-form-field-third {
+        flex-basis: calc(33.333% - var(--spacing-sm));
+      }
+    }
+  }
+  
+  .emr-form-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    justify-content: flex-end;
+    margin-top: var(--spacing-lg);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid #e0e0e0;
+  }
+}
+
+// Table Responsive
+.emr-table-container {
+  width: 100%;
+  overflow-x: auto;
+  margin: var(--spacing-md) 0;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  
+  table {
+    width: 100%;
+    min-width: 600px;
+    border-collapse: collapse;
+    background: white;
+    
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    
+    th {
+      background-color: #f8f9fa;
+      font-weight: 600;
+      color: #333;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    
+    tr:hover {
+      background-color: #f8f9fa;
+    }
+  }
+}
+
+// Mobile Table Alternative (Card View)
+.emr-mobile-cards {
+  display: none;
+  
+  .emr-mobile-card {
+    background: white;
+    border-radius: 8px;
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    
+    .emr-mobile-card-header {
+      font-weight: 600;
+      color: #00796b;
+      margin-bottom: var(--spacing-sm);
+    }
+    
+    .emr-mobile-card-row {
+      display: flex;
+      justify-content: space-between;
+      padding: var(--spacing-xs) 0;
+      border-bottom: 1px solid #f0f0f0;
+      
+      &:last-child {
+        border-bottom: none;
+      }
+      
+      .emr-mobile-card-label {
+        font-weight: 500;
+        color: #666;
+      }
+      
+      .emr-mobile-card-value {
+        color: #333;
+        text-align: right;
+      }
+    }
+    
+    .emr-mobile-card-actions {
+      display: flex;
+      gap: var(--spacing-xs);
+      margin-top: var(--spacing-sm);
+      padding-top: var(--spacing-sm);
+      border-top: 1px solid #f0f0f0;
+    }
+  }
+}
+
+// Navigation
+.emr-nav {
+  background: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  
+  .emr-nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-md) var(--container-padding);
+    max-width: var(--container-desktop);
+    margin: 0 auto;
+  }
+  
+  .emr-nav-brand {
+    font-size: 20px;
+    font-weight: 600;
+    color: #00796b;
+  }
+  
+  .emr-nav-menu {
+    display: flex;
+    gap: var(--spacing-md);
+    
+    .emr-nav-item {
+      padding: var(--spacing-sm) var(--spacing-md);
+      border-radius: 4px;
+      text-decoration: none;
+      color: #666;
+      transition: all 0.2s ease;
+      
+      &:hover, &.active {
+        background-color: #e0f2f1;
+        color: #00796b;
+      }
+    }
+  }
+  
+  .emr-nav-toggle {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+  }
+}
+
+// Sidebar Layout
+.emr-layout {
+  display: flex;
+  min-height: 100vh;
+  
+  .emr-sidebar {
+    width: 250px;
+    background: #f8f9fa;
+    border-right: 1px solid #e0e0e0;
+    padding: var(--spacing-lg);
+    
+    .emr-sidebar-menu {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      
+      .emr-sidebar-item {
+        margin-bottom: var(--spacing-xs);
+        
+        a {
+          display: flex;
+          align-items: center;
+          gap: var(--spacing-sm);
+          padding: var(--spacing-sm) var(--spacing-md);
+          border-radius: 4px;
+          text-decoration: none;
+          color: #666;
+          transition: all 0.2s ease;
+          
+          &:hover, &.active {
+            background-color: #e0f2f1;
+            color: #00796b;
+          }
+        }
+      }
+    }
+  }
+  
+  .emr-main {
+    flex: 1;
+    padding: var(--spacing-lg);
+    overflow-x: hidden;
+  }
+}
+
+// Responsive Breakpoints
+@media (max-width: 768px) {
+  :root {
+    --container-padding: var(--spacing-sm);
+    --spacing-md: 12px;
+    --spacing-lg: 16px;
+  }
+  
+  .emr-card {
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
+  }
+  
+  .emr-form-row {
+    flex-direction: column;
+    
+    .emr-form-field {
+      min-width: unset;
+      flex-basis: 100%;
+    }
+  }
+  
+  .emr-form-actions {
+    flex-direction: column;
+    
+    .emr-btn {
+      width: 100%;
+    }
+  }
+  
+  .emr-table-container {
+    display: none;
+  }
+  
+  .emr-mobile-cards {
+    display: block;
+  }
+  
+  .emr-nav {
+    .emr-nav-menu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: white;
+      flex-direction: column;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      padding: var(--spacing-md);
+      
+      &.emr-nav-menu-open {
+        display: flex;
+      }
+    }
+    
+    .emr-nav-toggle {
+      display: block;
+    }
+  }
+  
+  .emr-layout {
+    flex-direction: column;
+    
+    .emr-sidebar {
+      width: 100%;
+      order: 2;
+      border-right: none;
+      border-top: 1px solid #e0e0e0;
+      
+      .emr-sidebar-menu {
+        display: flex;
+        overflow-x: auto;
+        gap: var(--spacing-sm);
+        
+        .emr-sidebar-item {
+          margin-bottom: 0;
+          white-space: nowrap;
+        }
+      }
+    }
+    
+    .emr-main {
+      order: 1;
+      padding: var(--spacing-md);
+    }
+  }
+  
+  .emr-card-actions {
+    flex-direction: column;
+    
+    .emr-btn {
+      width: 100%;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --container-padding: var(--spacing-xs);
+    --spacing-sm: 6px;
+    --spacing-md: 10px;
+    --spacing-lg: 14px;
+  }
+  
+  .emr-card {
+    padding: var(--spacing-sm);
+    border-radius: 4px;
+  }
+  
+  .emr-nav-container {
+    padding: var(--spacing-sm) var(--container-padding);
+  }
+  
+  .emr-nav-brand {
+    font-size: 18px;
+  }
+}
+
+// Utility Classes
+.emr-hide-mobile {
+  @media (max-width: 768px) {
+    display: none !important;
+  }
+}
+
+.emr-hide-desktop {
+  @media (min-width: 769px) {
+    display: none !important;
+  }
+}
+
+.emr-text-center {
+  text-align: center;
+}
+
+.emr-text-right {
+  text-align: right;
+}
+
+.emr-w-full {
+  width: 100%;
+}
+
+.emr-h-full {
+  height: 100%;
+}
+
+// Spacing utilities
+.emr-m-0 { margin: 0; }
+.emr-m-sm { margin: var(--spacing-sm); }
+.emr-m-md { margin: var(--spacing-md); }
+.emr-m-lg { margin: var(--spacing-lg); }
+
+.emr-p-0 { padding: 0; }
+.emr-p-sm { padding: var(--spacing-sm); }
+.emr-p-md { padding: var(--spacing-md); }
+.emr-p-lg { padding: var(--spacing-lg); }
+
+.emr-mt-0 { margin-top: 0; }
+.emr-mt-sm { margin-top: var(--spacing-sm); }
+.emr-mt-md { margin-top: var(--spacing-md); }
+.emr-mt-lg { margin-top: var(--spacing-lg); }
+
+.emr-mb-0 { margin-bottom: 0; }
+.emr-mb-sm { margin-bottom: var(--spacing-sm); }
+.emr-mb-md { margin-bottom: var(--spacing-md); }
+.emr-mb-lg { margin-bottom: var(--spacing-lg); }

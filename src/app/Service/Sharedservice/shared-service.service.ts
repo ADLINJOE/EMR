@@ -19,6 +19,7 @@ export class SharedServiceService {
 
 
 patient = signal<any>(null);
+private _selectedDrug = signal<string | null>(null);
 
   setPatient(data: any) {
     this.patient.set(data);
@@ -26,6 +27,19 @@ patient = signal<any>(null);
 
   getPatient() {
     return this.patient();
+  }
+
+  // Drug monograph functionality
+  setSelectedDrug(drugName: string) {
+    this._selectedDrug.set(drugName);
+  }
+
+  getSelectedDrug() {
+    return this._selectedDrug();
+  }
+
+  clearSelectedDrug() {
+    this._selectedDrug.set(null);
   }
   setMenuItems(items: any[]) {
     this._menuItems.set(items);
