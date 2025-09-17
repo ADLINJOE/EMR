@@ -172,13 +172,15 @@ this.registerForm.get('email')?.disable();
           
    setTimeout(() => {
         this.patientInviteComp.Reload(payload);
-      }, 1500);
+      }, 1000);
         
 
 
 
             }
-
+ setTimeout(() => {
+  
+ 
  
       const formDataAPI = {
         ...this.registerForm.value,
@@ -199,6 +201,7 @@ this.registerForm.get('email')?.disable();
 
         }
       });
+           }, 1500);
       console.log('Register form data:', formData);
     }
   }

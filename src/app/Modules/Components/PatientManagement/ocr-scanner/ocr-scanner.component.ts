@@ -6,6 +6,14 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatButtonModule } from '@angular/material/button';
 import { DeployUrl, CommonService } from '../../../../Service/common.service';
 import { SharedServiceService } from '../../../../Service/Sharedservice/shared-service.service';
+import { MatSelectModule } from "@angular/material/select";
+import { MatAutocomplete, MatAutocompleteModule } from "@angular/material/autocomplete";
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { map, Observable, startWith } from 'rxjs';
+import { MatInputModule } from '@angular/material/input';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatFormFieldModule } from '@angular/material/form-field';
 
 interface OCRResult {
   rawText: string;
@@ -44,8 +52,23 @@ interface StructuredMedicationData {
     HttpClientModule,
     MatProgressSpinnerModule,
     MatButtonModule,
-    
-  ],
+    MatSelectModule,
+    MatAutocompleteModule,
+    ReactiveFormsModule,
+    FormsModule,
+       CommonModule,
+    MatInputModule,
+    MatFormFieldModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatButtonModule,
+    MatAutocomplete,
+    MatSelectModule,
+    ReactiveFormsModule,
+    MatAutocompleteModule,
+    FormsModule,
+
+],
   templateUrl: './ocr-scanner.component.html',
   styleUrls: ['./ocr-scanner.component.scss', '../../../Shared/styles/table-template.scss']
 })
@@ -58,10 +81,10 @@ export class OcrScannerComponent {
   private http = inject(HttpClient);
   private commonService = inject(CommonService);
   private sharedService = inject(SharedServiceService);
-
+  searchPatientControl = new FormControl();
   patientDetails = computed(() => this.sharedService.patientDetails());
   patientGlobal = computed(() => this.sharedService.patient());
-
+filteredPatients: Observable<any[]> | undefined;
   selectedFile: File | null = null;
   imagePreview: string | null = null;
   isDragOver = false;
@@ -72,13 +95,27 @@ export class OcrScannerComponent {
   errorMessage: string | null = null;
   mediaStream: MediaStream | null = null;
   returnUrl: string = '/medication-print';
+  patients: any[] = [];
 
-  ngOnInit() {
-    // Get return URL from query params
-    this.route.queryParams.subscribe(params => {
-      if (params['returnUrl']) {
-        this.returnUrl = params['returnUrl'];
-      }
+
+   userinfo = computed(() => this.sharedService.userInfo());
+  UserSetGlobal: any;
+  ngOnInit(): void {
+    this.UserSetGlobal = this.userinfo();
+    const payload = {
+      UserType: this.UserSetGlobal.userType,
+      UserId: this.UserSetGlobal.userID
+    }
+    this.commonService.Post('PatientHandle/Getmypatients', payload).subscribe({
+      next: (res) => {
+
+        if (res.success) {
+          this.patients = res.patients.filter((x: any) => x.isRegistered === true);
+          this.setupPatientFilter();
+        }
+
+      },
+
     });
   }
 
@@ -91,12 +128,26 @@ export class OcrScannerComponent {
     event.preventDefault();
     this.isDragOver = true;
   }
+ private _filterPatients(value: string): any[] {
+    const filterValue = value.toLowerCase();
+    return this.patients.filter(p =>
+      p.name?.toLowerCase().includes(filterValue) 
+      // ||
+      // p.patientId?.toLowerCase().includes(filterValue) ||
+      // p.email?.toLowerCase().includes(filterValue)
+    ).slice(0, 10);
+  }
 
   onDragLeave(event: DragEvent) {
     event.preventDefault();
     this.isDragOver = false;
   }
-
+ private setupPatientFilter() {
+    this.filteredPatients = this.searchPatientControl.valueChanges.pipe(
+      startWith(''),
+      map(value => this._filterPatients(value || ''))
+    );
+  }
   onDrop(event: DragEvent) {
     event.preventDefault();
     this.isDragOver = false;
@@ -113,7 +164,9 @@ export class OcrScannerComponent {
       this.handleFile(input.files[0]);
     }
   }
-
+ displayPatient(patient: any): string {
+  return patient ? patient.name : '';
+}
   private handleFile(file: File) {
     // Validate file type
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
@@ -143,7 +196,17 @@ export class OcrScannerComponent {
       this.imagePreview = null;
     }
   }
+  selectedPatient: any = null;
+patientselect(patid: number) {
+this.selectedPatient = this.patients.find(p => p.patientId === patid) || null;
+  const payload = {
+    patID: patid,
+    email: this.selectedPatient.email  // optional if you don’t want to filter by email
+  };
 
+  this.sharedService.setPatient(this.selectedPatient)
+
+}
   removeFile(event: Event) {
     event.stopPropagation();
     this.selectedFile = null;
@@ -251,7 +314,7 @@ export class OcrScannerComponent {
   private async extractStructuredData(rawText: string) {
     try {
       // Call AI service to extract structured medication data
-      const response = await this.http.post<any>('/api/ocr/extract-medication-data', {
+      const response = await this.commonService.Post('api/ocr/extract-medication-data', {
         text: rawText
       }).toPromise();
 
@@ -283,7 +346,7 @@ export class OcrScannerComponent {
   private saveMedicationsToPatient() {
     const patientDetails = this.patientDetails();
     const patientGlobal = this.patientGlobal();
-    const patient = patientDetails || patientGlobal;
+    const patient = this.selectedPatient || patientGlobal;
 
     if (!patient || !this.structuredData?.medications) {
       this.sharedService.Messages('error', 'OCR', 'Patient details or medication data not available', 3000);
@@ -311,11 +374,11 @@ export class OcrScannerComponent {
       MedicationList: medicationsToSave
     };
 
-    this.commonService.Post("CurrentMedication/Medications", payload).subscribe({
+    this.commonService.Post("CurrentMedication/currentmedication/", payload).subscribe({
       next: (response: any) => {
         if (response.success) {
           this.sharedService.Messages('success', 'OCR', `${medicationsToSave.length} medications added successfully`, 3000);
-          this.router.navigate(['/patient-management/current-medication']);
+          this.router.navigate(['/MainLayout/currentmedication']);
         } else {
           this.sharedService.Messages('error', 'OCR', 'Failed to save medications', 3000);
         }
@@ -338,9 +401,7 @@ export class OcrScannerComponent {
   }
 
   editStructuredData() {
-    // Open modal or navigate to edit page
-    // For now, just log the data
-    console.log('Edit structured data:', this.structuredData);
+  
   }
 
   // Error Handling

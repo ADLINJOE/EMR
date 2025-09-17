@@ -17,48 +17,52 @@
     <div class="emr-card-content">
       <!-- Tabs -->
       <div class="emr-tab-buttons">
-        <!-- <button class="emr-btn emr-tab-btn" 
+        <button class="emr-btn emr-tab-btn" 
                 [class.emr-tab-active]="activeTab === 'articles'" 
                 (click)="activeTab='articles'">
           <span class="emr-btn-icon">📄</span> Articles
-        </button> -->
+        </button>
         <button class="emr-btn emr-tab-btn" 
                 [class.emr-tab-active]="activeTab === 'videos'" 
                 (click)="activeTab='videos'">
           <span class="emr-btn-icon">🎬</span> Videos
         </button>
-        <!-- <button class="emr-btn emr-tab-btn" 
+        <button class="emr-btn emr-tab-btn" 
                 [class.emr-tab-active]="activeTab === 'topics'" 
                 (click)="activeTab='topics'">
           <span class="emr-btn-icon">📋</span> Topics
-        </button> -->
+        </button>
       </div>
 
       <!-- Articles Tab -->
       <div *ngIf="activeTab==='articles'" class="emr-tab-content">
-        <div *ngIf="loadingTopics" class="emr-loading">
+        <div *ngIf="loadingArticles" class="emr-loading">
           <mat-spinner class="emr-spinner"></mat-spinner>
           <p class="emr-loading-text">Loading articles...</p>
         </div>
-        <div *ngIf="!loadingTopics && (!topics || topics.length === 0)" class="emr-no-content">
+        <div *ngIf="!loadingArticles && (!articles || articles.length === 0)" class="emr-no-content">
           <span class="emr-no-content-icon">📄</span>
           <p class="emr-no-content-text">No articles available for this topic.</p>
         </div>
-        <div *ngIf="!loadingTopics && topics.length > 0" class="emr-table-container">
+        <div *ngIf="!loadingArticles && articles.length > 0" class="emr-table-container">
           <table class="emr-table">
             <thead class="emr-table-header">
               <tr>
+                <th class="emr-th">Title</th>
                 <th class="emr-th">Summary</th>
-                <th class="emr-th emr-th-actions">Link</th>
+                <th class="emr-th">Published Date</th>
+                <th class="emr-th emr-th-actions">Actions</th>
               </tr>
             </thead>
             <tbody class="emr-table-body">
-              <tr *ngFor="let topic of topics" class="emr-table-row">
-                <td class="emr-td">{{ topic.Teaser || 'N/A' }}</td>
+              <tr *ngFor="let article of articles" class="emr-table-row">
+                <td class="emr-td">{{ article.title || 'N/A' }}</td>
+                <td class="emr-td">{{ article.summary || 'N/A' }}</td>
+                <td class="emr-td">{{ (article.publishedDate | date:'shortDate') || 'N/A' }}</td>
                 <td class="emr-td emr-td-actions">
-                  <a [href]="topic.Url" target="_blank" class="emr-btn emr-btn-primary emr-btn-sm">
+                  <button (click)="viewArticleDetails(article)" class="emr-btn emr-btn-primary emr-btn-sm">
                     <span class="emr-btn-icon">📖</span> Read
-                  </a>
+                  </button>
                 </td>
               </tr>
             </tbody>
@@ -78,15 +82,16 @@
         </div>
         <div *ngIf="!loadingVideos && videos.length > 0" class="emr-video-grid">
           <div class="emr-video-card" *ngFor="let video of videos">
-            <div class="emr-video-wrapper">
-              <iframe [src]="getVideoUrl(video.id.videoId)" 
-                      frameborder="0" 
-                      allowfullscreen 
-                      class="emr-video-iframe"></iframe>
-            </div>
             <div class="emr-video-content">
               <h4 class="emr-video-title">{{ video.snippet.title }}</h4>
               <p class="emr-video-description">{{ video.snippet.description }}</p>
+              <div class="emr-video-actions">
+                <a [href]="'https://www.youtube.com/watch?v=' + video.id.videoId" 
+                   target="_blank" 
+                   class="emr-btn emr-btn-primary emr-btn-sm">
+                  <span class="emr-btn-icon">🎬</span> Watch on YouTube
+                </a>
+              </div>
             </div>
           </div>
         </div>
@@ -94,21 +99,31 @@
 
       <!-- Topics Tab -->
       <div *ngIf="activeTab==='topics'" class="emr-tab-content">
-        <div class="emr-table-container">
+        <div *ngIf="loadingTopics" class="emr-loading">
+          <mat-spinner class="emr-spinner"></mat-spinner>
+          <p class="emr-loading-text">Loading topics...</p>
+        </div>
+        <div *ngIf="!loadingTopics && (!topics || topics.length === 0)" class="emr-no-content">
+          <span class="emr-no-content-icon">📋</span>
+          <p class="emr-no-content-text">No topics available for this category.</p>
+        </div>
+        <div *ngIf="!loadingTopics && topics.length > 0" class="emr-table-container">
           <table class="emr-table">
             <thead class="emr-table-header">
               <tr>
+                <th class="emr-th">Title</th>
                 <th class="emr-th">Description</th>
-                <th class="emr-th emr-th-actions">More</th>
+                <th class="emr-th emr-th-actions">Actions</th>
               </tr>
             </thead>
             <tbody class="emr-table-body">
               <tr *ngFor="let topic of topics" class="emr-table-row">
                 <td class="emr-td">{{ topic.title || 'N/A' }}</td>
+                <td class="emr-td">{{ topic.Teaser || 'N/A' }}</td>
                 <td class="emr-td emr-td-actions">
-                  <a [href]="topic.Url" target="_blank" class="emr-btn emr-btn-secondary emr-btn-sm">
+                  <button (click)="viewTopicDetails(topic)" class="emr-btn emr-btn-secondary emr-btn-sm">
                     <span class="emr-btn-icon">👁️</span> View
-                  </a>
+                  </button>
                 </td>
               </tr>
             </tbody>

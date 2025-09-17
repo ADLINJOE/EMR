@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -8,18 +7,13 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { HttpClientModule } from '@angular/common/http';
-import { DeployUrl } from '../../../../Service/common.service';
+import { LearningServiceService, Article, Topic, Video } from '../../../../Service/learning-service.service';
 
 
 
 type CategoryKey = 'bp' | 'sugar' | 'diet' | 'exercise' | 'lifestyle';
 
-interface Topic {
-  Id: string;
-  title: string;
-  Teaser: string;
-  Url: string;
-}
+// Interfaces are now imported from the service
 
 @Component({
   selector: 'app-learing-hub',
@@ -49,8 +43,10 @@ export class LearingHubComponent {
   activeTab: 'articles' | 'videos' | 'topics' = 'articles';
 
   topics: Topic[] = [];
-  videos: any[] = [];
+  articles: Article[] = [];
+  videos: Video[] = [];
   loadingTopics = false;
+  loadingArticles = false;
   loadingVideos = false;
 
   private categoryFilterMap: Record<CategoryKey, string> = {
@@ -61,7 +57,7 @@ export class LearingHubComponent {
     lifestyle: 'Lifestyle'
   };
 
-  constructor(private http: HttpClient, private sanitizer: DomSanitizer) {}
+  constructor(private learningService: LearningServiceService, private sanitizer: DomSanitizer) {}
 
   ngOnInit(): void {
     this.loadAll();
@@ -69,35 +65,78 @@ export class LearingHubComponent {
 
   loadAll() {
     this.loadTopics();
+    this.loadArticles();
     this.loadVideos();
   }
 
   loadTopics() {
     this.loadingTopics = true;
-
     const filterValue = this.categoryFilterMap[this.selectedCategory];
 
-    this.http
-      .get<any>(`${DeployUrl.URL}api/learninghub/topics?filter=${encodeURIComponent(filterValue)}`)
+    this.learningService.getTopics(filterValue)
       .subscribe({
         next: res => {
-          this.topics = res?.result?.items?.item || [];
+          console.log('Topics API Response:', res);
+          this.topics = res?.data || [];
           this.loadingTopics = false;
         },
-        error: () => (this.loadingTopics = false)
+        error: (error) => {
+          console.error('Error loading topics:', error);
+          this.loadingTopics = false;
+        }
+      });
+  }
+  loadArticles() {
+    this.loadingArticles = true;
+    const filterValue = this.categoryFilterMap[this.selectedCategory];
+
+    this.learningService.getArticles(filterValue)
+      .subscribe({
+        next: res => {
+          console.log('Articles API Response:', res);
+          this.articles = res?.data || [];
+          this.loadingArticles = false;
+        },
+        error: (error) => {
+          console.error('Error loading articles:', error);
+          this.loadingArticles = false;
+        }
       });
   }
 
+  viewTopicDetails(topic: Topic) {
+    if (topic.Url) {
+      window.open(topic.Url, '_blank');
+    } else {
+      // Fallback: show topic details in a modal or navigate to a details page
+      console.log('Topic details:', topic);
+      alert(`Topic: ${topic.title}\n\nDescription: ${topic.Teaser}\n\nThis topic contains detailed information about ${topic.title.toLowerCase()}.`);
+    }
+  }
+
+  viewArticleDetails(article: Article) {
+    if (article.url) {
+      window.open(article.url, '_blank');
+    } else {
+      console.log('Article details:', article);
+      alert(`Article: ${article.title}\n\nSummary: ${article.summary}\n\nAuthor: ${article.author}`);
+    }
+  }
   loadVideos() {
     this.loadingVideos = true;
-    this.http
-      .get(`${DeployUrl.URL}api/learninghub/videos/daily?category=${this.selectedCategory}`)
+    const filterValue = this.categoryFilterMap[this.selectedCategory];
+
+    this.learningService.getVideos(filterValue)
       .subscribe({
-        next: (res: any) => {
-          this.videos = res?.items || [];
+        next: (res) => {
+          console.log('Videos API Response:', res);
+          this.videos = res?.data || [];
           this.loadingVideos = false;
         },
-        error: () => (this.loadingVideos = false)
+        error: (error) => {
+          console.error('Error loading videos:', error);
+          this.loadingVideos = false;
+        }
       });
   }
 

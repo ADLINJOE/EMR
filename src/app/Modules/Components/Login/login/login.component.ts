@@ -53,6 +53,9 @@ toggleLogin(string:string){
 if(string==='patient'){
 
 this.router.navigate(['/register']);
+}else {
+    this.showLogin = false;
+      this.toggleForm();
 }
 }
   passwordMatchValidator(): ValidatorFn {

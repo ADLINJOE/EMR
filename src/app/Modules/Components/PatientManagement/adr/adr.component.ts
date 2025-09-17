@@ -26,16 +26,14 @@ import { PatientlistComponent } from '../../Patient/patientlist/patientlist.comp
     MatDatepickerModule,
     MatNativeDateModule,
     MatButtonModule,
-    CommonModule,
     MatAutocomplete,
     MatSelectModule,
     ReactiveFormsModule,
     MatAutocompleteModule,
     FormsModule,
-    MatFormFieldModule,
-    ReactiveFormsModule, MatInputModule,
-    MatFormFieldModule, CommonModule,
-    MatButtonModule,
+ 
+
+  
    
   ],
   templateUrl: './adr.component.html',
