@@ -117,11 +117,11 @@ export const routes: Routes = [
   },
 
   // Wildcard route
-  { path: '**', redirectTo: 'login', pathMatch: 'full' }
+  { path: '**', redirectTo: 'login' }
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(routes, { useHash: true,onSameUrlNavigation: 'reload' })],
   exports: [RouterModule],
 })
 export class AppRoutingModule { }

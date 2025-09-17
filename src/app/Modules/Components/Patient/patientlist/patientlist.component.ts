@@ -85,13 +85,19 @@ export class PatientlistComponent {
           // Address: result.address,
           CreatedBy: this.UserSetGlobal.name ?? 'Admin',
           CreatedTime: new Date().toISOString(),
-          CreateUserId: this.UserSetGlobal.userID,
-          CreateUserType: this.UserSetGlobal.userType,
+          CreateUserId: this.UserSetGlobal.userID || 0,
+          CreateUserType: this.UserSetGlobal.userType || 'Admin',
           IsDeleted: false,
           SendInvite: false,
           InviteDateTime: null
         };
 
+  this.Reload(payload);
+      }
+    
+    });
+  }
+Reload(payload:any){
         this.Http.Post('PatientHandle/Addpatient', payload).subscribe({
           next: (res: any) => {
             if (res.success) {
@@ -102,10 +108,7 @@ export class PatientlistComponent {
           },
           error: (err) => console.error('Error saving patient', err)
         });
-      }
-    });
-  }
-
+}
   openPatientDetails(patient: any) {
       this.sharedService.setPatient(patient);
   this.router.navigate(['/MainLayout/patientmanagement']);

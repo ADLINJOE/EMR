@@ -76,7 +76,7 @@
 
           <mat-form-field appearance="fill">
             <mat-label>Email</mat-label>
-            <input matInput formControlName="email" type="email" required [disabled]="true" />
+            <input matInput formControlName="email" type="email" required />
           </mat-form-field>
 
           <mat-form-field appearance="fill">
@@ -102,3 +102,5 @@
     </ng-template>
   </div>
 </div>
+
+<app-patientlist [hidden]="true"></app-patientlist>

@@ -13,11 +13,13 @@ import { Router } from '@angular/router';
 import { MatCheckbox } from "@angular/material/checkbox";
 import { MatTab, MatTabsModule } from "@angular/material/tabs";
 import { ForgotPasswordDialogComponent } from '../../Shared/forgot-password-dialog/forgot-password-dialog.component';
+import { MatMenuModule } from '@angular/material/menu';
+
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, MatInputModule, MatFormFieldModule, MatButtonModule, MatSelectModule, MatOptionModule, MatCheckbox, MatTabsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, MatInputModule,MatMenuModule, MatFormFieldModule, MatButtonModule, MatSelectModule, MatOptionModule, MatCheckbox, MatTabsModule],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
@@ -47,7 +49,12 @@ export class LoginComponent {
     );
 
   }
+toggleLogin(string:string){
+if(string==='patient'){
 
+this.router.navigate(['/register']);
+}
+}
   passwordMatchValidator(): ValidatorFn {
     return (form: AbstractControl): ValidationErrors | null => {
       const password = form.get('Password')?.value;
