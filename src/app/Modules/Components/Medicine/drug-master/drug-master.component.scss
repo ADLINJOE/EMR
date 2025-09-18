@@ -102,3 +102,27 @@
   padding: 3px 6px;
   font-size: 11px;
 }
+
+.search-box{
+  padding-left: 10PX!important;
+  height: 42px;
+  font-size: 14PX!important;
+  border-radius: 0!important;
+  border: 1px solid #ced4da;
+  transition: all 0.3s ease;
+}
+
+.add-btn{
+  margin-left: 15px;
+  padding: 12px 19px!important;;
+  font-weight: 500;
+  font-size: 12px;
+  font-weight: 500;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  background: #48bb78; border-radius: 0px;color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 3px!important;
+  cursor: pointer;
+}
