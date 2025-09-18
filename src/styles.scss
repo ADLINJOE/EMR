@@ -8,7 +8,7 @@ html, body { height: 100%; }
 body { 
   margin: 0; 
   font-family: Roboto, "Helvetica Neue", sans-serif;
-  background-color: #f8f9fa;
+  background-color: #fff;
   color: #333;
   line-height: 1.6;
 }
@@ -186,3 +186,61 @@ p {
 // -----------------------------NGX toaster---End-----------------------------
 
 .card{ border-top:0px!important;}
+
+
+.add-button-wrappe .search-container .search-box{
+  padding-left: 10PX!important;
+  height: 42px;
+  font-size: 14PX!important;
+  border-radius: 0!important;
+  border: 1px solid #ced4da;
+  transition: all 0.3s ease;
+}
+
+.emr-container{ background: #fff!important;}
+th{ background: #000!important;}
+
+
+
+
+@media all and (max-width: 760px) {
+
+  h2{ font-size: 20px;}
+
+
+.welcome{ display: none;}
+
+.search-container{ width: 100%;;}
+.search-container .form-control {width: 100%!important;}
+
+
+body{ overflow-x: hidden!important;}
+
+.container{ padding: 30px;}
+
+.emr-card-header{ display: block!important;}
+
+.emr-card-header h2{  text-align: left!important;}
+.emr-card-header label{ margin-bottom: 20px;}
+
+.emr-card-header .mat-mdc-form-field{ display: block!important;margin-top: 15px;}
+
+.emr-tab-buttons{ margin-bottom: 10px;}
+.emr-btn-icon{ margin-top: 22px;;}
+.emr-form-field-full {width:100%!important;}
+
+.emr-table-container {
+    display: block;
+  }
+
+
+
+  .emr-upload-area{
+
+    margin-bottom: 30px;
+  }
+  .emr-instructions-section{ padding: 20px;}
+
+  th{ background: #000!important;}
+
+}
