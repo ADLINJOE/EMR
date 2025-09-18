@@ -340,3 +340,21 @@ table tr:hover {
   background: linear-gradient(90deg, transparent, rgba(0, 121, 107, 0.3), transparent);
   animation: medicationShimmer 1.5s ease-in-out;
 }
+
+.emr-table td:last-child{ width: 100px}
+.emr-card .emr-card-header{ display: block;}
+
+
+
+@media all and (max-width: 760px) {
+
+
+.emr-table th:nth-child(3){ min-width: 200px}
+.emr-table th:nth-child(4){ min-width: 200px}
+
+.container{ padding: 5px;}
+
+
+.emr-card{
+    max-width: 75%!important;}
+}

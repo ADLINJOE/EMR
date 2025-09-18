@@ -243,4 +243,16 @@ body{ overflow-x: hidden!important;}
 
   th{ background: #000!important;}
 
+
+  .emr-btn-group.emr-btn-group-horizontal {
+        flex-direction: initial!important;
+    }
+
+
+    .emr-btn-group {
+    display: grid;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
 }
