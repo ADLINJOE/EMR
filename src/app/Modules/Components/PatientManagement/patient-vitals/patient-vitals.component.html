@@ -3,14 +3,17 @@
 <div class="container">
   <div class="emr-card">
     <div class="emr-card-header">
+      <div class="row1">
       <h2 class="emr-card-title">Patient Vitals</h2>
 
+       <div class="emr-add-button-wrapper">
+        <button type="button" class="emr-btn-add" (click)="addVital()">+ Add Vitals</button>
+      </div>
+</div>
     
 
     <form [formGroup]="form" class="emr-form">
-         <div class="emr-add-button-wrapper">
-        <button type="button" class="emr-btn-add" (click)="addVital()">+ Add Vitals</button>
-      </div>
+        
       <div class="emr-table-container">
         <table class="emr-table" formArrayName="vitalList">
           <thead class="emr-table-header">
