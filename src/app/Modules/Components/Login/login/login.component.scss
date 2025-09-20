@@ -147,6 +147,13 @@
   
 }
 
+
+
+.mdc-dialog--open .mat-mdc-dialog-surface, .mdc-dialog--closing .mat-mdc-dialog-surface {
+  transform: none;
+}
+
+
 @media (max-width: 600px) {
   .auth-image {
     height: 132px;
