@@ -33,7 +33,7 @@ export class PatientInviteComponent {
     this.email.setValue(emailValue);
   }
     if (this.email.valid ) {
-   const registrationLink = `${DeployUrl.Front}register?email=${encodeURIComponent(this.email.value ?? '')}`;
+   const registrationLink = `${DeployUrl.Front}#/register?email=${encodeURIComponent(this.email.value ?? '')}`;
 
     this.UserSetGlobal = this.userinfo();
 const emailPayload = {

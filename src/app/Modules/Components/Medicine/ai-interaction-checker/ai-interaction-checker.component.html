@@ -73,28 +73,28 @@
             <div class="info-item">
               <mat-icon>badge</mat-icon>
               <div class="info-content">
-                <span class="label">Patient ID</span>
+                <span class="label">Patient ID :</span>
                 <span class="value">{{ selectedPatient.patientId }}</span>
               </div>
             </div>
             <div class="info-item">
               <mat-icon>cake</mat-icon>
               <div class="info-content">
-                <span class="label">Age</span>
+                <span class="label">Age :</span>
                 <span class="value">{{ calculateAge(selectedPatient.dateOfBirth) }} years</span>
               </div>
             </div>
             <div class="info-item">
               <mat-icon>wc</mat-icon>
               <div class="info-content">
-                <span class="label">Gender</span>
+                <span class="label">Gender :</span>
                 <span class="value">{{ selectedPatient.gender }}</span>
               </div>
             </div>
             <div class="info-item" *ngIf="selectedPatient.email">
               <mat-icon>email</mat-icon>
               <div class="info-content">
-                <span class="label">Email</span>
+                <span class="label">Email :</span>
                 <span class="value">{{ selectedPatient.email }}</span>
               </div>
             </div>
@@ -222,10 +222,10 @@
         <div class="section-header">
           <h3><mat-icon>analytics</mat-icon> AI Analysis Results</h3>
           <div class="analysis-actions" *ngIf="analysisResults">
-            <button mat-raised-button (click)="shareAnalysis()" [disabled]="sharingAnalysis">
+            <!-- <button mat-raised-button (click)="shareAnalysis()" [disabled]="sharingAnalysis">
               <mat-icon>share</mat-icon>
               {{ sharingAnalysis ? 'Sharing...' : 'Share' }}
-            </button>
+            </button> -->
           </div>
         </div>
         

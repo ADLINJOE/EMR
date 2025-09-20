@@ -13,7 +13,8 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { Observable, map, startWith } from 'rxjs';
 import { CommonService } from '../../../../Service/common.service';
-import { SharedServiceService } from '../../../../Service/shared-service.service';
+import { SharedServiceService } from '../../../../Service/Sharedservice/shared-service.service';
+
 
 interface Drug {
   id: string;
@@ -145,7 +146,7 @@ export class AdrReportGeneratorComponent implements OnInit {
   }
 
   loadDrugs(): void {
-    this.commonService.Get("DrugMaster/Drugs").subscribe({
+      this.commonService.Post('Drug/DrugMaster', { Mode: 'GET' }).subscribe({
       next: (response: any) => {
         if (response.success && response.data) {
           this.drugs = response.data;
