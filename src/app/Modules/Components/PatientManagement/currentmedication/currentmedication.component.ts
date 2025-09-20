@@ -102,6 +102,30 @@ export class CurrentmedicationComponent implements OnInit {
     });
   }
 
+  // Compute end date based on startDate + duration
+  private computeEndDate(startDate: Date | string | null, durationValue?: number | null, durationUnit?: string | null): Date | null {
+    if (!startDate || !durationValue || !durationUnit) return null;
+    const base = new Date(startDate);
+    if (isNaN(base.getTime())) return null;
+    const d = new Date(base);
+    switch ((durationUnit || '').toLowerCase()) {
+      case 'days': d.setDate(d.getDate() + durationValue); break;
+      case 'weeks': d.setDate(d.getDate() + durationValue * 7); break;
+      case 'months': d.setMonth(d.getMonth() + durationValue); break;
+      default: return null;
+    }
+    // Normalize to end of day
+    d.setHours(23, 59, 59, 999);
+    return d;
+  }
+
+  private daysUntil(date: Date | null): number | null {
+    if (!date) return null;
+    const now = new Date();
+    const diff = date.getTime() - now.getTime();
+    return Math.ceil(diff / (1000 * 60 * 60 * 24));
+  }
+
   ngOnInit(): void {
     this.loadDrugsAndMedications();
     this.loadNextFollowUp();
@@ -137,28 +161,32 @@ export class CurrentmedicationComponent implements OnInit {
   }
 
   // Create a new FormGroup for a medication row
- private createMedicationFormGroup(data?: any): FormGroup {
-  const isNew = !data;
+  private createMedicationFormGroup(data?: any): FormGroup {
+    const isNew = !data;
 
-  const group = this.fb.group({
-    id: [data?.id ?? null],
-    medname: [data?.medname ?? '', Validators.required],
-    dosage: [data?.dosage ?? ''],
-    frequency: [data?.frequency ?? null, Validators.required],
-    startDate: [data?.startDate ?? null, Validators.required],
-    ongoing: [data?.ongoing ?? false],
-    isNew: [isNew],
-    isEdited: [false],
-    isDeleted: [false],
-    isEditable: [isNew]
-  });
+    const group = this.fb.group({
+      id: [data?.id ?? null],
+      medname: [data?.medname ?? '', Validators.required],
+      dosage: [data?.dosage ?? ''],
+      frequency: [data?.frequency ?? null, Validators.required],
+      startDate: [data?.startDate ?? null, Validators.required],
+      // Duration fields (optional): e.g., 7 days, 2 weeks, 3 months
+      durationValue: [data?.durationValue ?? null],
+      durationUnit: [data?.durationUnit ?? 'days'],
+      ongoing: [data?.ongoing ?? false],
+      isNew: [isNew],
+      isEdited: [false],
+      isDeleted: [false],
+      isEditable: [isNew]
+    });
 
-  if (!isNew) {
-    this.disableRow(group); // ensure existing rows start readonly
+    if (!isNew) {
+      this.disableRow(group); // ensure existing rows start readonly
+    }
+
+    return group;
   }
-
-  return group;
-}
+ 
 
 
   // Add a new, empty medication row at top
@@ -297,7 +325,7 @@ addMedication() {
     this.originalValues.set(index, { ...medicationControl.getRawValue() });
 
     medicationControl.patchValue({ isEditable: true });
-    ['medname', 'dosage', 'frequency', 'startDate', 'ongoing'].forEach(f => medicationControl.get(f)?.enable());
+    ['medname', 'dosage', 'frequency', 'startDate', 'durationValue', 'durationUnit', 'ongoing'].forEach(f => medicationControl.get(f)?.enable());
     this.setupAutocomplete(index); // ensure autocomplete active
     this.cdr.detectChanges();
   }
@@ -487,11 +515,14 @@ addMedication() {
       // No existing medications to check against
       this.completeMedicationSave(medicationIndex);
       return;
+    }else {
+     this.completeMedicationSave(medicationIndex);
     }
 
     // Show AI interaction checker with current medication context
     this.pendingMedicationIndex = medicationIndex;
     this.showAiChecker = true;
+    
   }
 
   completeMedicationSave(index: number) {
@@ -792,7 +823,7 @@ addMedication() {
       }
       medicationControl.patchValue({ isEditable: false });
       // ensure controls disabled
-      ['medname', 'dosage', 'frequency', 'startDate', 'ongoing'].forEach(f => medicationControl.get(f)?.disable());
+      ['medname', 'dosage', 'frequency', 'startDate', 'durationValue', 'durationUnit', 'ongoing'].forEach(f => medicationControl.get(f)?.disable());
     }
 
     this.medicationForm.updateValueAndValidity();
@@ -849,6 +880,7 @@ addMedication() {
       const savePayload = {
         mode: 'SAVE',
         patientId: patientId,
+        PatientEmail: details?.email ?? ptDetails?.email ?? 'system',
         medicationList: toSave.map((m: MedicationDto) => ({
           id: m.id ?? null,
           patientId: patientId,
@@ -856,7 +888,10 @@ addMedication() {
           dosage: m.dosage || '',
           frequency: m.frequency,
           startDate: m.startDate,
+          DurationValue: (m as any).durationValue ?? null,
+          DurationUnit: (m as any).durationUnit ?? null,
           ongoing: m.ongoing || false,
+          EndDate: this.computeEndDate(m.startDate as any, (m as any).durationValue ?? null, (m as any).durationUnit ?? null)?.toISOString() ?? null,
           lastEditedBy: userEmail
         }))
       };
@@ -892,6 +927,8 @@ addMedication() {
         const allSuccessful = responses.every((r: any) => r?.success !== false);
         if (allSuccessful) {
           this.sharedService.Messages('success', 'Current Medication', 'Saved Successfully', 3000);
+          // After saving, schedule alerts for meds ending in <= 2 days
+          this.scheduleEndAlerts(patientId);
           this.loadMedications();
         } else {
           console.error('Some operations failed', responses);
@@ -903,6 +940,41 @@ addMedication() {
         console.error('Save failed', err);
         const errMsg = err?.error?.message || err?.message || 'Failed to save medications. Please try again.';
         this.sharedService.Messages('error', 'Save Failed', errMsg, 5000);
+      }
+    });
+  }
+
+  // Call backend to schedule alert emails for meds ending within next 2 days
+  private scheduleEndAlerts(patientId: string) {
+    const meds = this.medicationsArray.controls
+      .map(ctrl => (ctrl as FormGroup).getRawValue())
+      .filter((m: any) => !m.isDeleted && !m.ongoing && m.startDate && m.durationValue && m.durationUnit);
+
+    const items = meds.map((m: any) => {
+      const end = this.computeEndDate(m.startDate, m.durationValue, m.durationUnit);
+      const days = this.daysUntil(end);
+      return {
+        id: m.id ?? null,
+        medname: m.medname,
+        startDate: m.startDate,
+        durationValue: m.durationValue,
+        durationUnit: m.durationUnit,
+        endDate: end ? end.toISOString() : null,
+        daysUntilEnd: days
+      };
+    }).filter(x => x.endDate && x.daysUntilEnd !== null && x.daysUntilEnd <= 2 && x.daysUntilEnd >= 0);
+
+    if (items.length === 0) return;
+
+    const payload = { patientId, items };
+    this.commonService.Post('currentmed/schedule-end-alerts', payload).subscribe({
+      next: (res: any) => {
+        if (res?.success !== false) {
+          console.log('Scheduled medication end alerts:', items.length);
+        }
+      },
+      error: (err) => {
+        console.error('Failed to schedule end alerts', err);
       }
     });
   }
@@ -924,7 +996,7 @@ addMedication() {
         isEditable: false
       });
       // disable controls visually
-      ['medname', 'dosage', 'frequency', 'startDate', 'ongoing'].forEach(f => medicationControl.get(f)?.disable());
+      ['medname', 'dosage', 'frequency', 'startDate', 'durationValue', 'durationUnit', 'ongoing'].forEach(f => medicationControl.get(f)?.disable());
       this.originalValues.delete(index);
     }
 
@@ -934,14 +1006,14 @@ addMedication() {
 
   // enable/disable helpers
   enableRow(row: FormGroup) {
-    ['medname', 'dosage', 'frequency', 'startDate', 'ongoing'].forEach(f => {
+    ['medname', 'dosage', 'frequency', 'startDate', 'durationValue', 'durationUnit', 'ongoing'].forEach(f => {
       const control = row.get(f);
       if (control) control.enable();
     });
   }
 
   disableRow(row: FormGroup) {
-    ['medname', 'dosage', 'frequency', 'startDate', 'ongoing'].forEach(f => row.get(f)?.disable());
+    ['medname', 'dosage', 'frequency', 'startDate', 'durationValue', 'durationUnit', 'ongoing'].forEach(f => row.get(f)?.disable());
   }
 
   enableMedicationRow(row: FormGroup) { this.enableRow(row); }
@@ -985,7 +1057,7 @@ addMedication() {
           this.originalValues.delete(index);
         }
         formGroup.patchValue({ isEditable: false });
-        ['medname', 'dosage', 'frequency', 'startDate', 'ongoing'].forEach(f => formGroup.get(f)?.disable());
+        ['medname', 'dosage', 'frequency', 'startDate', 'durationValue', 'durationUnit', 'ongoing'].forEach(f => formGroup.get(f)?.disable());
       }
     });
     this.cdr.detectChanges();
@@ -1144,6 +1216,8 @@ addMedication() {
       <td>${medValue.dosage || 'N/A'}</td>
       <td>${medValue.frequency || 'N/A'}</td>
       <td>${medValue.ongoing ? 'Yes' : 'No'}</td>
+      <td>${medValue.durationValue ?? 'N/A'}</td>
+      <td>${medValue.durationUnit || 'N/A'}</td>
 
       <td>${medValue.startDate ? new Date(medValue.startDate).toLocaleDateString() : 'N/A'}</td>
     </tr>
@@ -1161,8 +1235,11 @@ addMedication() {
               <th style="padding: 12px; border: 1px solid #ddd; text-align: left;">Medicine Name</th>
               <th style="padding: 12px; border: 1px solid #ddd; text-align: left;">Dosage</th>
               <th style="padding: 12px; border: 1px solid #ddd; text-align: left;">Frequency</th>
-              <th style="padding: 12px; border: 1px solid #ddd; text-align: left;">ongoing</th>
-   
+                    <th style="padding: 12px; border: 1px solid #ddd; text-align: left;">Ongoing</th>
+              <th style="padding: 12px; border: 1px solid #ddd; text-align: left;">Duration Value</th>
+              <th style="padding: 12px; border: 1px solid #ddd; text-align: left;">Duration Unit</th>
+
+
               <th style="padding: 12px; border: 1px solid #ddd; text-align: left;">Start Date</th>
             </tr>
           </thead>

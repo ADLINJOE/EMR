@@ -38,7 +38,16 @@
 
           <button mat-flat-button color="primary" class="submit-btn" type="submit">Login</button>
         </form>
-        <!-- <p class="switch">Don't have an account? <a (click)="toggleLoginForm()">Sign up</a></p> -->
+<p class="switch">
+  Don't have an account?
+  <a mat-button [matMenuTriggerFor]="signupMenu">Sign up</a>
+</p>
+
+<mat-menu #signupMenu="matMenu">
+  <button mat-menu-item (click)="toggleLogin('patient')">Patient</button>
+  <button mat-menu-item (click)="toggleLogin('pharmacist')">Pharmacist</button>
+</mat-menu>
+
       </div>
 
       <ng-template #signupTemplate>

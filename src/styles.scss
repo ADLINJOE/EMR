@@ -13,6 +13,11 @@ body {
   line-height: 1.6;
 }
 
+// Make Angular Material overlays (autocomplete, datepicker, etc.) appear above custom modals
+.cdk-overlay-container, .cdk-overlay-pane {
+  z-index: 10050 !important; // higher than custom overlays
+}
+
 // Global responsive typography
 h1, h2, h3, h4, h5, h6 {
   margin: 0 0 1rem 0;

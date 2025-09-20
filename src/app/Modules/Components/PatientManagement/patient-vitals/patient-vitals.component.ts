@@ -96,9 +96,16 @@ export class PatientVitalsComponent {
     vitals.push(this.createVital(data, isNew));
     
     // Scroll to the new row after DOM update with longer delay
-    setTimeout(() => {
-      this.scrollToNewRow(vitals.length +1);
-    }, 600);
+        var selectElement: any = document.getElementById('scroll');
+if (selectElement) {
+    selectElement.focus();
+    selectElement.selectedIndex = 0;
+
+    setTimeout(function () {
+        // 👇 scroll to bottom
+        selectElement.scrollTop = selectElement.scrollHeight;
+    }, 100);
+}
   }
 // private scrollToNewRow(index: number) {
 //     const tableContainer = document.querySelector('.emr-table-container');

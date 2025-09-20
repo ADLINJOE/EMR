@@ -204,7 +204,26 @@
             </div>
           </div>
         </div>
+<mat-form-field appearance="outline" class="emr-form-field emr-form-field-full" style="width: 38% !important;">
+  <input type="text"
+         matInput
+         placeholder="Search patient..."
+         [formControl]="searchPatientControl"
+         [matAutocomplete]="patientAuto">
 
+  <mat-autocomplete #patientAuto="matAutocomplete"
+                    [displayWith]="displayPatient"
+                    (optionSelected)="patientselect($event.option.value.patientId)">
+    <mat-option *ngFor="let patient of (filteredPatients | async) || []"
+                [value]="patient">
+      <div>
+        <strong>{{ patient.name }}</strong>
+        <small *ngIf="patient.patientId"> (ID: {{ patient.patientId }})</small>
+        <small *ngIf="patient.email"> (Email: {{ patient.email }})</small>
+      </div>
+    </mat-option>
+  </mat-autocomplete>
+</mat-form-field>
         <!-- Action Buttons -->
         <div class="emr-result-actions">
           <button type="button" 

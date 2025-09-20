@@ -19,12 +19,16 @@ export interface MedicationDto {
   isNew?: boolean;
   isEdited?: boolean;
   Deleted?: boolean;  // <-- Add this line
+    // ✅ Add these two for duration
+  durationValue?: number;
+  durationUnit?: string;  // e.g., "days", "weeks", "months"
 }
 
 
 export interface MedicationRequestDto {
   mode :string;
   patientId?: number;
+  PatientEmail?: string;
   medicationList: MedicationDto[];
 }
 export interface AllergyDto {

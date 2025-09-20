@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -12,10 +12,11 @@ import { MatDialog } from '@angular/material/dialog';
 import { CommonService } from '../../../../Service/common.service';
 import { SharedServiceService } from '../../../../Service/Sharedservice/shared-service.service';
 import { ForgotPasswordDialogComponent } from '../../Shared/forgot-password-dialog/forgot-password-dialog.component';
+import { PatientlistComponent } from '../patientlist/patientlist.component';
 
 @Component({
   selector: 'app-patient-registrationlink',
-  imports: [MatInputModule, ReactiveFormsModule, MatSelectModule, CommonModule, MatFormFieldModule, MatButtonModule, MatIconModule, MatOptionModule],
+  imports: [MatInputModule, ReactiveFormsModule, MatSelectModule, CommonModule, MatFormFieldModule, MatButtonModule, MatIconModule, MatOptionModule, PatientlistComponent],
   templateUrl: './patient-registrationlink.component.html',
   styleUrl: './patient-registrationlink.component.scss'
 })
@@ -27,6 +28,8 @@ export class PatientRegistrationlinkComponent implements OnInit {
   registerForm: FormGroup;
   PatientEmail: string | null;
   HideRegister: boolean = true;
+   @ViewChild(PatientlistComponent, { static: false })
+  patientInviteComp!: PatientlistComponent;
  @HostListener('window:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent) {
     if ((event.key === 'F5') || (event.ctrlKey && event.key === 'r')) {
@@ -94,7 +97,8 @@ this.registerForm.get('email')?.disable();
         }
       });
     } else {
-      this.Sharedservice.Messages('error', 'Error', 'No email found in query parameters.', 3000);
+           this.showLogin = false;
+    //  this.Sharedservice.Messages('error', 'Error', 'No email found in query parameters.', 3000);
     }
   }
 
@@ -120,16 +124,68 @@ this.registerForm.get('email')?.disable();
     }
   }
 
+    
   onRegisterSubmit() {
     if (this.registerForm.valid) {
       const formData = new FormData();
       Object.entries(this.registerForm.value).forEach(([key, value]) => {
         formData.append(key, value as any);
       });
+      if(!this.PatientEmail){
+     const emailPayload = {
+
+  Sentby:'Admin',
+  SentUSerId: "0",
+  SentbyRole:'Admin',
+  ToEmail : this.registerForm.get('email')?.value,
+  Subject : 'Patient Registration Invitation',
+  Body : `
+    <p>Dear Patient,</p>
+    <p>Welcome to the RxSmart family!</p>
+    <p>If you have any questions, feel free to reach out to us at rxsmart789@gmail.com.</p>
+    <p>Best regards,<br/>The RxSmart Team</p>
+  `
+};
+
+      this.Commonservice.Post("PatientHandle/PTinvite", emailPayload).subscribe(val => {
+        if (val.success) {
+   
+
+        }else{
+
+        }
+      });
+       const payload = {
+          // Name: result.name,
+          // Gender: result.gender,
+          // Age: result.age,
+          Email: this.registerForm.get('email')?.value,
+          // Address: result.address,
+          CreatedBy:  'Admin',
+          CreatedTime: new Date().toISOString(),
+          CreateUserId:  0,
+          CreateUserType:  'Admin',
+          IsDeleted: false,
+          SendInvite: true,
+          InviteDateTime: null
+        };
+          
+   setTimeout(() => {
+        this.patientInviteComp.Reload(payload);
+      }, 1000);
+        
+
+
+
+            }
+ setTimeout(() => {
+  
+ 
+ 
       const formDataAPI = {
         ...this.registerForm.value,
-        photoBase64: this.photoBase64,
-        email : this.PatientEmail
+        photoBase64: this.photoBase64 || "",
+        email : this.PatientEmail || this.registerForm.get('email')?.value
       };
       this.Commonservice.Post('PatientRegisterNew', formDataAPI).subscribe({
         next: (response) => {
@@ -145,6 +201,7 @@ this.registerForm.get('email')?.disable();
 
         }
       });
+           }, 1500);
       console.log('Register form data:', formData);
     }
   }

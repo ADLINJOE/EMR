@@ -12,6 +12,21 @@
     </div>
 
     <div class="emr-card-content emr-dashboard-content">
+      <div class="emr-controls">
+        <form [formGroup]="dateRangeForm" class="emr-date-range-form" (ngSubmit)="onDateRangeChange()">
+          <mat-form-field appearance="outline" class="emr-date-range-field">
+            <mat-label>Date range</mat-label>
+            <mat-date-range-input [rangePicker]="picker" [min]="null" [max]="null">
+              <input matStartDate placeholder="Start date" formControlName="startDate" (dateChange)="onDateRangeChange()">
+              <input matEndDate placeholder="End date" formControlName="endDate" (dateChange)="onDateRangeChange()">
+            </mat-date-range-input>
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-date-range-picker #picker></mat-date-range-picker>
+          </mat-form-field>
+          <button mat-raised-button color="primary" type="submit">Apply</button>
+          <button mat-stroked-button type="button" (click)="resetDateRange()">Reset</button>
+        </form>
+      </div>
       <mat-tab-group class="emr-tab-group" [(selectedIndex)]="selectedTab" (selectedIndexChange)="updateCharts()">
         <mat-tab class="emr-tab" label="Blood Pressure">
           <div class="emr-tab-content">

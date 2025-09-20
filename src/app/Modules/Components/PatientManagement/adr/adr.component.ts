@@ -4,12 +4,13 @@ import { CommonModule } from '@angular/common';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
+import { MatNativeDateModule, MatOptionModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { CommonService, DeployUrl } from '../../../../Service/common.service';
 import { SharedServiceService } from '../../../../Service/Sharedservice/shared-service.service';
-import { map, Observable, of, startWith } from 'rxjs';
+import { map, Observable, of, startWith, debounceTime, distinctUntilChanged, filter } from 'rxjs';
 import { MatAutocomplete } from "@angular/material/autocomplete";
 import { MatSelectModule } from "@angular/material/select";
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
@@ -26,16 +27,16 @@ import { PatientlistComponent } from '../../Patient/patientlist/patientlist.comp
     MatDatepickerModule,
     MatNativeDateModule,
     MatButtonModule,
-    CommonModule,
     MatAutocomplete,
     MatSelectModule,
     ReactiveFormsModule,
     MatAutocompleteModule,
+    MatOptionModule,
+    MatIconModule,
     FormsModule,
-    MatFormFieldModule,
-    ReactiveFormsModule, MatInputModule,
-    MatFormFieldModule, CommonModule,
-    MatButtonModule,
+ 
+
+  
    
   ],
   templateUrl: './adr.component.html',
@@ -49,12 +50,21 @@ export class ADRComponent implements OnInit {
   private Http = inject(CommonService);
   private sharedService = inject(SharedServiceService);
 
-  searchPatientControl = new FormControl();
+  searchPatientControl = new FormControl<string | null>('');
   filteredPatients: Observable<any[]> | undefined;
 
   adrForm: FormGroup;
   UserSetGlobal: any;
   patients: any[] = [];
+  // Drug master and autocomplete lists (per-row)
+  drugList: any[] = [];
+  filteredDrugs: Observable<any[]>[] = [];
+
+  // Reports popup state
+  showReports = false;
+  reportsDrugControl = new FormControl<string | null>('');
+  filteredReportDrugs: Observable<any[]> = of([]);
+  reportResults: any[] = [];
   constructor() {
     this.adrForm = this.fb.group({
       reactions: this.fb.array([])
@@ -79,6 +89,25 @@ export class ADRComponent implements OnInit {
       },
 
     });
+    // Load drug master for autocomplete usage
+    this.loadDrugMaster();
+    // Setup reports drug autocomplete stream
+    this.filteredReportDrugs = this.reportsDrugControl.valueChanges.pipe(
+      startWith('' as string | null),
+      debounceTime(150),
+      distinctUntilChanged(),
+      map((value: string | null) => this.filterDrugs(typeof value === 'string' ? value : ''))
+    );
+
+    // Auto-load report results as user types in the reports popup
+    this.reportsDrugControl.valueChanges
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        map(v => (typeof v === 'string' ? v.trim() : '')),
+        filter(v => v.length >= 2)
+      )
+      .subscribe(name => this.loadAdrByDrug(name));
   }
   private setupPatientFilter() {
     this.filteredPatients = this.searchPatientControl.valueChanges.pipe(
@@ -126,9 +155,21 @@ createReaction(patient?: any, isNew: boolean = false): FormGroup {
   }
    if (this.selectedPatient) {
          this.reactions.push(this.createReaction({ patientId: this.selectedPatient.patientId , email: this.selectedPatient.email,id : this.selectedPatient.id }, true));
+         // setup autocomplete stream for the newly added row
+         const newIndex = this.reactions.length - 1;
+         this.ensureFilteredDrugsSize(newIndex);
+         this.setupAutocomplete(newIndex);
    }
-  // add empty reaction
+      var selectElement: any = document.getElementById('scroll');
+if (selectElement) {
+    selectElement.focus();
+    selectElement.selectedIndex = 0;
 
+    setTimeout(function () {
+        // 👇 scroll to bottom
+        selectElement.scrollTop = selectElement.scrollHeight;
+    }, 100);
+}
 }
 
 
@@ -185,31 +226,29 @@ selectedPatient: any = null;
 
 patientselect(patid: number) {
   console.log("Selected Patient ID:", patid);
-this.selectedPatient = this.patients.find(p => p.patientId === patid) || null;
+  this.selectedPatient = this.patients.find(p => p.patientId === patid) || null;
   const payload = {
     patID: patid,
-    email: this.selectedPatient.email  // optional if you don’t want to filter by email
+    email: this.selectedPatient?.email
   };
-      this.reactions.clear();
+  this.reactions.clear();
   this.Http.Post('api/ADR/getByPatient', payload).subscribe({
     next: (res: any[]) => {
       console.log("ADR Data:", res);
-
       this.reactions.clear();
-      if (res.length === 0) {
-
-
-
-         this.reactions.push(this.createReaction({ patientId: patid, email: this.selectedPatient.email,id : this.selectedPatient.id }, true));
-
+      if (!res || res.length === 0) {
+        this.reactions.push(this.createReaction({ patientId: patid, email: this.selectedPatient?.email, id: this.selectedPatient?.id }, true));
+        const idx = this.reactions.length - 1;
+        this.ensureFilteredDrugsSize(idx);
+        this.setupAutocomplete(idx);
       } else {
-        this.reactions.clear();
-      res.forEach((med: any) => {
-  
-        this.reactions.push(this.createReaction(med));
-      });
+        res.forEach((med: any, i: number) => {
+          this.reactions.push(this.createReaction(med));
+          const idx = this.reactions.length - 1;
+          this.ensureFilteredDrugsSize(idx);
+          this.setupAutocomplete(idx);
+        });
       }
-
     },
     error: (err) => {
       console.error("Error fetching ADRs", err);
@@ -267,11 +306,11 @@ this.selectedPatient = this.patients.find(p => p.patientId === patid) || null;
           dateOccurred = isNaN(d.getTime()) ? null : d.toISOString();
         }
       }
-
+  this.selectedPatient = this.patients.find(p => p.patientId === val.patientId) || null;
       return {
         ID: val.ID || 0,  // assuming 0 for new entries
         PatientId: val.patientId ?? null,             // optional; include if you have it
-        PatientName: val.patientName || '',
+        PatientName: this.selectedPatient?.name || '',
         Email: val.email || '',
         DrugName: val.drugname || null,
         Description: val.description || null,
@@ -314,5 +353,107 @@ this.selectedPatient = this.patients.find(p => p.patientId === patid) || null;
 
   trackByIndex(index: number): number {
     return index;
+  }
+
+  // =========================
+  // Drug autocomplete helpers
+  // =========================
+  private loadDrugMaster() {
+    this.Http.Post('Drug/DrugMaster', { Mode: 'GET' }).subscribe({
+      next: (res: any) => {
+        this.drugList = res?.success && Array.isArray(res.result) ? res.result : [];
+        // refresh existing rows' autocomplete
+        for (let i = 0; i < this.reactions.length; i++) {
+          this.ensureFilteredDrugsSize(i);
+          this.setupAutocomplete(i);
+        }
+      },
+      error: () => {
+        this.drugList = [];
+      }
+    });
+  }
+
+  private ensureFilteredDrugsSize(index: number) {
+    while (this.filteredDrugs.length <= index) {
+      this.filteredDrugs.push(of(this.drugList.slice(0, 10)));
+    }
+  }
+
+  private setupAutocomplete(index: number) {
+    const reactionControl = this.reactions.at(index) as FormGroup;
+    if (!reactionControl) return;
+
+    const drugCtrl = reactionControl.get('drugname') as FormControl;
+    if (!drugCtrl) return;
+
+    this.filteredDrugs[index] = drugCtrl.valueChanges.pipe(
+      startWith((drugCtrl.value as string) || ''),
+      debounceTime(150),
+      distinctUntilChanged(),
+      map((value: string) => this.filterDrugs(typeof value === 'string' ? value : ''))
+    );
+  }
+
+  private filterDrugs(value: string): any[] {
+    if (!this.drugList?.length) return [];
+    if (!value || value.trim() === '') return this.drugList.slice(0, 10);
+    const fv = value.toLowerCase();
+    return this.drugList.filter((drug: any) =>
+      (drug.drugName || '').toLowerCase().includes(fv) ||
+      (drug.genericName || '').toLowerCase().includes(fv)
+    ).slice(0, 10);
+  }
+
+  displayDrugName = (drugName: string): string => drugName || '';
+
+  onDrugSelected(drugName: string, index: number) {
+    const reactionControl = this.reactions.at(index) as FormGroup;
+    if (!reactionControl) return;
+    reactionControl.get('drugname')?.setValue(drugName);
+  }
+
+  // =========================
+  // Reports modal handlers
+  // =========================
+  openReports() {
+    this.showReports = true;
+    // reset previous state
+    this.reportResults = [];
+    this.reportsDrugControl.setValue('');
+  }
+
+  closeReports() {
+    this.showReports = false;
+  }
+
+  // Open reports prefilled for a given drug (used from drug autocomplete field)
+  openReportsForDrug(drugName: string | null | undefined) {
+    const name = (drugName || '').toString().trim();
+    if (!name) { return; }
+    this.showReports = true;
+    this.reportResults = [];
+    this.reportsDrugControl.setValue(name);
+    this.loadAdrByDrug(name);
+  }
+
+  selectReportDrug(drugName: string) {
+    this.reportsDrugControl.setValue(drugName);
+    this.loadAdrByDrug(drugName);
+  }
+
+  private loadAdrByDrug(drugName: string) {
+    if (!drugName || !drugName.trim()) return;
+    const payload = { drugName: drugName.trim() };
+    this.Http.Post('api/ADR/getByDrug', payload).subscribe({
+      next: (res: any) => {
+        // Expecting array of ADR entries with patient info
+        this.reportResults = Array.isArray(res) ? res : (res?.data || res?.result || []);
+      },
+      error: (err) => {
+        console.error('Failed to load ADR by drug', err);
+        this.reportResults = [];
+      }
+    });
   }
 }

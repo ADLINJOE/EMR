@@ -2,6 +2,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { LayoutComponent } from './Modules/Components/MainLayout/layout/layout.component';
+import { HashLocationStrategy, LocationStrategy } from '@angular/common';
 
 export const routes: Routes = [
   // Default path
@@ -112,16 +113,23 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./Modules/Components/PatientManagement/patient-followups/patient-followups.component')
             .then(m => m.PatientFollowupsComponent)
+      },
+       {
+        path: 'drugmono',
+        loadComponent: () =>
+          import('./Modules/Components/Medicine/drug-monograph/drug-monograph.component')
+            .then(m => m.DrugMonographComponent)
       }
     ],
   },
 
   // Wildcard route
-  { path: '**', redirectTo: 'login', pathMatch: 'full' }
+  { path: '**', redirectTo: 'login' }
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(routes, { useHash: true, onSameUrlNavigation: 'reload' })],
   exports: [RouterModule],
+  providers: [{ provide: LocationStrategy, useClass: HashLocationStrategy }]
 })
 export class AppRoutingModule { }

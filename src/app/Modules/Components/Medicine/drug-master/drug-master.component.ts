@@ -101,6 +101,17 @@ isDeleted: [data?.isDeleted ?? false]
       return;
     }
     drugs.push(this.createDrug());
+     var selectElement: any = document.getElementById('scroll');
+if (selectElement) {
+    selectElement.focus();
+    selectElement.selectedIndex = 0;
+
+    setTimeout(function () {
+        // 👇 scroll to bottom
+        selectElement.scrollTop = selectElement.scrollHeight;
+    }, 100);
+}
+
   }
 
   removeDrug(index: number): void {

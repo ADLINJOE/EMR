@@ -1,10 +1,17 @@
 import { Component, ElementRef, ViewChild, inject, computed } from '@angular/core';
+import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Chart, registerables } from 'chart.js';
 import annotationPlugin from 'chartjs-plugin-annotation';
 import { CommonService } from '../../../../Service/common.service';
 import { SharedServiceService } from '../../../../Service/Sharedservice/shared-service.service';
 import { MatCardModule } from "@angular/material/card";
 import { MatTabGroup, MatTabsModule } from "@angular/material/tabs";
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatNativeDateModule } from '@angular/material/core';
+import { CommonModule } from '@angular/common';
 
 
 Chart.register(...registerables, annotationPlugin);
@@ -12,7 +19,18 @@ Chart.register(...registerables, annotationPlugin);
 @Component({
   selector: 'app-vitals-bp-monitor',
   standalone: true,
-  imports: [MatTabGroup, MatTabsModule, MatCardModule],
+  imports: [
+    MatTabGroup, 
+    MatTabsModule, 
+    MatCardModule, 
+    MatDatepickerModule, 
+    MatFormFieldModule, 
+    MatInputModule, 
+    MatButtonModule, 
+    MatNativeDateModule,
+    ReactiveFormsModule,
+    CommonModule
+  ],
   templateUrl: './vitals-bp-monitor.component.html',
   styleUrls: ['./vitals-bp-monitor.component.scss', '../../../Shared/styles/table-template.scss']
 })
@@ -28,31 +46,103 @@ export class VitalsBpMonitorComponent {
 
   selectedTab = 0;
   readings: any[] = [];
+  filteredReadings: any[] = [];
+  
+  // Date range form
+  dateRangeForm = new FormGroup({
+    startDate: new FormControl<Date | null>(null),
+    endDate: new FormControl<Date | null>(null)
+  });
+  
+  // Chart instances to destroy before re-rendering
+  bpTimeChart: Chart | null = null;
+  bpTrendChart: Chart | null = null;
+  sugarTimeChart: Chart | null = null;
+  sugarTrendChart: Chart | null = null;
 
   ngAfterViewInit() {
-    this.loadVitals();
+    // Set default date range to last 30 days BEFORE initial load
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - 30);
+
+    this.dateRangeForm.patchValue({ startDate, endDate });
+    this.loadVitals(startDate, endDate);
   }
 
-  loadVitals() {
+  loadVitals(startDate?: Date, endDate?: Date) {
     const details = this.patientDetails();
     if (!details) return;
 
-    this.commonService.Post('dashboard/vitalschart', { Mode: 'GET', PatientId: details.patientID })
+    const payload: any = {
+      Mode: 'GET',
+      PatientId: details.patientID
+    };
+
+    // Add date range to payload if provided
+    if (startDate && endDate) {
+      payload.StartDate = startDate.toISOString().split('T')[0];
+      payload.EndDate = endDate.toISOString().split('T')[0];
+    }
+
+    this.commonService.Post('dashboard/vitalschart', payload)
       .subscribe((res: any) => {
         if (res.success && res.result) {
           this.readings = res.result.map((v: any) => ({
             date: v.readingDateTime.split('T')[0],
+            dateTime: new Date(v.readingDateTime),
             systolic: v.systolic,
             diastolic: v.diastolic,
             sugarFasting: v.sugarFasting,
             sugarPP: v.sugarPP
           }));
+          this.applyDateFilter();
           this.updateCharts();
         }
       });
   }
 
+  applyDateFilter() {
+    const startDate = this.dateRangeForm.get('startDate')?.value;
+    const endDate = this.dateRangeForm.get('endDate')?.value;
+
+    if (!startDate || !endDate) {
+      this.filteredReadings = [...this.readings];
+      return;
+    }
+
+    this.filteredReadings = this.readings.filter(reading => {
+      const readingDate = reading.dateTime;
+      return readingDate >= startDate && readingDate <= endDate;
+    });
+  }
+
+  onDateRangeChange() {
+    const startDate = this.dateRangeForm.get('startDate')?.value;
+    const endDate = this.dateRangeForm.get('endDate')?.value;
+
+    if (startDate && endDate) {
+      this.loadVitals(startDate, endDate);
+    }
+  }
+
+  resetDateRange() {
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - 30);
+    
+    this.dateRangeForm.patchValue({
+      startDate: startDate,
+      endDate: endDate
+    });
+    
+    this.loadVitals(startDate, endDate);
+  }
+
   updateCharts() {
+    // Destroy existing charts before creating new ones
+    this.destroyCharts();
+    
     if (this.selectedTab === 0) {
       this.renderBpTimeSeries();
       this.renderBpTrends();
@@ -62,22 +152,41 @@ export class VitalsBpMonitorComponent {
     }
   }
 
+  destroyCharts() {
+    if (this.bpTimeChart) {
+      this.bpTimeChart.destroy();
+      this.bpTimeChart = null;
+    }
+    if (this.bpTrendChart) {
+      this.bpTrendChart.destroy();
+      this.bpTrendChart = null;
+    }
+    if (this.sugarTimeChart) {
+      this.sugarTimeChart.destroy();
+      this.sugarTimeChart = null;
+    }
+    if (this.sugarTrendChart) {
+      this.sugarTrendChart.destroy();
+      this.sugarTrendChart = null;
+    }
+  }
+
   renderBpTimeSeries() {
-    new Chart(this.bpTimeChartRef.nativeElement, {
+    this.bpTimeChart = new Chart(this.bpTimeChartRef.nativeElement, {
       type: 'line',
       data: {
-        labels: this.readings.map(r => r.date),
+        labels: this.filteredReadings.map(r => r.date),
         datasets: [
           {
             label: 'Systolic',
-            data: this.readings.map(r => r.systolic),
+            data: this.filteredReadings.map(r => r.systolic),
             borderColor: '#e53935',
             fill: false,
             pointBackgroundColor: ctx => (ctx.raw as number) > 140 ? 'red' : '#e53935'
           },
           {
             label: 'Diastolic',
-            data: this.readings.map(r => r.diastolic),
+            data: this.filteredReadings.map(r => r.diastolic),
             borderColor: '#1e88e5',
             fill: false,
             pointBackgroundColor: ctx => (ctx.raw as number) > 90 ? 'red' : '#1e88e5'
@@ -99,11 +208,11 @@ export class VitalsBpMonitorComponent {
   }
 
   renderBpTrends() {
-    const avgBp = this.readings.map(r => (r.systolic + r.diastolic) / 2);
-    new Chart(this.bpTrendChartRef.nativeElement, {
+    const avgBp = this.filteredReadings.map(r => (r.systolic + r.diastolic) / 2);
+    this.bpTrendChart = new Chart(this.bpTrendChartRef.nativeElement, {
       type: 'bar',
       data: {
-        labels: this.readings.map(r => r.date),
+        labels: this.filteredReadings.map(r => r.date),
         datasets: [{
           label: 'Avg BP',
           data: avgBp,
@@ -114,21 +223,21 @@ export class VitalsBpMonitorComponent {
   }
 
   renderSugarTimeSeries() {
-    new Chart(this.sugarTimeChartRef.nativeElement, {
+    this.sugarTimeChart = new Chart(this.sugarTimeChartRef.nativeElement, {
       type: 'line',
       data: {
-        labels: this.readings.map(r => r.date),
+        labels: this.filteredReadings.map(r => r.date),
         datasets: [
           {
             label: 'Fasting Sugar',
-            data: this.readings.map(r => r.sugarFasting),
+            data: this.filteredReadings.map(r => r.sugarFasting),
             borderColor: '#43a047',
             fill: false,
             pointBackgroundColor: ctx => (ctx.raw as number) > 100 ? 'red' : '#43a047'
           },
           {
             label: 'PP Sugar',
-            data: this.readings.map(r => r.sugarPP),
+            data: this.filteredReadings.map(r => r.sugarPP),
             borderColor: '#fb8c00',
             fill: false,
             pointBackgroundColor: ctx => (ctx.raw as number) > 140 ? 'red' : '#fb8c00'
@@ -150,11 +259,11 @@ export class VitalsBpMonitorComponent {
   }
 
   renderSugarTrends() {
-    const avgSugar = this.readings.map(r => (r.sugarFasting + r.sugarPP) / 2);
-    new Chart(this.sugarTrendChartRef.nativeElement, {
+    const avgSugar = this.filteredReadings.map(r => (r.sugarFasting + r.sugarPP) / 2);
+    this.sugarTrendChart = new Chart(this.sugarTrendChartRef.nativeElement, {
       type: 'bar',
       data: {
-        labels: this.readings.map(r => r.date),
+        labels: this.filteredReadings.map(r => r.date),
         datasets: [{
           label: 'Avg Sugar',
           data: avgSugar,

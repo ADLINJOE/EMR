@@ -68,6 +68,7 @@
               <th class="dosage-col">Dosage</th>
               <th class="frequency-col">Frequency</th>
               <th class="date-col">Start Date</th>
+              <th class="duration-col">Duration</th>
               <th class="ongoing-col" style="width: 35%;">Ongoing</th>
               <th class="actions-col">Actions</th>
             </tr>
@@ -151,6 +152,27 @@
 
                 </td>
 
+                <td class="duration-col">
+                  <div class="duration-fields">
+                    <mat-form-field appearance="outline" class="duration-value-field">
+                      <mat-label>Value</mat-label>
+                      <input matInput type="number" min="1" formControlName="durationValue"
+                             [readonly]="!medication.get('isEditable')?.value"
+                             [disabled]="!medication.get('isEditable')?.value || medication.get('ongoing')?.value"
+                             placeholder="e.g., 7">
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" class="duration-unit-field">
+                      <mat-label>Unit</mat-label>
+                      <mat-select formControlName="durationUnit"
+                                  [disabled]="!medication.get('isEditable')?.value || medication.get('ongoing')?.value">
+                        <mat-option value="days">Days</mat-option>
+                        <mat-option value="weeks">Weeks</mat-option>
+                        <mat-option value="months">Months</mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+                </td>
+
                 <td class="center-checkbox ongoing-col" style="width: 35%;">
                   <div class="checkbox-wrapper">
                     <input type="checkbox" 
@@ -210,7 +232,7 @@
             </ng-container>
 
             <tr *ngIf="medicationsArray.length === 0 || allMedicationsDeleted()" class="no-data-row">
-              <td colspan="6" class="no-data">
+              <td colspan="7" class="no-data">
                 <p>No medications added yet. Click "Add Medication" to get started.</p>
               </td>
             </tr>

@@ -25,9 +25,14 @@
   </mat-autocomplete>
 </mat-form-field>
 
-      <button type="button" class="btn btn-primary add-btn" (click)="addReaction()">
-        <span class="emr-btn-icon">+</span> Add Reaction
-      </button>
+      <div class="emr-btn-group">
+        <button type="button" class="btn btn-primary add-btn" (click)="addReaction()">
+          <span class="emr-btn-icon">+</span> Add Reaction
+        </button>
+        <button type="button" class="emr-btn emr-btn-secondary" (click)="openReports()">
+          <span class="emr-btn-icon">📄</span> Reports
+        </button>
+      </div>
     </div>
 <div *ngIf="selectedPatient" class="patient-header">
   <h3>Patient: {{ selectedPatient.name }} (ID: {{ selectedPatient.patientId }})</h3>
@@ -35,7 +40,7 @@
 </div>
 
     <form [formGroup]="adrForm" class="emr-form">
-      <div class="emr-table-container">
+      <div class="emr-table-container" id="scroll">
         <table class="emr-table" formArrayName="reactions">
           <thead class="emr-table-header">
             <tr>
@@ -69,12 +74,37 @@
                               class="emr-input emr-textarea"></textarea>
                   </mat-form-field>
                 </td>
-   <td class="emr-td emr-td-description">
+                <!-- Drug Name with Autocomplete -->
+                <td class="emr-td emr-td-description">
                   <mat-form-field appearance="outline" class="emr-form-field emr-form-field-full">
-                    <textarea matInput rows="2"
-                              placeholder="Drug Name.."
-                              formControlName="drugname"
-                              class="emr-input emr-textarea"></textarea>
+                    <input type="text"
+                           matInput
+                           placeholder="Search medication..."
+                           formControlName="drugname"
+                           [matAutocomplete]="drugAuto"
+                           class="emr-input" />
+
+                    <!-- Quick Reports trigger for this drug -->
+                    <!-- <button mat-icon-button
+                            matSuffix
+                            type="button"
+                            class="emr-btn-icon"
+                            aria-label="Open ADR reports for this drug"
+                            (click)="openReportsForDrug(reaction.get('drugname')?.value)">
+                      <mat-icon>assessment</mat-icon>
+                    </button> -->
+
+                    <mat-autocomplete #drugAuto="matAutocomplete" 
+                                      [displayWith]="displayDrugName"
+                                      (optionSelected)="onDrugSelected($event.option.value, i)">
+                      <mat-option *ngFor="let drug of (filteredDrugs[i] | async) || []" [value]="drug.drugName">
+                        <div>
+                          <strong>{{ drug.drugName }}</strong>
+                          <small *ngIf="drug.genericName"> ({{ drug.genericName }})</small>
+                          <small *ngIf="drug.brandName"> - {{ drug.brandName }}</small>
+                        </div>
+                      </mat-option>
+                    </mat-autocomplete>
                   </mat-form-field>
                 </td>
                 <!-- Date -->
@@ -143,5 +173,67 @@
         </button>
       </div>
     </form>
+  </div>
+</div>
+
+<!-- Reports Modal -->
+<div class="ai-checker-overlay" *ngIf="showReports" (click)="closeReports()">
+  <div class="ai-checker-modal" (click)="$event.stopPropagation()">
+    <div class="ai-checker-header">
+      <h3><mat-icon>assessment</mat-icon> ADR Reports by Drug</h3>
+      <button class="close-btn" (click)="closeReports()">×</button>
+    </div>
+    <div class="ai-checker-content" style="padding:16px;">
+      <div style="display:flex; gap:12px; align-items:center; margin-bottom: 12px;">
+        <mat-form-field appearance="outline" class="emr-form-field emr-form-field-full">
+          <input type="text"
+                 matInput
+                 placeholder="Search drug for reports..."
+                 [formControl]="reportsDrugControl"
+                 [matAutocomplete]="reportsAuto"
+                 #reportsTrigger="matAutocompleteTrigger"
+                 (focus)="reportsTrigger.openPanel()">
+          <mat-autocomplete #reportsAuto="matAutocomplete" 
+                            [displayWith]="displayDrugName"
+                            (optionSelected)="selectReportDrug($event.option.value)">
+            <mat-option *ngFor="let drug of (filteredReportDrugs | async) || []" [value]="drug.drugName">
+              <div>
+                <strong>{{ drug.drugName }}</strong>
+                <small *ngIf="drug.genericName"> ({{ drug.genericName }})</small>
+                <small *ngIf="drug.brandName"> - {{ drug.brandName }}</small>
+              </div>
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+      </div>
+
+      <div class="tablefix" *ngIf="(reportResults?.length ?? 0) > 0">
+        <table class="full-width-table">
+          <thead>
+            <tr>
+              <th>Patient</th>
+              
+              <th>Patient ID</th>
+              <th>Description</th>
+              <th>Date</th>
+              <th>AI Severity</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let r of reportResults">
+              <td>{{ r.patientName || r.PatientName || 'N/A' }}</td>
+              <td>{{ r.patientId || r.PatientId || 'N/A' }}</td>
+              <td>{{ r.description || r.Description }}</td>
+              <td>{{ (r.dateOccurred || r.DateOccurred) | date:'mediumDate' }}</td>
+              <td>{{ r.aiSeveritySuggestion || r.AISeveritySuggestion || '-' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div *ngIf="(reportResults?.length ?? 0) === 0" style="text-align:center; color:#666; padding: 12px;">
+        No records to show. Search and select a drug above.
+      </div>
+    </div>
   </div>
 </div>

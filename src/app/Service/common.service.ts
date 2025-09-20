@@ -9,8 +9,8 @@ export const DeployUrl = {
 
    URL: 'https://app.rxsmart.in/api/',
    Front: 'https://app.rxsmart.in/'
- //  URL: 'https://localhost:44308/',
- // Front: 'https://localhost:4200/'
+//    URL: 'https://localhost:44308/',
+//  Front: 'https://localhost:4200/'
 
 };
 
