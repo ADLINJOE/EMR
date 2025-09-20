@@ -212,7 +212,7 @@ h2 {
 // Tab Content
 .tab-content {
   padding: 24px 0;
-  min-height: 400px;
+  min-height: 300px;
 }
 
 // Info Grid and Cards
@@ -810,8 +810,10 @@ h2 {
     border-radius: 0;
 }
 .search-section .search-wrapper{ display: table;}
-.card{ max-height: 400px!important;}
+.card{ height: auto; max-height: 350px!important;}
 
+
+.container{ height: auto!important;}
 
 @media all and (max-width: 760px) {
 
@@ -820,6 +822,6 @@ h2 {
     max-width: 300px!important;}
 
 
-    
+    .drug-monograph-content{ min-height: 400px!important;}
 
 }
