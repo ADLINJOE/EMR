@@ -204,13 +204,51 @@ th{ background: #000!important;}
 .emr-card{ border: none!important;}
 
 
-.mat-mdc-form-field-infix{ max-width: 100px!important;}
+/*.mat-mdc-form-field-infix{ max-width: 100px!important;}*/
 
 .emr-table{ background: #fff!important;}
 
 
+.mat-mdc-dialog-surface {
+  
+  border-radius: 0px!important;
+}
+
+
+.forgot-password-dialog {
+  
+  padding: 20px!important;
+  border-radius: 0px!important;
+}
+
+
+
+.forgot-password-dialog  .mat-mdc-dialog-content {
+  display: block;
+  flex-grow: 1;
+  box-sizing: border-box;
+  margin: 0;
+  overflow: hidden!important;
+  max-height:none!important;
+}
+
+
+
+.emr-table th{
+  padding: 7px 10x!important
+}
+
+.emr-table-container{border-radius:0px!important}
+
+.emr-table th {
+  padding: 8px 12px!important}
+
 @media all and (max-width: 760px) {
 
+
+   .forgot-password-dialog{
+    min-width: 298px!important;
+  }
   h2{ font-size: 20px;}
 
 
