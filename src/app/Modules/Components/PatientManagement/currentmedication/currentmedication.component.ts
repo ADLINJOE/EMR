@@ -1,21 +1,16 @@
 import { Component, OnInit, inject, ChangeDetectorRef, ViewChild, computed } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, Validators, FormControl, FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatCardModule } from '@angular/material/card';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule, MatOptionModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 import { Observable, of, startWith, map, debounceTime, distinctUntilChanged, forkJoin } from 'rxjs';
-
-
 
 import { DrugMonographComponent } from "../../Medicine/drug-monograph/drug-monograph.component";
 import { AllergyComponent } from "../allergy/allergy.component";
@@ -38,6 +33,8 @@ import { MedicationDto } from '../../../Interface/PatientFile';
   styleUrls: ['./currentmedication.component.scss','../../../Shared/styles/table-template.scss']
 })
 export class CurrentmedicationComponent implements OnInit {
+
+
   private fb = inject(FormBuilder);
   private commonService = inject(CommonService);
   private sharedService = inject(SharedServiceService);
@@ -223,7 +220,7 @@ addMedication() {
 }
 
 
-
+medarray:any
   private setupAutocomplete(index: number) {
     const medicationControl = this.medicationsArray.at(index) as FormGroup;
     if (!medicationControl) return;
@@ -287,13 +284,14 @@ addMedication() {
     }
 
     const payload = { Mode: 'GET', PatientId: patientId };
-
+    this.medarray = [];
     this.commonService.Post("CurrentMedication/currentmedication/", payload).subscribe({
       next: (res: any) => {
         this.isLoading = false;
         if (res?.success && Array.isArray(res.result)) {
           res.result.forEach((med: any, index: number) => {
             const group = this.createMedicationFormGroup(med);
+            this.medarray = res.result
             this.medicationsArray.push(group);
             // maintain filteredDrugs entry for each row
             this.filteredDrugs.push(of(this.drugList.slice(0, 10)));
@@ -1392,4 +1390,464 @@ addMedication() {
     // For now, just dismiss the notification
     this.dismissFollowUpNotification();
   }
+vitals:any
+loadVitalsFromAPI(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    this.getFormControls.clear();
+
+    const details = this.patientDetails();
+    const ptDetails = this.patientglobal();
+
+    const payload = {
+      mode: 'GET',
+      patientId: details?.patientID ?? ptDetails.patientId
+    };
+
+    this.commonService.Post("CurrentMedication/Vitals", payload).subscribe({
+      next: (res: any) => {
+        if (res.success && res.result) {
+          this.vitals = res.result;
+        }
+        resolve(); // Done loading
+      },
+      error: () => {
+        this.getFormControls.clear();
+        resolve(); // Still resolve so Promise.all continues
+      }
+    });
+  });
+}
+
+  allergy:any
+ loadAllergyFromAPI(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    this.getFormControls.clear();
+
+    const details = this.patientDetails();
+    const ptDetails = this.patientglobal();
+
+    const payload = {
+      mode: 'GET',
+      patientId: details?.patientID ?? ptDetails.patientId
+    };
+
+    this.commonService.Post("CurrentMedication/Allergy/", payload).subscribe({
+      next: (res: any) => {
+        if (res.success && res.result) {
+          this.allergy = res.result;
+        }
+        resolve();
+      },
+      error: () => {
+        this.getFormControls.clear();
+        resolve();
+      }
+    });
+  });
+}
+
+async printPatientDetails(): Promise<void> {
+  try {
+    this.isLoading = true;
+    const patient = this.patientDetails() || this.patientglobal();
+
+    if (!patient) {
+      this.sharedService.Messages('warning', 'Print', 'No patient details available', 3000);
+      return;
+    }
+
+    // ✅ Wait for vitals and allergy data to be fully loaded
+    await Promise.all([
+      this.loadVitalsFromAPI(),
+      this.loadAllergyFromAPI()
+    ]);
+
+    // ✅ Once data is ready, generate and print
+    const printContent = this.generatePrintContent(patient, this.vitals || [], this.allergy || []);
+    this.openPrintWindowfull(printContent);
+  } catch (error) {
+    console.error('Error preparing print content:', error);
+    this.sharedService.Messages('error', 'Error', 'Failed to prepare print content', 3000);
+  } finally {
+    this.isLoading = false;
+    this.ngOnInit(); // if needed
+  }
+}
+
+
+// Add this helper method to generate the print content
+private generatePrintContent(patient: any, vitals: any[], allergies: any[]): string {
+  const datePipe = new DatePipe('en-US');
+  const currentDate = new Date();
+  const formattedDate = datePipe.transform(currentDate, 'medium');
+  const patientId = patient.patientID || patient.patientId;
+
+  // Start building the HTML content
+  let content = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Patient Summary - ${patient.patientName || patient.name || 'Unknown'}</title>
+      <style>
+        body { 
+          font-family: Arial, sans-serif; 
+          margin: 20px; 
+          line-height: 1.6; 
+          color: #333;
+        }
+        .header { 
+          text-align: center; 
+          margin-bottom: 30px; 
+          padding-bottom: 15px;
+          border-bottom: 2px solid #2196F3;
+        }
+        .section { 
+          margin-bottom: 30px; 
+          page-break-inside: avoid;
+        }
+        .section-title { 
+          font-size: 18px; 
+          font-weight: bold; 
+          color: #2196F3;
+          border-bottom: 1px solid #ddd; 
+          padding-bottom: 5px; 
+          margin: 30px 0 15px 0;
+        }
+        table { 
+          width: 100%; 
+          border-collapse: collapse; 
+          margin: 15px 0;
+          font-size: 13px;
+          border: 1px solid #ddd;
+        }
+        th { 
+          background-color: #f5f5f5; 
+          text-align: left; 
+          padding: 10px; 
+          border: 1px solid #ddd; 
+          font-weight: 600;
+        }
+        td { 
+          padding: 10px; 
+          border: 1px solid #eee; 
+          vertical-align: top; 
+        }
+        .patient-info { 
+          display: grid; 
+          grid-template-columns: 150px 1fr 150px 1fr; 
+          gap: 10px 20px; 
+          margin: 20px 0;
+        }
+        .info-label { 
+          font-weight: bold; 
+          color: #555;
+        }
+        .no-data {
+          color: #666;
+          font-style: italic;
+          padding: 15px;
+          text-align: center;
+        }
+        @media print {
+          @page { 
+            size: A4; 
+            margin: 1.5cm;
+          }
+          body { 
+            margin: 0;
+            font-size: 12px;
+          }
+          .no-print { 
+            display: none; 
+          }
+          .section {
+            page-break-inside: avoid;
+          }
+          table {
+            font-size: 11px;
+          }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <h1 style="margin-bottom: 5px; color: #2196F3;">PATIENT MEDICAL SUMMARY</h1>
+        <div style="color: #666; margin-bottom: 10px;">Generated on: ${formattedDate}</div>
+      </div>
+
+      <!-- Patient Information Section -->
+      <div class="section">
+        <div class="section-title">PATIENT INFORMATION</div>
+        <div class="patient-info">
+          <div class="info-label">Patient ID:</div>
+          <div>${patientId || 'N/A'}</div>
+          
+          <div class="info-label">Name:</div>
+          <div>${patient.patientName || patient.name || 'N/A'}</div>
+          
+          <div class="info-label">Age/Gender:</div>
+          <div>${patient.age || 'N/A'} / ${patient.gender || 'N/A'}</div>
+          
+          <div class="info-label">Date of Birth:</div>
+          <div>${patient.dob ? datePipe.transform(patient.dob, 'mediumDate') : 'N/A'}</div>
+          
+      
+          
+          <div class="info-label">Email:</div>
+          <div>${patient.email || 'N/A'}</div>
+ 
+        </div>
+      </div>
+
+      <!-- Current Medications Section -->
+      <div class="section">
+        <div class="section-title">CURRENT MEDICATIONS</div>
+  `;
+
+  // Add medications table
+  const medications =  this.medarray;
+  if (medications.length > 0) {
+    content += `
+      <table>
+        <thead>
+          <tr>
+            <th>Medication</th>
+            <th>Dosage</th>
+            <th>Frequency</th>
+            <th>Start Date</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
+    medications.forEach((med: any) => {
+      const startDate = med.startDate ? new Date(med.startDate) : null;
+   
+      // Format start date or show N/A
+       const startDateStr = startDate ? datePipe.transform(startDate, 'mediumDate') : 'N/A';      
+      content += `
+        <tr>
+          <td>${med.medname || 'N/A'}</td>
+          <td>${med.dosage || 'N/A'}</td>
+          <td>${med.frequency || 'N/A'}</td>
+          <td>${startDateStr}</td>
+          <td>${med.ongoing ? 'Ongoing' : 'Completed'}</td>
+        </tr>
+      `;
+    });
+
+    content += `
+        </tbody>
+      </table>
+    `;
+  } else {
+    content += `<div class="no-data">No medications found.</div>`;
+  }
+
+  content += `</div>`;
+
+  // Add Vitals Section
+  content += `
+    <div class="section">
+      <div class="section-title">VITAL SIGNS</div>
+  `;
+
+  if (vitals && vitals.length > 0) {
+    const processedVitals = vitals.map(v => ({
+  ...v,
+  // Combine readingDate and readingTime into a single timestamp for sorting
+  recordedDate: this.combineDateAndTime(v.readingDate, v.readingTime),
+  // Include the original fields for display
+  formattedDateTime: this.formatDateTimeForDisplay(v.readingDate, v.readingTime)
+}));
+
+    // Sort vitals by date (newest first)
+    const sortedVitals = [...vitals].sort((a, b) => 
+      new Date(b.recordedDate || b.readingDate).getTime() - new Date(a.recordedDate || a.readingDate).getTime()
+    );
+
+    content += `
+      <table class="emr-table">
+        <thead>
+          <tr>
+            <th class="emr-th emr-th-serial">Sl.No</th>
+            <th class="emr-th emr-th-datetime">Date & Time</th>
+            <th class="emr-th emr-th-bp">
+              <div class="emr-vital-header">
+                <div class="emr-vital-title">Blood Pressure</div>
+                <div class="emr-vital-range">
+                  <span class="emr-range-label">Sys (90–140)</span> / 
+                  <span class="emr-range-label">Dia (60–90)</span> mmHg
+                </div>
+              </div>
+            </th>
+            <th class="emr-th emr-th-sugar">
+              <div class="emr-vital-header">
+                <div class="emr-vital-title">Blood Sugar</div>
+                <div class="emr-vital-range">
+                  <span class="emr-range-label">Fasting (70–100)</span> / 
+                  <span class="emr-range-label">PP (100–140)</span> mg/dL
+                </div>
+              </div>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
+    sortedVitals.forEach((vital, index) => {
+   const formattedDate = datePipe.transform(vital.readingDateTime, 'yyyy-MM-dd');
+const formattedTime = datePipe.transform(vital.readingDateTime, 'hh:mm a');
+      
+      content += `
+        <tr>
+          <td class="emr-td emr-td-serial">
+            <span class="emr-serial-number">${index + 1}</span>
+          </td>
+            <td class="emr-td emr-td-datetime">
+      ${formattedDate} & ${formattedTime}
+    </td>
+          <td class="emr-td emr-td-bp">
+            <div class="emr-bp-container">
+              <span>${vital.systolic || '--'}</span>
+              <span class="emr-vital-separator">/</span>
+              <span>${vital.diastolic || '--'}</span>
+              <span>mmHg</span>
+            </div>
+          </td>
+          <td class="emr-td emr-td-sugar">
+            <div class="emr-sugar-container">
+              <span>${vital.sugarFasting || '--'}</span>
+              <span class="emr-vital-separator">/</span>
+              <span>${vital.sugarPP || '--'}</span>
+              <span>mg/dL</span>
+            </div>
+          </td>
+        </tr>
+      `;
+    });
+
+    content += `
+        </tbody>
+      </table>
+    `;
+  } else {
+    content += `<div class="no-data">No vital signs recorded.</div>`;
+  }
+
+  content += `</div>`;
+
+  // Add Allergies Section
+  content += `
+    <div class="section">
+      <div class="section-title">ALLERGIES</div>
+  `;
+
+  if (allergies && allergies.length > 0) {
+    content += `
+      <table>
+        <thead>
+      <tr>
+            <th style="width: 10%;">Sl.No</th>
+            <th>Allergy Description</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
+    allergies.forEach((allergy, index) => {
+      content += `
+        <tr>
+          <td style="text-align: center; font-weight: 600;">${index + 1}</td>
+          <td>${allergy.description || 'N/A'}</td>
+        </tr>
+      `;
+    });
+
+    content += `
+        </tbody>
+      </table>
+    `;
+  } else {
+    content += `<div class="no-data">No allergies recorded.</div>`;
+  }
+
+  content += `
+    </div>
+
+    <div class="no-print" style="text-align: center; margin: 30px 0; padding: 20px; border-top: 1px solid #eee;">
+      <button onclick="window.print()" style="padding: 10px 25px; background: #2196F3; color: white; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px; font-size: 14px;">
+        <i class="material-icons" style="vertical-align: middle; font-size: 16px; margin-right: 5px;">print</i> Print
+      </button>
+      <button onclick="window.close()" style="padding: 10px 25px; background: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">
+        <i class="material-icons" style="vertical-align: middle; font-size: 16px; margin-right: 5px;">close</i> Close
+      </button>
+    </div>
+
+    <script>
+      // Add Material Icons
+      const link = document.createElement('link');
+      link.href = 'https://fonts.googleapis.com/icon?family=Material+Icons';
+      link.rel = 'stylesheet';
+      document.head.appendChild(link);
+    </script>
+  `;
+
+  // Close the HTML
+  content += `
+    </body>
+    </html>
+  `;
+
+  return content;
+}
+private combineDateAndTime(date: Date | string | null, time: string | null): Date {
+  if (!date || !time) return new Date(); // Fallback to current date
+  
+  const dateObj = new Date(date);
+  const [hours, minutes] = String(time).split(':').map(Number);
+  
+  const combined = new Date(dateObj);
+  combined.setHours(hours, minutes || 0, 0, 0);
+  return combined;
+}
+
+/**
+ * Formats date and time for display
+ */
+private formatDateTimeForDisplay(date: Date | string | null, time: string | null): string {
+  if (!date) return 'N/A';
+  
+  const datePipe = new DatePipe('en-US');
+  const formattedDate = datePipe.transform(date, 'mediumDate');
+  
+  if (!time) return formattedDate || 'N/A';
+  
+  // Format time to 12-hour format with AM/PM
+  const [hours, minutes] = String(time).split(':').map(Number);
+  const period = hours >= 12 ? 'PM' : 'AM';
+  const displayHours = hours % 12 || 12; // Convert 0 to 12 for 12 AM
+  
+  return `${formattedDate} ${displayHours}:${String(minutes).padStart(2, '0')} ${period}`;
+}
+// Add this method to open the print window
+private openPrintWindowfull(content: string): void {
+  const printWindow = window.open('', '_blank');
+  if (!printWindow) {
+    this.sharedService.Messages('error', 'Error', 'Could not open print window. Please allow popups for this site.', 3000);
+    return;
+  }
+
+  printWindow.document.write(content);
+  printWindow.document.close();
+
+  // Auto-print after content is loaded
+  printWindow.onload = () => {
+    setTimeout(() => {
+      printWindow.focus();
+      printWindow.print();
+    }, 500);
+  };
+}
 }

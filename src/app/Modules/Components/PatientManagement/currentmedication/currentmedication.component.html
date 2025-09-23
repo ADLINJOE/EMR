@@ -50,7 +50,10 @@
             <span class="emr-hide-desktop">Follow-up</span>
           </button>
 
-   
+   <button type="button" class="emr-btn emr-btn-secondary" (click)="printPatientDetails()" [disabled]="isLoading">
+  <mat-icon>print</mat-icon>
+  Print All Details
+</button>
 
           <button type="button" class="emr-btn emr-btn-secondary" (click)="openDrugMonograph('test')">
             <mat-icon>info</mat-icon>

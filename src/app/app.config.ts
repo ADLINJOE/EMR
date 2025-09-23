@@ -7,7 +7,7 @@ import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideToastr, ToastrModule } from 'ngx-toastr';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { HashLocationStrategy, LocationStrategy } from '@angular/common';
-import { provideServiceWorker } from '@angular/service-worker';
+
 
 export const appConfig: ApplicationConfig = {
   providers: [
