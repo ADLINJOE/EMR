@@ -48,6 +48,7 @@ strength: [data?.strength ?? ''],
 dosageForm: [data?.dosageForm ?? ''],
 medicineType: [data?.medicineType ?? '', Validators.required],
 drugCategory : [data?.drugCategory?? ''],
+Pack: [data?.pack ?? null, Validators.required],
 unitPrice: [data?.unitPrice ?? null],
 status: [data?.status ?? 'Active'],
 lastEditedBy: [data?.lastEditedBy ?? ''],
@@ -94,12 +95,13 @@ isDeleted: [data?.isDeleted ?? false]
 
 
   addDrug(): void {
+    this.searchText = ""
     const drugs = this.getFormControls;
     const last = drugs.at(drugs.length - 1);
-    if (last?.invalid) {
-      last.markAllAsTouched();
-      return;
-    }
+    // if (last?.invalid) {
+    //   last.markAllAsTouched();
+    //   return;
+    // }
     drugs.push(this.createDrug());
      var selectElement: any = document.getElementById('scroll');
 if (selectElement) {
@@ -134,10 +136,10 @@ if (selectElement) {
       }
     });
 
-    if (hasInvalid) {
-      this.sharedService.Messages('error', 'Drug Master', 'Fill Mandatory Fields', 3000);
-      return;
-    }
+    // if (hasInvalid) {
+    //   this.sharedService.Messages('error', 'Drug Master', 'Fill Mandatory Fields', 3000);
+    //   return;
+    // }
 
     const rows = drugsArray.controls.map(ctrl => ctrl.value);
 

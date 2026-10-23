@@ -36,7 +36,7 @@ export interface MedicationData {
   providedIn: 'root'
 })
 export class OcrService {
-  private readonly API_BASE_URL = 'https://localhost:44308/api';
+  private readonly API_BASE_URL = 'https://app.rxsmart.in/api/';
   private readonly OCR_SPACE_API_KEY = 'K87899142388957'; // Free OCR.space API key
   private readonly OCR_SPACE_URL = 'https://api.ocr.space/parse/image';
 

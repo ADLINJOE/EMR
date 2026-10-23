@@ -63,7 +63,7 @@ Update your `appsettings.json` with your email provider settings:
     "FromName": "RxSmart EMR System"
   },
   "AppSettings": {
-    "BaseUrl": "http://localhost:4200"
+    "BaseUrl": "https://app.rxsmart.in/api"
   }
 }
 ```

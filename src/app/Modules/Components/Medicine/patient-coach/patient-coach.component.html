@@ -1,0 +1,84 @@
+<div class="container" style="height: 240px; overflow: auto;">
+  <h2>🏃‍♂️ AI Lifestyle & Diet Coach</h2>
+
+  <form (ngSubmit)="analyze()" #coachForm="ngForm">
+    <label>Age</label>
+    <input [(ngModel)]="age" name="age" type="number" required />
+
+    <label>Gender</label>
+    <select [(ngModel)]="gender" name="gender" required>
+      <option value="Male">Male</option>
+      <option value="Female">Female</option>
+    </select>
+
+    <label>BP Readings (comma separated)</label>
+    <input [(ngModel)]="bpStr" name="bpStr" placeholder="BP Readings" />
+
+    <label>Glucose Readings (comma separated)</label>
+    <input [(ngModel)]="glucoseStr" name="glucoseStr" placeholder="Glucose Readings" />
+
+    <label>Medications</label>
+    <textarea
+      [(ngModel)]="meds"
+      name="meds"
+      placeholder="e.g. Metformin 500mg BID, Amlodipine 5mg OD">
+    </textarea>
+
+    <button type="submit" [disabled]="loading || !coachForm.form.valid">
+      {{ loading ? 'Analyzing...' : 'Generate Plan' }}
+    </button>
+  </form>
+
+  @if (loading) {
+    <div class="loader">Analyzing patient data...</div>
+  }
+
+
+
+  @if (result) {
+    <div class="chat-box">
+      <h3>🩺 AI Health Summary</h3>
+
+      <div class="section">
+        <h4>🧠 Interpretation</h4>
+        <p>{{ result.interpretation }}</p>
+      </div>
+
+      <div class="section">
+        <h4>🥗 Diet Plan</h4>
+        <ul>
+          @for (item of result.dietPlan; track item) {
+            <li>{{ item }}</li>
+          }
+        </ul>
+      </div>
+
+      <div class="section">
+        <h4>🏋️ Exercise Plan</h4>
+        <ul>
+          @for (item of result.exercisePlan; track item) {
+            <li>{{ item }}</li>
+          }
+        </ul>
+      </div>
+
+      <div class="section">
+        <h4>💡 Lifestyle Tips</h4>
+        <ul>
+          @for (item of result.lifestyleTips; track item) {
+            <li>{{ item }}</li>
+          }
+        </ul>
+      </div>
+
+      <div class="section alert-section">
+        <h4>⚠️ Alerts</h4>
+        <ul>
+          @for (item of result.alerts; track item) {
+            <li>{{ item }}</li>
+          }
+        </ul>
+      </div>
+    </div>
+  }
+</div>

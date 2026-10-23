@@ -18,6 +18,9 @@
   box-sizing: border-box;
   border-top: 6px solid #00796b;
 
+   @media (max-width: 768px) {
+    max-width: 100%; // Remove or override the 30% max-width
+  }
   h2 {
     text-align: center;
     margin-bottom: 20px;

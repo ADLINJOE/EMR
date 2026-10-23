@@ -6,15 +6,28 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ADRComponent } from "../../PatientManagement/adr/adr.component";
 import { AddPatientDialogComponent } from '../add-patient-dialog/add-patient-dialog.component';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { ConfirmDialogComponent } from '../../Shared/confirm-dialog/confirm-dialog.component';
 import { PatientFilterPipe } from "../../../pipes/patient-filter.pipe";
 import { Route, Router } from '@angular/router';
+import { DrugAdvisorComponent } from "../../Medicine/drug-advisor/drug-advisor.component";
+import { PatientCoachComponent } from "../../Medicine/patient-coach/patient-coach.component";
 
 @Component({
   selector: 'app-patientlist',
-  imports: [PatientInviteComponent, CommonModule, ReactiveFormsModule, FormsModule, PatientFilterPipe],
+  standalone: true,
+  imports: [
+    PatientInviteComponent,
+    CommonModule,
+    ReactiveFormsModule,
+    FormsModule,
+    PatientFilterPipe,
+    MatDialogModule,
+    DrugAdvisorComponent,
+    PatientCoachComponent
+],
   templateUrl: './patientlist.component.html',
-  styleUrl: './patientlist.component.scss'
+  styleUrls: ['./patientlist.component.scss']
 })
 export class PatientlistComponent {
   patients: any[] = [];
@@ -110,8 +123,47 @@ Reload(payload:any){
         });
 }
   openPatientDetails(patient: any) {
-      this.sharedService.setPatient(patient);
-  this.router.navigate(['/MainLayout/patientmanagement']);
-}
+    this.sharedService.setPatient(patient);
+    this.router.navigate(['/MainLayout/patientmanagement']);
+  }
 
+  deletePatient(patientId: number) {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: {
+        title: 'Delete Patient',
+        message: 'Are you sure you want to delete this unregistered patient?',
+        confirmText: 'Delete',
+        cancelText: 'Cancel'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.loading = true;
+        const payload = {
+          PatientId: patientId,
+
+        };
+
+        this.Http.Post('PatientHandle/DeletePatient', payload).subscribe({
+          next: (res: any) => {
+            if (res.success) {
+              this.sharedService.Messages('success', 'Success', 'Patient deleted successfully', 3000);
+              // Refresh the patient list
+              this.ngOnInit();
+            } else {
+              this.sharedService.Messages('error', 'Error', res.message || 'Failed to delete patient', 3000);
+              this.loading = false;
+            }
+          },
+          error: (error) => {
+            console.error('Error deleting patient:', error);
+            this.sharedService.Messages('error', 'Error', 'Failed to delete patient. Please try again.', 3000);
+            this.loading = false;
+          }
+        });
+      }
+    });
+  }
 }

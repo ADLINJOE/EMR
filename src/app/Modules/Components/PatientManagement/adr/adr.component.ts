@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, computed, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule, FormsModule, FormControl } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatInputModule } from '@angular/material/input';
@@ -48,6 +48,7 @@ export class ADRComponent implements OnInit {
   private fb = inject(FormBuilder);
   private http = inject(HttpClient);
   private Http = inject(CommonService);
+  private cdr = inject(ChangeDetectorRef);
   private sharedService = inject(SharedServiceService);
 
   searchPatientControl = new FormControl<string | null>('');
@@ -425,6 +426,7 @@ patientselect(patid: number) {
 
   closeReports() {
     this.showReports = false;
+    this.cdr.detectChanges();
   }
 
   // Open reports prefilled for a given drug (used from drug autocomplete field)

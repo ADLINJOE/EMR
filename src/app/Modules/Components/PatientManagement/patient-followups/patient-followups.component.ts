@@ -75,7 +75,7 @@ export class PatientFollowupsComponent implements OnInit {
 
   displayedColumns: string[] = ['followUpDate', 'notes', 'emailReminder', 'status', 'actions'];
 
-  private apiUrl = 'https://localhost:7071/api/PatientManagement';
+  private apiUrl = 'https://app.rxsmart.in/api/PatientManagement';
 
   constructor(
     private http: HttpClient,

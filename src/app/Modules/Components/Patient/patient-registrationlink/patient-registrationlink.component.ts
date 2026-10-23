@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -50,7 +50,7 @@ export class PatientRegistrationlinkComponent implements OnInit {
     // Clear beforeunload when leaving
     window.onbeforeunload = null;
   }
-  constructor(private router: Router, private fb: FormBuilder, private route: ActivatedRoute, private Commonservice: CommonService, private Sharedservice: SharedServiceService, private dialog: MatDialog) {
+  constructor(private router: Router,private cdr: ChangeDetectorRef, private fb: FormBuilder, private route: ActivatedRoute, private Commonservice: CommonService, private Sharedservice: SharedServiceService, private dialog: MatDialog) {
     this.PatientEmail = this.route.snapshot.queryParamMap.get('email');
     this.CheckPatientRegister()
     this.loginForm = this.fb.group({
@@ -85,8 +85,10 @@ this.registerForm.get('email')?.disable();
     this.router.navigate(['MainLayout', 'login']);
 
           } else {
+
             this.showLogin = false;
-            this.Sharedservice.Messages('error', 'Login', 'Email not found.', 3000);
+                        this.cdr.detectChanges();
+           // this.Sharedservice.Messages('error', 'Login', 'Email not found.', 3000);
            this.registerForm.get('email')?.setValue(this.PatientEmail);
 this.registerForm.get('email')?.disable();
 

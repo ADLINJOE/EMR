@@ -61,9 +61,14 @@
     </td>
     <td>{{ p.email }}</td>
     <td>
-      
-       Invited
-
+      <div class="d-flex gap-2">
+        <span>Invited</span>
+        <button class="btn btn-primary add-btn" style="    margin-left: 5px"
+                (click)="deletePatient(p.patientId); $event.stopPropagation()"
+                title="Delete unregistered patient">
+          <i class="bi bi-trash">Delete</i>
+        </button>
+      </div>
     </td>
   </ng-template>
 
@@ -74,11 +79,19 @@
       Not invited
     </td>
     <td>{{ p.email }}</td>
-    <td>
+    <td style="display: flex;">
       <button style="cursor: pointer;" class="btn btn-primary float-end"
               (click)="sendInvite(p.email); $event.stopPropagation()">
         Send Invite
       </button>
+        <div class="d-flex gap-2">
+        <!-- <span>Invited</span> -->
+        <button class="btn btn-primary add-btn" style="    margin-left: 5px"
+                (click)="deletePatient(p.patientId); $event.stopPropagation()"
+                title="Delete unregistered patient">
+          <i class="bi bi-trash">Delete</i>
+        </button>
+      </div>
     </td>
   </ng-template>
 

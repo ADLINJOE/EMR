@@ -78,51 +78,44 @@
           </thead>
           <tbody formArrayName="medications">
             <ng-container *ngFor="let medication of medicationsArray.controls; let i = index; trackBy: trackByFn">
-              <tr [formGroupName]="i" 
-                  class="medication-row" 
-                
-                  [class.editing]="medication.get('isEditable')?.value"
-                  [class.row-added]="medication.get('isNew')?.value"
-                  *ngIf="!medication.get('isDeleted')?.value">
-                <td class="medication-name-col">
-                         <mat-form-field appearance="outline" class="full">
-  <input type="text"
-         matInput
-         placeholder="Search medication..."
-         formControlName="medname"
-         [matAutocomplete]="drugAuto"
-         [readonly]="!medication.get('isEditable')?.value">
-
-  <mat-autocomplete #drugAuto="matAutocomplete" 
-                    [displayWith]="displayFn" 
-                    (optionSelected)="onDrugSelected($event.option.value, i)">
- <mat-option *ngFor="let drug of (filteredDrugs[i] | async) || []"
-            [value]="drug.drugName">
-  <div>
-    <strong>{{ drug.drugName }}</strong>
-    <small *ngIf="drug.genericName"> ({{ drug.genericName }})</small>
-    <small *ngIf="drug.brandName"> - {{ drug.brandName }}</small>
-  </div>
-</mat-option>
-
-  </mat-autocomplete>
-
-  <mat-error *ngIf="medication.get('medname')?.invalid && medication.get('medname')?.touched">
-    Medication name is required
-  </mat-error>
-</mat-form-field>
-
+              <tr [formGroupName]="i" class="medication-row" [class.editing]="medication.get('isEditable')?.value"
+                [class.row-added]="medication.get('isNew')?.value" *ngIf="!medication.get('isDeleted')?.value">
+                <td class="medication-name-col"  >
+                  <mat-form-field >
+                    <input [class.category-antibiotic]="drugCategories[i] === 'Antibiotic'"
+      [class.category-vitamin]="drugCategories[i] === 'Vitamin'"
+      [class.category-analgesic]="drugCategories[i] === 'Analgesic'" type="text" matInput placeholder="Search medication..." formControlName="medname"
+                      [matAutocomplete]="drugAuto" [readonly]="!medication.get('isEditable')?.value" >
+          
+                    <mat-autocomplete #drugAuto="matAutocomplete" [displayWith]="displayFn"
+                      (optionSelected)="onDrugSelected($event.option.value, i)">
+                      <mat-option *ngFor="let drug of (filteredDrugs[i] | async) || []" [value]="drug.drugName">
+                        <div>
+                          <strong>{{ drug.drugName }}</strong>
+                          <small *ngIf="drug.genericName"> ({{ drug.genericName }})</small>
+                          <small *ngIf="drug.brandName"> - {{ drug.brandName }}</small>
+                        </div>
+                      </mat-option>
+          
+                    </mat-autocomplete>
+          
+                    <mat-error *ngIf="medication.get('medname')?.invalid && medication.get('medname')?.touched">
+                      Medication name is required
+                    </mat-error>
+                  </mat-form-field>
+          
                 </td>
-
+          
                 <td class="dosage-col">
                   <mat-form-field appearance="outline" class="full">
-                    <input matInput formControlName="dosage" placeholder="e.g., 500mg" [readonly]="!medication.get('isEditable')?.value">
+                    <input matInput formControlName="dosage" placeholder="e.g., 500mg"
+                      [readonly]="!medication.get('isEditable')?.value">
                     <mat-error *ngIf="medication.get('dosage')?.invalid && medication.get('dosage')?.touched">
                       Dosage is required
                     </mat-error>
                   </mat-form-field>
                 </td>
-
+          
                 <td class="frequency-col">
                   <mat-form-field appearance="outline" class="full">
                     <mat-select formControlName="frequency" [disabled]="!medication.get('isEditable')?.value">
@@ -135,39 +128,36 @@
                     </mat-error>
                   </mat-form-field>
                 </td>
-
+          
                 <td class="date-col">
-                <mat-form-field appearance="outline" class="date-field">
-  <mat-label>Start Date</mat-label>
-  <input 
-    matInput 
-    [matDatepicker]="picker" 
-    formControlName="startDate" 
-    [readonly]="!medication.get('isEditable')?.value">
-  <mat-datepicker-toggle matSuffix [for]="picker">
-    <mat-icon matDatepickerToggleIcon>event</mat-icon>
-  </mat-datepicker-toggle>
-  <mat-datepicker #picker></mat-datepicker>
-  <mat-error *ngIf="medication.get('startDate')?.invalid && medication.get('startDate')?.touched">
-    Start date is required
-  </mat-error>
-</mat-form-field>
-
+                  <mat-form-field appearance="outline" class="date-field">
+                    <mat-label>Start Date</mat-label>
+                    <input matInput [matDatepicker]="picker" formControlName="startDate"
+                      [readonly]="!medication.get('isEditable')?.value">
+                    <mat-datepicker-toggle matSuffix [for]="picker">
+                      <mat-icon matDatepickerToggleIcon>event</mat-icon>
+                    </mat-datepicker-toggle>
+                    <mat-datepicker #picker></mat-datepicker>
+                    <mat-error *ngIf="medication.get('startDate')?.invalid && medication.get('startDate')?.touched">
+                      Start date is required
+                    </mat-error>
+                  </mat-form-field>
+          
                 </td>
-
+          
                 <td class="duration-col">
                   <div class="duration-fields">
                     <mat-form-field appearance="outline" class="duration-value-field">
                       <mat-label>Value</mat-label>
-                      <input matInput type="number" min="1" formControlName="durationValue"
-                             [readonly]="!medication.get('isEditable')?.value"
-                             [disabled]="!medication.get('isEditable')?.value || medication.get('ongoing')?.value"
-                             placeholder="e.g., 7">
+                      <input matInput type="number" min="1" formControlName="durationValue" 
+                        [readonly]="!medication.get('isEditable')?.value"
+                        [disabled]="!medication.get('isEditable')?.value || medication.get('ongoing')?.value"
+                        placeholder="e.g., 7">
                     </mat-form-field>
                     <mat-form-field appearance="outline" class="duration-unit-field">
                       <mat-label>Unit</mat-label>
                       <mat-select formControlName="durationUnit"
-                                  [disabled]="!medication.get('isEditable')?.value || medication.get('ongoing')?.value">
+                        [disabled]="!medication.get('isEditable')?.value || medication.get('ongoing')?.value">
                         <mat-option value="days">Days</mat-option>
                         <mat-option value="weeks">Weeks</mat-option>
                         <mat-option value="months">Months</mat-option>
@@ -175,65 +165,54 @@
                     </mat-form-field>
                   </div>
                 </td>
-
+          
                 <td class="center-checkbox ongoing-col" style="width: 35%;">
                   <div class="checkbox-wrapper">
-                    <input type="checkbox" 
-                           formControlName="ongoing" 
-                           [disabled]="!medication.get('isEditable')?.value"
-                           id="ongoing-{{i}}">
-                    <label for="ongoing-{{i}}" class="checkbox-label" 
-                           [class.checked]="medication.get('ongoing')?.value">
+                    <input type="checkbox" formControlName="ongoing" [disabled]="!medication.get('isEditable')?.value"
+                      id="ongoing-{{i}}">
+                    <label for="ongoing-{{i}}" class="checkbox-label" [class.checked]="medication.get('ongoing')?.value">
                       {{ medication.get('ongoing')?.value ? 'Yes' : 'No' }}
                     </label>
                   </div>
                 </td>
-
+          
                 <td class="actions-col">
                   <div class="emr-btn-group">
                     <button type="button" class="emr-btn emr-btn-icon emr-btn-secondary emr-btn-sm"
-                            *ngIf="!medication.get('isEditable')?.value"
-                            (click)="editMedication(i)"
-                            [disabled]="isLoading"
-                            title="Edit medication">
+                      *ngIf="!medication.get('isEditable')?.value" (click)="editMedication(i)" [disabled]="isLoading"
+                      title="Edit medication">
                       <mat-icon>edit</mat-icon>
                     </button>
-
+          
                     <button type="button" class="emr-btn emr-btn-icon emr-btn-primary emr-btn-sm"
-                            *ngIf="medication.get('isEditable')?.value"
-                            (click)="saveMedication(i)"
-                            [disabled]="isLoading"
-                            title="Save and check interactions">
+                      *ngIf="medication.get('isEditable')?.value" (click)="saveMedication(i)" [disabled]="isLoading"
+                      title="Save and check interactions">
                       <mat-icon>save</mat-icon>
                     </button>
-
+          
                     <button type="button" class="emr-btn emr-btn-icon emr-btn-outline emr-btn-danger emr-btn-sm"
-                            *ngIf="medication.get('isEditable')?.value"
-                            (click)="cancelEdit(i)"
-                            [disabled]="isLoading"
-                            title="Cancel editing">
+                      *ngIf="medication.get('isEditable')?.value" (click)="cancelEdit(i)" [disabled]="isLoading"
+                      title="Cancel editing">
                       <mat-icon>cancel</mat-icon>
                     </button>
-<!-- 
-                    <button type="button" class="emr-btn emr-btn-icon emr-btn-secondary emr-btn-sm"
-                            *ngIf="!medication.get('isEditable')?.value && medication.get('medname')?.value"
-                            (click)="openDrugMonograph(medication.get('medname')?.value)"
-                            [disabled]="isLoading"
-                            title="View drug monograph">
-                      <mat-icon>description</mat-icon>
-                    </button> -->
-
-                    <button type="button" class="emr-btn emr-btn-icon emr-btn-danger emr-btn-sm"
-                            (click)="deleteMedication(i)"
-                            [disabled]="isLoading"
-                            title="Delete medication">
+                    <!-- 
+                              <button type="button" class="emr-btn emr-btn-icon emr-btn-secondary emr-btn-sm"
+                                      *ngIf="!medication.get('isEditable')?.value && medication.get('medname')?.value"
+                                      (click)="openDrugMonograph(medication.get('medname')?.value)"
+                                      [disabled]="isLoading"
+                                      title="View drug monograph">
+                                <mat-icon>description</mat-icon>
+                              </button> -->
+          
+                    <button type="button" class="emr-btn emr-btn-icon emr-btn-danger emr-btn-sm" (click)="deleteMedication(i)"
+                      [disabled]="isLoading" title="Delete medication">
                       <mat-icon>delete</mat-icon>
                     </button>
                   </div>
                 </td>
               </tr>
             </ng-container>
-
+          
             <tr *ngIf="medicationsArray.length === 0 || allMedicationsDeleted()" class="no-data-row">
               <td colspan="7" class="no-data">
                 <p>No medications added yet. Click "Add Medication" to get started.</p>

@@ -8,7 +8,7 @@
       type="text" 
       style="width: 55%"
       class="form-control search-box" 
-      placeholder="Search Drugs1..." 
+      placeholder="Search Drugs..." 
       [(ngModel)]="searchText"
     />
   </div>
@@ -27,14 +27,14 @@
        <thead>
   <tr>
     <th style="width: 4%;">Sl.No</th>
-    <th style="width: 12%;">Drug Name</th>
+    <th style="width: 12%;">Drug/Brand Name</th>
     <th style="width: 12%;">Generic Name</th>
-    <th style="width: 9%;">Brand Name</th>
-    <th style="width: 6%;">Drug Code</th>
+    <th style="width: 9%;">Brand Name To Display </th>
+    <!-- <th style="width: 6%;">Drug Code</th> -->
     <th style="width: 5%;">Strength</th>
     <th style="width: 8%;">Dosage Form</th>
-    <th style="width: 7%;">Type</th>
-    <th style="width: 6%;">Drug Category</th>
+    <!-- <th style="width: 7%;">Type</th> -->
+    <th style="width: 6%;">Pack</th>
     <th style="width: 5%;">Unit Price</th>
     <th style="width: 6%;">Status</th>
     <th style="width: 1%;">Actions</th>
@@ -47,17 +47,42 @@
   <tr [formGroupName]="i" 
       class="drug-table-row"
       [class.drug-row-new]="drug.get('isNew')?.value"
-      [hidden]="drug.get('isDeleted')?.value">
+      [hidden]="drug.get('isDeleted')?.value"
+      [ngClass]="{
+        'category-antibiotic': drug.get('drugCategory')?.value === 'Antibiotic',
+        'category-vitamin': drug.get('drugCategory')?.value === 'Vitamin',
+        'category-analgesic':drug.get('drugCategory')?.value === 'Analgesic',
+    'category-antihypertensive': drug.get('drugCategory')?.value === 'Antihypertensives',
+    'category-antidiabetic': drug.get('drugCategory')?.value === 'Antidiabetics',
+    'category-AnalgesicsNSAIDs': drug.get('drugCategory')?.value === 'AnalgesicsNSAIDs',
+    'category-anticoagulant': drug.get('drugCategory')?.value === 'Anticoagulants',
+    'category-anticonvulsant': drug.get('drugCategory')?.value === 'Anticonvulsants',
+    'category-antipsychotic': drug.get('drugCategory')?.value === 'Antipsychotics',
+    'category-sedative': drug.get('drugCategory')?.value === 'SedativesAnxiolytics',
+    'category-narcotic': drug.get('drugCategory')?.value === 'Narcotics',
+    'category-antiviral': drug.get('drugCategory')?.value === 'Antivirals',
+    'category-antifungal': drug.get('drugCategory')?.value === 'Antifungals',
+    'category-antimalarial': drug.get('drugCategory')?.value === 'Antimalarials',
+    'category-antitubercular': drug.get('drugCategory')?.value === 'Antituberculars',
+    'category-antiemetic': drug.get('drugCategory')?.value === 'Antiemetics',
+    'category-vaccine': drug.get('drugCategory')?.value === 'Vaccines',
+    'category-hormone': drug.get('drugCategory')?.value === 'Hormones',
+    'category-combination': drug.get('drugCategory')?.value === 'Combinationproducts'
+      }">
+
+
+
+
     <td class="drug-td-serial">{{ i + 1 }}</td>
     <td><input class="plain-input" formControlName="drugName" placeholder="Drug Name" /></td>
     <td><input class="plain-input" formControlName="genericName" placeholder="Generic Name" /></td>
     <td><input class="plain-input" formControlName="brandName" placeholder="Brand Name" /></td>
-    <td><input class="plain-input" formControlName="drugCode" placeholder="Drug Code" /></td>
+    <!-- <td><input class="plain-input" formControlName="drugCode" placeholder="Drug Code" /></td> -->
 
     <td><input class="plain-input" formControlName="strength" placeholder="Strength" /></td>
     <td><input class="plain-input" formControlName="dosageForm" placeholder="Dosage Form" /></td>
 
-    <td>
+    <!-- <td>
       <select class="plain-input" formControlName="medicineType">
         <option value="Tablet">Tablet</option>
         <option value="Injection">Injection</option>
@@ -67,14 +92,31 @@
         <option value="Powder">Powder</option>
         <option value="Inhaler">Inhaler</option>
       </select>
-    </td>
+    </td> -->
 <td>
-
-  <select class="plain-input" formControlName="drugCategory">
+        <input class="plain-input" formControlName="Pack" placeholder="Pack" />
+  <!-- <select class="plain-input" formControlName="drugCategory">
         <option value="Antibiotic">Antibiotic</option>
         <option value="Vitamin">Vitamin</option>
         <option value="Analgesic">Analgesic</option>
-      </select>
+         <option value="Antifungals">Antifungals</option>
+        <option value="Antimalarials">Antimalarials</option>
+         <option value="Antituberculars">Antituberculars</option>
+        <option value="Antiemetics">Antiemetics</option> 
+        <option value="Vaccines">Vaccines</option>
+        <option value="Hormones">Hormones</option>
+         <option value="Combinationproducts">Combination products</option>
+        <option value="Antihypertensives">Antihypertensives</option>
+         <option value="Antidiabetics">Antidiabetics</option>
+        <option value="AnalgesicsNSAIDs">Analgesics NSAIDs</option>
+         <option value="Anticoagulants">Anticoagulants</option>
+        <option value="Anticonvulsants">Anticonvulsants</option> 
+        <option value="Antipsychotics">Antipsychotics</option>
+        <option value="SedativesAnxiolytics">Sedatives Anxiolytics</option>
+         <option value="Narcotics">Narcotics</option>
+        <option value="Antivirals">Antivirals</option>
+      
+      </select> -->
 
 
 </td>

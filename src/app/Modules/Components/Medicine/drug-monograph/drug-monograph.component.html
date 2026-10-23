@@ -32,13 +32,21 @@
         </div>
       </div>
     </div>
-
+<div style="height: 300px; overflow: auto;">
     <!-- Loading State -->
     <div *ngIf="isLoading" class="loading-container">
-      <div class="loading-spinner"></div>
+      <mat-spinner></mat-spinner>
       <p>Loading drug information...</p>
     </div>
-
+<div class="monograph-section">
+  <div class="mono-card" *ngFor="let section of parsedSections">
+    <h4 class="mono-heading">
+      <mat-icon>chevron_right</mat-icon> {{ section.title }}
+    </h4>
+    <p class="mono-body">{{ section.body }}</p>
+  </div>
+</div>
+</div>
     <!-- Drug Monograph Display -->
     <div *ngIf="selectedDrug && !isLoading" class="monograph-content">
       
@@ -76,7 +84,7 @@
         
         <!-- Overview Tab -->
         <mat-tab label="Overview">
-          <div class="tab-content">
+          <!-- <div class="tab-content">
             <div class="info-grid">
               <div class="info-card">
                 <h4><mat-icon>info</mat-icon> General Information</h4>
@@ -110,11 +118,20 @@
                 </div>
               </div>
             </div>
-          </div>
+          </div> -->
+          <!-- Monograph Paragraph View -->
+
+
+<!-- Loading Spinner -->
+<div *ngIf="isLoading" class="loading">
+  <mat-spinner diameter="30"></mat-spinner>
+  <p>Loading drug details...</p>
+</div>
+
         </mat-tab>
 
         <!-- Indications Tab -->
-        <mat-tab label="Indications">
+        <!-- <mat-tab label="Indications">
           <div class="tab-content">
             <div class="indication-section">
               <h4><mat-icon>medical_services</mat-icon> Approved Indications</h4>
@@ -128,7 +145,7 @@
               <p *ngIf="!selectedDrug.indications?.length" class="no-data">No indication data available</p>
             </div>
           </div>
-        </mat-tab>
+        </mat-tab> -->
 
         <!-- Dosage Tab -->
         <mat-tab label="Dosage & Administration">
@@ -325,14 +342,14 @@
     </div>
 
     <!-- No Results -->
-    <div *ngIf="searchPerformed && !selectedDrug && !isLoading" class="no-results">
+    <!-- <div *ngIf="searchPerformed && !selectedDrug && !isLoading" class="no-results">
       <mat-icon>search_off</mat-icon>
       <h3>No Drug Information Found</h3>
       <p>We couldn't find monograph information for "{{searchTerm}}". Please check the spelling or try a different drug name.</p>
       <button mat-raised-button color="primary" (click)="clearSearch()">
         Clear Search
       </button>
-    </div>
+    </div> -->
 
   </div>
 </div>

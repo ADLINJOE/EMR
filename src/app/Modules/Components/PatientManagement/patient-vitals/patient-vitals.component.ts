@@ -10,6 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { CommonService } from '../../../../Service/common.service';
 import { SharedServiceService } from '../../../../Service/Sharedservice/shared-service.service';
 import { VitalDto } from '../../../Interface/PatientFile';
+import { PatientCoachComponent } from "../../Medicine/patient-coach/patient-coach.component";
 
 @Component({
   selector: 'app-patient-vitals',
@@ -23,8 +24,8 @@ import { VitalDto } from '../../../Interface/PatientFile';
     MatDatepickerModule,
     MatNativeDateModule,
     MatIconModule,
-
-  ],
+    PatientCoachComponent
+],
   templateUrl: './patient-vitals.component.html',
   styleUrls: ['./patient-vitals.component.scss', '../../../Shared/styles/table-template.scss']
 })
@@ -43,7 +44,10 @@ export class PatientVitalsComponent {
       vitalList: this.fb.array([])
     });
   }
-
+  showCoach = false;
+  closeCoach() {
+    this.showCoach = false;
+  }
   // Create a new vital form group
   createVital(data?: any, isNew = true): FormGroup {
     let readingDate = null;

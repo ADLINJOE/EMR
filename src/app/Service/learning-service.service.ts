@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { DeployUrl } from './common.service';
@@ -56,17 +56,41 @@ export class LearningServiceService {
   constructor(private http: HttpClient) {}
 
   // Articles API methods
-  getArticles(category?: string): Observable<{ data: Article[], success: boolean }> {
-    let url = `${DeployUrl.URL}api/learninghub/articles`;
-    if (category) {
-      url += `?category=${encodeURIComponent(category)}`;
-    }
-    return this.http.get<{ data: Article[], success: boolean }>(url);
+getArticles(
+  category?: string,
+  page: number = 1,
+  pageSize: number = 10
+): Observable<{ data: Article[], success: boolean }> {
+  let url = `${DeployUrl.URL}api/learninghub?category=${category}&page=${page}&pageSize=${pageSize}`;
+
+  if (category) {
+    url += `&category=${encodeURIComponent(category)}`;
   }
+
+  return this.http.get<{ data: Article[], success: boolean }>(url);
+}
+
+
 
   getArticleById(id: string): Observable<{ data: Article, success: boolean }> {
     return this.http.get<{ data: Article, success: boolean }>(`${DeployUrl.URL}api/learninghub/articles/${id}`);
   }
+
+  createArticle(article: Article): Observable<{ data: Article, success: boolean }> {
+    return this.http.post<{ data: Article, success: boolean }>(`${DeployUrl.URL}api/learninghub/articles`, article);
+  }
+
+  updateArticle(id: string, article: Article): Observable<{ data: Article, success: boolean }> {
+    return this.http.put<{ data: Article, success: boolean }>(`${DeployUrl.URL}api/learninghub/articles/${id}`, article);
+  }
+
+ deleteArticle(id: string): Observable<{ success: boolean }> {
+    return this.http.post<{ success: boolean }>(
+        `${DeployUrl.URL}api/learninghub/articles/${id}`,
+        {} // empty body required for POST
+    );
+}
+
 
   // Topics API methods
   getTopics(category?: string): Observable<{ data: Topic[], success: boolean }> {
@@ -92,7 +116,7 @@ export class LearningServiceService {
 
   // Legacy method for backward compatibility
   getResources(type?: string, category?: string): Observable<LearningResource[]> {
-    const apiUrl = 'https://localhost:5001/api/LearningResources';
+    const apiUrl = 'https://app.rxsmart.in/api/LearningResources';
     let url = apiUrl;
     if (type || category) {
       const params = [];
@@ -102,4 +126,30 @@ export class LearningServiceService {
     }
     return this.http.get<LearningResource[]>(url);
   }
+
+ getDocuments() {
+    return this.http.get<any[]>(`${DeployUrl.URL}/list`);
+  }
+
+uploadDocument(file: File, title: string, uploadedBy: string) {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("title", title);
+  formData.append("uploadedBy", uploadedBy);
+
+  return this.http.post(`${DeployUrl.URL}api/Documents/upload`, formData);
+}
+
+
+
+  deleteDocument(id: number) {
+    return this.http.get(`${DeployUrl.URL}api/Documents/${id}`);
+  }
+
+
+
+
+
+
+   
 }

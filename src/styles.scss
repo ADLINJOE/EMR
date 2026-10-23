@@ -55,6 +55,35 @@ p {
 .mat-form-field.mat-focused .mat-form-field-label {
   color: #00796b;
 }
+.category-antibiotic {
+  background-color: #f68e8e !important; /* light red */
+}
+
+.category-vitamin {
+  background-color: #89f489 !important; /* light green */
+}
+
+.category-analgesic {
+  background-color: #8b8be6 !important; /* light blue */
+}
+
+
+.category-antihypertensive { background-color: lightblue !important; }
+.category-antidiabetic { background-color: orange !important; }
+.category-anticoagulant { background-color: yellow !important; }
+.category-anticonvulsant { background-color: violet !important; }
+.category-antipsychotic { background-color: pink !important; }
+.category-sedative { background-color: blue !important; color: white !important; }
+.category-narcotic { background-color: black!important; color: white!important; }
+.category-antiviral { background-color: teal!important; }
+.category-antifungal { background-color: green!important; }
+.category-antimalarial { background-color: olive!important; }
+.category-antitubercular { background-color: burgundy!important; color: white!important; }
+.category-antiemetic { background-color: rgb(197, 254, 226)!important; }
+.category-vaccine { background-color: purple!important; color: white!important; }
+.category-hormone { background-color:  rgb(98, 98, 235)!important; } /* Blue stripe */
+.category-combination { background-color: white!important; border: 2px solid gray!important; }
+.category-AnalgesicsNSAIDs{background-color: brown !important;}
 
 // Global table styling for mobile
 @media (max-width: 768px) {

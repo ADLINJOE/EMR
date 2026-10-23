@@ -59,6 +59,7 @@ get showBackdrop() {
     "Reports": "insert_chart",
     "Settings": "settings",
     "Default": "medical_services",
+    "Drug Cost - Benefit Advisor": "medication"
   };
 
   return iconMap[title] || iconMap["Default"];

@@ -917,8 +917,9 @@ table th:last-child {
 /* Form Fields in Table */
 table td {
   .mat-mdc-form-field {
-    width: 100%;
+    width: 75% !important;
     margin: 0;
+    border-radius: 10px;
     
     .mat-mdc-form-field-wrapper {
       padding-bottom: 0;
@@ -1587,3 +1588,121 @@ input[type="checkbox"]:disabled {
 
 .mat-mdc-form-field{ display: block;}
 
+ mat-form-field  .category-antibiotic {
+  background-color: #f68e8e !important; /* light red */
+      border-radius: 5px;
+}
+
+ mat-form-field   .category-vitamin {
+  background-color: #89f489 !important; /* light green */
+  border-radius: 5px;
+}
+
+ mat-form-field   .category-analgesic {
+  background-color: #8b8be6 !important; /* light blue */
+  border-radius: 5px;
+}
+
+mat-form-field .category-antibiotic {
+  background-color: #f68e8e !important; /* light red */
+  border-radius: 5px;
+}
+
+mat-form-field .category-vitamin {
+  background-color: #89f489 !important; /* light green */
+  border-radius: 5px;
+}
+
+mat-form-field .category-analgesic {
+  background-color: #8b8be6 !important; /* light blue */
+  border-radius: 5px;
+}
+
+mat-form-field .category-antihypertensive {
+  background-color: lightblue !important;
+  border-radius: 5px;
+}
+
+mat-form-field .category-antidiabetic {
+  background-color: orange !important;
+  border-radius: 5px;
+}
+
+mat-form-field .category-analgesics-nsaids {
+  background-color: brown !important;
+  border-radius: 5px;
+  color: white;
+}
+
+mat-form-field .category-anticoagulant {
+  background-color: yellow !important;
+  border-radius: 5px;
+}
+
+mat-form-field .category-anticonvulsant {
+  background-color: violet !important;
+  border-radius: 5px;
+}
+
+mat-form-field .category-antipsychotic {
+  background-color: pink !important;
+  border-radius: 5px;
+}
+
+mat-form-field .category-sedative {
+  background-color: blue !important;
+  color: white;
+  border-radius: 5px;
+}
+
+mat-form-field .category-narcotic {
+  background-color: black !important;
+  color: white;
+  border-radius: 5px;
+}
+
+mat-form-field .category-antiviral {
+  background-color: teal !important;
+  border-radius: 5px;
+  color: white;
+}
+
+mat-form-field .category-antifungal {
+  background-color: green !important;
+  border-radius: 5px;
+  color: white;
+}
+
+mat-form-field .category-antimalarial {
+  background-color: olive !important;
+  border-radius: 5px;
+  color: white;
+}
+
+mat-form-field .category-antitubercular {
+  background-color: burgundy !important; /* fallback: maroon */
+  border-radius: 5px;
+  color: white;
+}
+
+mat-form-field .category-antiemetic {
+  background-color: mintcream !important;
+  border-radius: 5px;
+}
+
+mat-form-field .category-vaccine {
+  background-color: purple !important;
+  border-radius: 5px;
+  color: white;
+}
+
+mat-form-field .category-hormone {
+  border: 2px solid blue !important; /* blue stripe effect */
+  border-radius: 5px;
+}
+
+mat-form-field .category-combination {
+  background-color: white !important;
+  border: 2px solid gray !important;
+  border-radius: 5px;
+}

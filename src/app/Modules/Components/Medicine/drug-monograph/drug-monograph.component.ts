@@ -11,6 +11,10 @@ import { CommonService } from '../../../../Service/common.service';
 import { SharedServiceService } from '../../../../Service/Sharedservice/shared-service.service';
 import { Subject, takeUntil } from 'rxjs';
 
+interface Section {
+  title: string;
+  body: string;
+}
 
 interface DrugMonograph {
   genericName: string;
@@ -95,6 +99,8 @@ export class DrugMonographComponent implements OnInit, OnDestroy {
   searchPerformed = false;
   selectedTabIndex = 0;
   recentDrugs: string[] = [];
+  selectedDrugrr: string = "";
+  parsedSections: { title: string; body: string; }[] =[];
 
   ngOnInit(): void {
     this.loadRecentSearches();
@@ -104,11 +110,86 @@ export class DrugMonographComponent implements OnInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
   }
-
+sections: Section[] = [];
   onSearchChange(): void {
     // Optional: Implement autocomplete or real-time search suggestions
   }
+ parseIntoSections(text: string): Section[] {
+    if (!text) return [];
 
+    // Normalize line endings
+    const normalized = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+
+    // Regex: capture headings like "Overview:", "Indications:", etc.
+    // We will split wherever we find a heading at line start.
+    const headingRegex = /^([A-Za-z0-9 &\-]+):\s*$/m;
+
+    // We'll iterate lines, grouping heading + following paragraph(s)
+    const lines = normalized.split('\n');
+    const sections: Section[] = [];
+    let currentTitle = '';
+    let currentBodyLines: string[] = [];
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+
+      // If line matches a heading ending with ":" (ex: "Overview:")
+      const match = line.match(/^([A-Za-z0-9 &\-]+):$/);
+      if (match) {
+        // flush previous section
+        if (currentTitle || currentBodyLines.length) {
+          sections.push({
+            title: currentTitle || 'General',
+            body: currentBodyLines.join(' ').trim()
+          });
+          currentBodyLines = [];
+        }
+        currentTitle = match[1];
+        continue;
+      }
+
+      // If a line starts with a heading but in single-line form like "Overview: text..."
+      const inlineMatch = line.match(/^([A-Za-z0-9 &\-]+):\s*(.+)$/);
+      if (inlineMatch) {
+        // flush previous
+        if (currentTitle || currentBodyLines.length) {
+          sections.push({
+            title: currentTitle || 'General',
+            body: currentBodyLines.join(' ').trim()
+          });
+          currentBodyLines = [];
+        }
+        currentTitle = inlineMatch[1];
+        currentBodyLines.push(inlineMatch[2]);
+        continue;
+      }
+
+      // Regular content line — add to current body
+      if (line.length > 0) {
+        currentBodyLines.push(line);
+      } else {
+        // blank line -> interpret as paragraph break; add a line break marker
+        if (currentBodyLines.length) {
+          currentBodyLines.push('\n');
+        }
+      }
+    }
+
+    // flush last
+    if (currentTitle || currentBodyLines.length) {
+      sections.push({
+        title: currentTitle || 'General',
+        body: currentBodyLines.join(' ').replace(/\s+\n\s+/g, '\n\n').trim()
+      });
+    }
+
+    // If no headings were detected, return whole text as single section
+    if (sections.length === 0 && normalized.trim()) {
+      return [{ title: 'Monograph', body: normalized.trim() }];
+    }
+
+    return sections;
+  }
   searchDrug(): void {
     if (!this.searchTerm.trim()) {
       this.sharedService.Messages('warning', 'Search', 'Please enter a drug name to search', 3000);
@@ -118,7 +199,7 @@ export class DrugMonographComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.searchPerformed = true;
     this.selectedDrug = null;
-
+this.parsedSections = []
     // First try to get from API
     this.commonService.Post("api/ADR/checkmono", { description: this.searchTerm.trim() })
       .pipe(takeUntil(this.destroy$))
@@ -126,8 +207,10 @@ export class DrugMonographComponent implements OnInit, OnDestroy {
         next: (response: any) => {
           this.isLoading = false;
           if ( response.severity) {
-            this.selectedDrug = response.severity;
-            this.addToRecentSearches(this.searchTerm.trim());
+            this.selectedDrugrr = response.severity;
+                  this.sections = this.parseIntoSections(this.selectedDrugrr.toString());
+                   this.parsedSections = this.parseMonograph(this.selectedDrugrr);
+           // this.addToRecentSearches(this.searchTerm.trim());
             this.selectedTabIndex = 0; // Reset to first tab
           } else {
             // If API doesn't have data, use mock data for demonstration
@@ -142,7 +225,23 @@ export class DrugMonographComponent implements OnInit, OnDestroy {
         }
       });
   }
+parseMonograph(text: string) {
+    const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+    const result: { title: string; body: string }[] = [];
+    let current: any = null;
 
+    for (const line of lines) {
+      const match = line.match(/^([A-Za-z\s&]+):\s*(.*)$/);
+      if (match) {
+        if (current) result.push(current);
+        current = { title: match[1], body: match[2] };
+      } else if (current) {
+        current.body += ' ' + line;
+      }
+    }
+    if (current) result.push(current);
+    return result;
+  }
   private loadMockData(): void {
     // Mock data for demonstration - replace with actual API data
     const mockDrugs: { [key: string]: DrugMonograph } = {

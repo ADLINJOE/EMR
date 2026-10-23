@@ -119,6 +119,12 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./Modules/Components/Medicine/drug-monograph/drug-monograph.component')
             .then(m => m.DrugMonographComponent)
+      },
+      {
+        path: 'drugPriceAI',
+        loadComponent: () =>
+          import('./Modules/Components/Medicine/drug-advisor/drug-advisor.component')
+            .then(m => m.DrugAdvisorComponent)
       }
     ],
   },

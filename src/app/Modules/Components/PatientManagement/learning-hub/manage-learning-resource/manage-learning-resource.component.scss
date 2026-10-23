@@ -1,0 +1,113 @@
+// @import 'src/styles/variables';
+// @import 'src/styles/mixins';
+
+.manage-resource-container {
+  max-width: 800px;
+  width: 100%;
+  padding: 20px;
+  position: relative;
+  
+  .dialog-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 0 20px 0;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    font-weight: 500;
+    // color: $primary-color;
+    
+    .close-button {
+      margin-left: auto;
+    }
+  }
+}
+
+.resource-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  
+  &.column {
+    flex-direction: column;
+  }
+  
+  .full-width {
+    flex: 1;
+  }
+  
+  .category-field {
+    min-width: 200px;
+  }
+  
+  .duration-field {
+    width: 150px;
+  }
+  
+  .status-toggle {
+    margin: 8px 0 16px;
+  }
+}
+
+.content-editor {
+  width: 100%;
+  min-height: 200px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 4px;
+  padding: 8px;
+  margin-top: 8px;
+}
+
+textarea.mat-input-element {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.tag-input {
+  margin-top: 8px;
+  width: 100%;
+}
+
+.dialog-actions {
+  padding: 16px 0 0;
+  margin-top: 16px;
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+  
+  .save-button {
+    min-width: 100px;
+    
+    .spinner-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .form-row {
+    flex-direction: column;
+    gap: 12px;
+    
+    .category-field, .duration-field {
+      width: 100%;
+    }
+  }
+  
+  .dialog-actions {
+    flex-direction: column;
+    gap: 8px;
+    
+    button {
+      width: 100%;
+      margin: 0;
+    }
+  }
+}

@@ -49,8 +49,10 @@ const emailPayload = {
     <p>You're just one step away from completing your registration.</p>
     <p>Please click the link below to get started:</p>
     <p><a href="${registrationLink}" target="_blank">Complete Your Registration</a></p>
+    <p> If Already registered, please <a href="https://app.rxsmart.in/#/login" target="_blank">login here</a>.</p>
     <p>If you have any questions, feel free to reach out to us at rxsmart789@gmail.com.</p>
     <p>Best regards,<br/>The RxSmart Team</p>
+
   `
 };
 

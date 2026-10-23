@@ -3,13 +3,80 @@
 <div class="container">
   <div class="emr-card">
     <div class="emr-card-header">
-      <div class="row1">
-      <h2 class="emr-card-title">Patient Vitals</h2>
+    <div 
+  class="row1" 
+  style="
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    flex-wrap: wrap; 
+    gap: 12px; 
+    margin-bottom: 16px; 
+    border-bottom: 2px solid #e0e0e0; 
+    padding: 8px 12px;
+  "
+>
+  <!-- Left Side: Title -->
+  <div style="flex: 1; min-width: 180px;">
+    <h2 
+      class="emr-card-title" 
+      style="margin: 0; font-size: 22px; font-weight: 600; color: #004d40;"
+    >
+      Patient Vitals
+    </h2>
+  </div>
 
-       <div class="emr-add-button-wrapper">
-        <button type="button" class="emr-btn-add" (click)="addVital()">+ Add Vitals</button>
-      </div>
+  <!-- Right Side: Buttons -->
+  <div 
+    style="
+      display: flex; 
+      flex-wrap: wrap; 
+      gap: 10px; 
+      justify-content: flex-end; 
+      flex: 1; 
+      min-width: 200px;
+    "
+  >
+    <button 
+      type="button" 
+      (click)="addVital()"
+      style="
+        background: linear-gradient(135deg, #00796b, #004d40);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-size: 15px;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+      "
+      onmouseover="this.style.transform='scale(1.05)'; this.style.opacity='0.9';"
+      onmouseout="this.style.transform='scale(1)'; this.style.opacity='1';"
+    >
+      + Add Vitals
+    </button>
+
+    <button 
+      type="button" 
+      (click)="showCoach = true"
+      style="
+        background: linear-gradient(135deg, #2bc6b4, #004d40);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-size: 15px;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+      "
+      onmouseover="this.style.transform='scale(1.05)'; this.style.opacity='0.9';"
+      onmouseout="this.style.transform='scale(1)'; this.style.opacity='1';"
+    >
+    Lifestyle & Diet Coach
+    </button>
+  </div>
 </div>
+
     
 
     <form [formGroup]="form" class="emr-form">
@@ -143,5 +210,18 @@
         </button>
       </div>
     </form>
+  </div>
+</div>
+</div>
+
+<div *ngIf="showCoach" class="drug-monograph-overlay" (click)="closeCoach()">
+  <div class="drug-monograph-modal" style="max-height: 66vh !important" (click)="$event.stopPropagation()">
+    <div class="drug-monograph-header">
+      <h3><mat-icon>description</mat-icon>AI Lifestyle & Diet Coach</h3>
+      <button class="close-btn" (click)="closeCoach()">×</button>
+    </div>
+    <div class="drug-monograph-content" style="min-height: 0px !important">
+      <app-patient-coach></app-patient-coach>
+    </div>
   </div>
 </div>

@@ -185,6 +185,7 @@ export class CurrentmedicationComponent implements OnInit {
   }
  
 
+drugCategories: string[] = [];
 
   // Add a new, empty medication row at top
 addMedication() {
@@ -260,6 +261,7 @@ medarray:any
       if (selectedDrug.dosageForm && !medicationControl.get('dosage')?.value) {
         medicationControl.get('dosage')?.setValue(selectedDrug.dosageForm);
       }
+        // this.drugCategories[index] = selectedDrug.drugCategory || '';
       if (!medicationControl.get('isNew')?.value) {
         medicationControl.get('isEdited')?.setValue(true);
       }
@@ -295,6 +297,10 @@ medarray:any
             this.medicationsArray.push(group);
             // maintain filteredDrugs entry for each row
             this.filteredDrugs.push(of(this.drugList.slice(0, 10)));
+      const drugDetails = this.drugList.find(d => d.drugName === med.medname || d.id === med.drugId);
+
+  // set category for coloring
+  this.drugCategories[index] = drugDetails?.drugCategory || '';
             // setup autocomplete for this index
             this.setupAutocomplete(index);
             // store original for cancel
