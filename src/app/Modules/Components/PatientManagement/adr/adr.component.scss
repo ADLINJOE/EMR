@@ -1,0 +1,687 @@
+// ========== Container & Card ==========
+.emr-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.emr-card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+}
+
+// ========== Header Section ==========
+.emr-card-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.header-title-section {
+  flex: 1 1 100%;
+  min-width: 250px;
+}
+
+.emr-card-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #2d3748;
+
+  .emr-icon {
+    font-size: 1.75rem;
+  }
+}
+
+.header-search-section {
+  flex: 1 1 350px;
+  min-width: 250px;
+
+  .search-patient-field {
+    width: 100%;
+    margin: 0;
+  }
+}
+
+.emr-btn-group {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  
+  button {
+    white-space: nowrap;
+  }
+}
+
+// ========== Patient Header ==========
+.patient-header {
+  background: linear-gradient(135deg, #e0f7fa, #b2ebf2);
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  border-left: 4px solid #00838f;
+
+  h3 {
+    margin: 0 0 0.5rem 0;
+    color: #004d40;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+
+  p {
+    margin: 0;
+    color: #00695c;
+    font-size: 0.9rem;
+  }
+}
+
+// ========== Table Container ==========
+.emr-table-container {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 1.5rem;
+}
+
+.table-wrapper {
+  min-width: 100%;
+  overflow-x: auto;
+}
+
+.emr-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 1100px;
+  background: #ffffff;
+
+  .emr-table-header {
+    background: #000000 !important;
+    
+    th {
+      padding: 14px 12px;
+      color: #ffffff !important;
+      font-weight: 600;
+      font-size: 14px;
+      text-align: left;
+      border: none;
+      white-space: nowrap;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: #000000 !important;
+    }
+  }
+
+  .emr-table-body {
+    tr {
+      border-bottom: 1px solid #e0e0e0;
+      transition: background-color 0.2s;
+
+      &:hover {
+        background-color: #f8f9fa;
+      }
+    }
+
+    td {
+      padding: 12px;
+      vertical-align: top;
+    }
+  }
+
+  // Column widths
+  .emr-th-serial,
+  .emr-td-serial {
+    width: 60px;
+    text-align: center;
+  }
+
+  .emr-th-description,
+  .emr-td-description {
+    width: 25%;
+    min-width: 200px;
+  }
+
+  .emr-th-drug,
+  .emr-td-drug {
+    width: 20%;
+    min-width: 180px;
+  }
+
+  .emr-th-date,
+  .emr-td-date {
+    width: 15%;
+    min-width: 150px;
+  }
+
+  .emr-th-severity,
+  .emr-td-severity {
+    width: 30%;
+    min-width: 250px;
+  }
+}
+
+// ========== Serial Number ==========
+.emr-serial-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border-radius: 50%;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+// ========== Form Fields ==========
+.emr-form-field {
+  width: 100%;
+  margin: 0;
+
+  &.emr-form-field-full {
+    width: 100%;
+  }
+
+  &.emr-form-field-date {
+    width: 100%;
+  }
+}
+
+.emr-input {
+  font-size: 14px;
+  
+  &.emr-textarea {
+    resize: vertical;
+    min-height: 60px;
+    font-family: inherit;
+    line-height: 1.5;
+    
+    &.emr-textarea-ai {
+      background-color: #f9fafb;
+      color: #374151;
+    }
+  }
+}
+
+// ========== Severity Assessment Section ==========
+.severity-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.emr-btn-ai {
+  width: 100%;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 0.9rem;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// ========== Buttons ==========
+.btn,
+.emr-btn {
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.btn-primary,
+.emr-btn-primary {
+  background: linear-gradient(135deg, #48bb78, #38a169);
+  color: white;
+}
+
+.emr-btn-secondary {
+  background: linear-gradient(135deg, #4299e1, #3182ce);
+  color: white;
+}
+
+.emr-btn-sm {
+  padding: 6px 12px;
+  font-size: 0.85rem;
+}
+
+.add-btn {
+  margin: 0;
+}
+
+// ========== Form Actions ==========
+.emr-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 2px solid #e0e0e0;
+  flex-wrap: wrap;
+}
+
+// ========== Modal Styles ==========
+.ai-checker-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.ai-checker-modal {
+  background: white;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 1000px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.ai-checker-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem;
+  border-bottom: 2px solid #e0e0e0;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 12px 12px 0 0;
+
+  h3 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    color: white;
+    font-size: 1.25rem;
+  }
+
+  .close-btn {
+    background: transparent;
+    border: none;
+    font-size: 32px;
+    color: white;
+    cursor: pointer;
+    padding: 0;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+  }
+}
+
+.ai-checker-content {
+  padding: 1.5rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.reports-search-wrapper {
+  margin-bottom: 1.5rem;
+}
+
+// ========== Reports Table ==========
+.reports-table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.reports-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 700px;
+
+  thead {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    
+    th {
+      padding: 12px;
+      text-align: left;
+      color: white;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+  }
+
+  tbody {
+    tr {
+      border-bottom: 1px solid #e0e0e0;
+      transition: background-color 0.2s;
+
+      &:hover {
+        background-color: #f8f9fa;
+      }
+    }
+
+    td {
+      padding: 12px;
+    }
+  }
+}
+
+.no-reports-message {
+  text-align: center;
+  color: #666;
+  padding: 2rem;
+  background-color: #f9fafb;
+  border-radius: 8px;
+  font-style: italic;
+}
+
+// ========== RESPONSIVE BREAKPOINTS ==========
+
+// Tablet: 768px and below
+@media (max-width: 768px) {
+  .emr-container {
+    padding: 0.75rem;
+  }
+
+  .emr-card {
+    padding: 1rem;
+  }
+
+  .emr-card-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .header-title-section {
+    flex: 1 1 100%;
+  }
+
+  .emr-card-title {
+    font-size: 1.25rem;
+  }
+
+  .header-search-section {
+    flex: 1 1 100%;
+  }
+
+  .emr-btn-group {
+    width: 100%;
+    
+    button {
+      flex: 1;
+    }
+  }
+
+  .emr-form-actions {
+    justify-content: center;
+    
+    button {
+      flex: 1;
+    }
+  }
+
+  .ai-checker-modal {
+    max-height: 90vh;
+  }
+}
+
+// Mobile: 576px and below
+@media (max-width: 576px) {
+  .emr-card {
+    padding: 0.75rem;
+  }
+
+  .emr-card-title {
+    font-size: 1.1rem;
+    flex-wrap: wrap;
+  }
+
+  // Convert table to card layout on mobile
+  .emr-table {
+    min-width: 100%;
+    
+    thead {
+      display: none;
+    }
+
+    tbody {
+      tr {
+        display: block;
+        margin-bottom: 1.5rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 1rem;
+        background: white;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+        &:hover {
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+      }
+
+      td {
+        display: block;
+        padding: 0.75rem 0;
+        border: none;
+        text-align: left;
+
+        &::before {
+          content: attr(data-label);
+          display: block;
+          font-weight: 600;
+          color: #2d3748;
+          margin-bottom: 0.5rem;
+          font-size: 0.9rem;
+        }
+
+        &.emr-td-serial {
+          text-align: left;
+          padding-bottom: 1rem;
+          margin-bottom: 0.75rem;
+          border-bottom: 2px solid #e0e0e0;
+
+          &::before {
+            display: inline-block;
+            margin-right: 0.5rem;
+          }
+
+          .emr-serial-number {
+            display: inline-flex;
+          }
+        }
+      }
+    }
+  }
+
+  .severity-wrapper {
+    gap: 12px;
+  }
+
+  .emr-btn-ai {
+    padding: 10px 16px;
+    font-size: 0.95rem;
+  }
+
+  // Reports table mobile
+  .reports-table {
+    min-width: 100%;
+    
+    thead {
+      display: none;
+    }
+
+    tbody {
+      tr {
+        display: block;
+        margin-bottom: 1rem;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 1rem;
+      }
+
+      td {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #f0f0f0;
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        &::before {
+          content: attr(data-label);
+          font-weight: 600;
+          color: #2d3748;
+          flex: 0 0 40%;
+        }
+      }
+    }
+  }
+
+  .ai-checker-modal {
+    margin: 10px;
+    max-height: 95vh;
+  }
+
+  .ai-checker-header {
+    padding: 1rem;
+    
+    h3 {
+      font-size: 1rem;
+    }
+
+    .close-btn {
+      font-size: 28px;
+    }
+  }
+
+  .ai-checker-content {
+    padding: 1rem;
+  }
+
+  .patient-header {
+    h3 {
+      font-size: 1rem;
+    }
+
+    p {
+      font-size: 0.85rem;
+    }
+  }
+}
+
+// Extra small: 480px and below
+@media (max-width: 480px) {
+  .emr-container {
+    padding: 0.5rem;
+  }
+
+  .emr-card {
+    padding: 0.5rem;
+  }
+
+  .emr-card-title {
+    font-size: 1rem;
+    
+    .emr-icon {
+      font-size: 1.25rem;
+    }
+  }
+
+  .emr-btn-group {
+    flex-direction: column;
+    
+    button {
+      width: 100%;
+    }
+  }
+
+  .emr-form-actions {
+    flex-direction: column;
+    
+    button {
+      width: 100%;
+    }
+  }
+}
+
+// Legacy styles (keep for compatibility)
+.adr-container {
+  max-width: 1200px;
+  margin: auto;
+  padding: 1rem;
+
+  h2 {
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.buttons {
+  margin-top: 15px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+.btn-primary {
+  background: #48bb78;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 3px;
+  cursor: pointer;
+}

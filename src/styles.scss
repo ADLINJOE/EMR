@@ -1,4 +1,336 @@
 /* You can add global styles to this file, and also import other style files */
 
+// Import global design system
+@import './styles/global-buttons.scss';
+@import './styles/responsive-layout.scss';
+
 html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+body { 
+  margin: 0; 
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background-color: #fff;
+  color: #333;
+  line-height: 1.6;
+}
+
+// Make Angular Material overlays (autocomplete, datepicker, etc.) appear above custom modals
+.cdk-overlay-container, .cdk-overlay-pane {
+  z-index: 10050 !important; // higher than custom overlays
+}
+
+// Global responsive typography
+h1, h2, h3, h4, h5, h6 {
+  margin: 0 0 1rem 0;
+  font-weight: 600;
+  line-height: 1.2;
+  color: #333;
+}
+
+h1 { font-size: clamp(1.75rem, 4vw, 2.5rem); }
+h2 { font-size: clamp(1.5rem, 3.5vw, 2rem); }
+h3 { font-size: clamp(1.25rem, 3vw, 1.75rem); }
+h4 { font-size: clamp(1.125rem, 2.5vw, 1.5rem); }
+h5 { font-size: clamp(1rem, 2vw, 1.25rem); }
+h6 { font-size: clamp(0.875rem, 1.5vw, 1rem); }
+
+p {
+  margin: 0 0 1rem 0;
+  font-size: clamp(0.875rem, 2vw, 1rem);
+}
+
+// Global form styling
+.mat-form-field {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.mat-form-field-appearance-outline .mat-form-field-outline-thick {
+  color: #00796b;
+}
+
+.mat-form-field-appearance-outline.mat-focused .mat-form-field-outline-thick {
+  color: #00796b;
+}
+
+.mat-form-field.mat-focused .mat-form-field-label {
+  color: #00796b;
+}
+.category-antibiotic {
+  background-color: #f68e8e !important; /* light red */
+}
+
+.category-vitamin {
+  background-color: #89f489 !important; /* light green */
+}
+
+.category-analgesic {
+  background-color: #8b8be6 !important; /* light blue */
+}
+
+
+.category-antihypertensive { background-color: lightblue !important; }
+.category-antidiabetic { background-color: orange !important; }
+.category-anticoagulant { background-color: yellow !important; }
+.category-anticonvulsant { background-color: violet !important; }
+.category-antipsychotic { background-color: pink !important; }
+.category-sedative { background-color: blue !important; color: white !important; }
+.category-narcotic { background-color: black!important; color: white!important; }
+.category-antiviral { background-color: teal!important; }
+.category-antifungal { background-color: green!important; }
+.category-antimalarial { background-color: olive!important; }
+.category-antitubercular { background-color: burgundy!important; color: white!important; }
+.category-antiemetic { background-color: rgb(197, 254, 226)!important; }
+.category-vaccine { background-color: purple!important; color: white!important; }
+.category-hormone { background-color:  rgb(98, 98, 235)!important; } /* Blue stripe */
+.category-combination { background-color: white!important; border: 2px solid gray!important; }
+.category-AnalgesicsNSAIDs{background-color: brown !important;}
+
+// Global table styling for mobile
+@media (max-width: 768px) {
+  .mat-table {
+    display: none;
+  }
+  
+  .mobile-card-view {
+    display: block;
+  }
+}
+
+@media (min-width: 769px) {
+  .mobile-card-view {
+    display: none;
+  }
+}
+/* styles.css or global styles file */
+
+///---------------------------------Six month calendar design------End-----------------------
+
+// -----------------------------NGX toaster--------------------------------
+
+#toast-container>.toast-success {
+  border: 1.5px solid #25AE88;
+  margin-top: 5px;
+  color: black;
+  background-color: white;
+  width: 280px;
+  box-shadow: 2px 1px 1px 1px lightgrey;
+  background-image: url(../src/assets/Message_Icon/Sucess.svg);
+
+  .toast-progress {
+    opacity: 0.5;
+    background-color: #25AE88;
+  }
+
+  .toast-title {
+    // font-size: 14px;
+    font-size: 14px !important;
+    color: black;
+    opacity: 30;
+  }
+}
+
+#toast-container>.toast-error {
+  border: 1.5px solid #D75A4A;
+  margin-top: 5px;
+  color: black;
+  background-color: white;
+  width: 280px;
+  box-shadow: 2px 1px 1px 1px lightgrey;
+  background-image: url(../src/assets/Message_Icon//Error.svg);
+
+  .toast-progress {
+    opacity: 0.5;
+    background-color: #D75A4A;
+  }
+
+  .toast-title {
+    // font-size: 14px;
+    font-size: v14px !important;
+    color: black;
+    opacity: 30;
+  }
+}
+
+#toast-container>.toast-info {
+  border: 1.5px solid #2f96b4;
+  margin-top: 5px;
+  color: black;
+  background-color: white;
+  width: 280px;
+  box-shadow: 2px 1px 1px 1px lightgrey;
+  background-image: url(../src/assets/Message_Icon/Info.svg);
+
+  .toast-progress {
+    opacity: 0.5;
+    background-color: #2f96b4;
+  }
+
+  .toast-title {
+    // font-size: 14px;
+    font-size: 14px !important;
+    color: black;
+    opacity: 30;
+  }
+}
+
+#toast-container>.toast-warning {
+  border: 1.5px solid #f89406;
+  margin-top: 5px;
+  color: black;
+  background-color: white;
+  width: 280px;
+  box-shadow: 2px 1px 1px 1px lightgrey;
+  background-image: url(../src/assets/Message_Icon/Warning.svg);
+
+  .toast-progress {
+    opacity: 0.5;
+    background-color: #f89406;
+  }
+
+  .toast-title {
+    // font-size: 14px;
+    font-size: 14px !important;
+    color: black;
+    opacity: 30;
+  }
+}
+
+.toast-message {
+  color: black;
+  // font-size: 12px;
+  font-size: 12px !important;
+  font-weight: 500;
+  line-height: 25px;
+}
+#toast-container.toast-top-right {
+    position: absolute;
+  top: 60px; // 👈 adjust this depending on your header height
+  right: 20px;
+  z-index: 1050; // 👈 make sure it appears above other content
+  opacity: 0.95; // 👈 slight transparency
+  pointer-events: none; // prevent it from interfering with clicks
+}
+
+#toast-container > div {
+  pointer-events: auto; // re-enable pointer events for toast content
+  border-radius: 4px;
+  backdrop-filter: blur(2px); // optional subtle blur effect
+}
+
+// -----------------------------NGX toaster---End-----------------------------
+
+.card{ border-top:0px!important;}
+
+
+.add-button-wrappe .search-container .search-box{
+  padding-left: 10PX!important;
+  height: 42px;
+  font-size: 14PX!important;
+  border-radius: 0!important;
+  border: 1px solid #ced4da;
+  transition: all 0.3s ease;
+}
+
+.emr-container{ background: #fff!important;}
+th{ background: #000!important;}
+
+
+.emr-card{ border: none!important;}
+
+
+/*.mat-mdc-form-field-infix{ max-width: 100px!important;}*/
+
+.emr-table{ background: #fff!important;}
+
+
+.mat-mdc-dialog-surface {
+  
+  border-radius: 0px!important;
+}
+
+
+.forgot-password-dialog {
+  
+  padding: 20px!important;
+  border-radius: 0px!important;
+}
+
+
+
+.forgot-password-dialog  .mat-mdc-dialog-content {
+  display: block;
+  flex-grow: 1;
+  box-sizing: border-box;
+  margin: 0;
+  overflow: hidden!important;
+  max-height:none!important;
+}
+
+
+
+.emr-table th{
+  padding: 7px 10x!important
+}
+
+.emr-table-container{border-radius:0px!important}
+
+.emr-table th {
+  padding: 8px 12px!important}
+
+@media all and (max-width: 760px) {
+
+
+   .forgot-password-dialog{
+    min-width: 298px!important;
+  }
+  h2{ font-size: 20px;}
+
+
+.welcome{ display: none;}
+
+.search-container{ width: 100%;;}
+.search-container .form-control {width: 100%!important;}
+
+
+body{ overflow-x: hidden!important;}
+
+.container{ padding: 30px;}
+
+.emr-card-header{ display: block!important;}
+
+.emr-card-header h2{  text-align: left!important;}
+.emr-card-header label{ margin-bottom: 20px;}
+
+.emr-card-header .mat-mdc-form-field{ display: block!important;margin-top: 15px;}
+
+.emr-tab-buttons{ margin-bottom: 10px;}
+.emr-btn-icon{ margin-top: 22px;;}
+.emr-form-field-full {width:100%!important;}
+
+.emr-table-container {
+    display: block;
+  }
+
+
+
+  .emr-upload-area{
+
+    margin-bottom: 30px;
+  }
+  .emr-instructions-section{ padding: 20px;}
+
+  th{ background: #000!important;}
+
+
+  .emr-btn-group.emr-btn-group-horizontal {
+        flex-direction: initial!important;
+    }
+
+
+    .emr-btn-group {
+    display: grid;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+}

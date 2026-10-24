@@ -1,0 +1,258 @@
+<div class="patient-followups-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <div class="title-section">
+      <h2>
+        <mat-icon>schedule</mat-icon>
+        Patient Follow-ups
+      </h2>
+      <p class="subtitle" *ngIf="selectedPatient">
+        Managing follow-ups for {{ selectedPatient?.firstName }} {{ selectedPatient?.lastName }} ({{ selectedPatient?.patientId }})
+      </p>
+    </div>
+    
+    <div class="action-buttons">
+      <button mat-raised-button color="primary" (click)="toggleForm()" [disabled]="!selectedPatient">
+        <mat-icon>{{ showForm ? 'close' : 'add' }}</mat-icon>
+        {{ showForm ? 'Cancel' : 'Schedule Follow-up' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Patient Selection Alert -->
+  <mat-card class="patient-alert" *ngIf="!selectedPatient">
+    <mat-card-content>
+      <div class="alert-content">
+        <mat-icon color="warn">warning</mat-icon>
+        <div>
+          <h3>No Patient Selected</h3>
+          <p>Please select a patient from the patient list to manage follow-ups.</p>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Follow-up Form -->
+  <mat-card class="form-card" *ngIf="showForm && selectedPatient">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>event_note</mat-icon>
+        {{ editingFollowUp ? 'Edit Follow-up' : 'Schedule New Follow-up' }}
+      </mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <form [formGroup]="followUpForm" (ngSubmit)="onSubmit()" class="followup-form">
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Follow-up Date & Time</mat-label>
+            <input matInput type="datetime-local" formControlName="followUpDate" required>
+            <mat-icon matSuffix>event</mat-icon>
+            <mat-error *ngIf="followUpForm.get('followUpDate')?.hasError('required')">
+              Follow-up date is required
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Notes</mat-label>
+            <textarea matInput formControlName="notes" rows="3" 
+                      placeholder="Enter follow-up notes, purpose, or instructions..."></textarea>
+            <mat-icon matSuffix>note</mat-icon>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row reminder-settings">
+          <div class="reminder-checkbox">
+            <mat-checkbox formControlName="emailReminder">
+              <mat-icon>email</mat-icon>
+              Send Email Reminder
+            </mat-checkbox>
+          </div>
+          
+          <mat-form-field appearance="outline" class="reminder-days">
+            <mat-label>Days Before</mat-label>
+            <input matInput type="number" formControlName="reminderDaysBefore" min="1" max="30">
+            <mat-icon matSuffix>schedule</mat-icon>
+            <mat-error *ngIf="followUpForm.get('reminderDaysBefore')?.hasError('required')">
+              Reminder days is required
+            </mat-error>
+            <mat-error *ngIf="followUpForm.get('reminderDaysBefore')?.hasError('min')">
+              Must be at least 1 day
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-actions">
+          <button mat-button type="button" (click)="resetForm()">
+            <mat-icon>clear</mat-icon>
+            Cancel
+          </button>
+          <button mat-raised-button color="primary" type="submit" 
+                  [disabled]="!followUpForm.valid || isLoading">
+            <mat-icon>{{ editingFollowUp ? 'update' : 'save' }}</mat-icon>
+            {{ editingFollowUp ? 'Update Follow-up' : 'Schedule Follow-up' }}
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Upcoming Follow-ups Dashboard -->
+  <mat-card class="dashboard-card" *ngIf="upcomingFollowUps.length > 0">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>notification_important</mat-icon>
+        Upcoming Follow-ups (Next 30 Days)
+      </mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <div class="upcoming-grid">
+        <div *ngFor="let followUp of upcomingFollowUps" 
+             class="upcoming-item"
+             [class.overdue]="isOverdue(followUp.followUpDate)"
+             [class.today]="isToday(followUp.followUpDate)">
+          <div class="upcoming-date">
+            <div class="date-day">{{ followUp.followUpDate | date:'dd' }}</div>
+            <div class="date-month">{{ followUp.followUpDate | date:'MMM' }}</div>
+            <div class="date-time">{{ followUp.followUpDate | date:'HH:mm' }}</div>
+          </div>
+          <div class="upcoming-details">
+            <h4>Patient: {{ followUp.patientId }}</h4>
+            <p>{{ followUp.notes || 'No notes' }}</p>
+            <div class="upcoming-meta">
+              <mat-chip [color]="getStatusColor(followUp.status)" selected>
+                {{ followUp.status }}
+              </mat-chip>
+              <span *ngIf="followUp.emailReminder" class="reminder-badge">
+                <mat-icon>email</mat-icon>
+                Email Reminder
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Patient Follow-ups Table -->
+  <mat-card class="table-card" *ngIf="selectedPatient">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>list</mat-icon>
+        Follow-up History
+      </mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <div class="table-container">
+        <table mat-table [dataSource]="followUps" class="followups-table">
+          
+          <!-- Date Column -->
+          <ng-container matColumnDef="followUpDate">
+            <th mat-header-cell *matHeaderCellDef>
+              <mat-icon>event</mat-icon>
+              Follow-up Date
+            </th>
+            <td mat-cell *matCellDef="let followUp">
+              <div class="date-cell"
+                   [class.overdue]="isOverdue(followUp.followUpDate)"
+                   [class.today]="isToday(followUp.followUpDate)">
+                <div class="date-primary">{{ followUp.followUpDate | date:'MMM dd, yyyy' }}</div>
+                <div class="date-secondary">{{ followUp.followUpDate | date:'HH:mm' }}</div>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Notes Column -->
+          <ng-container matColumnDef="notes">
+            <th mat-header-cell *matHeaderCellDef>
+              <mat-icon>note</mat-icon>
+              Notes
+            </th>
+            <td mat-cell *matCellDef="let followUp">
+              <div class="notes-cell">
+                {{ followUp.notes || 'No notes' }}
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Email Reminder Column -->
+          <ng-container matColumnDef="emailReminder">
+            <th mat-header-cell *matHeaderCellDef>
+              <mat-icon>notifications</mat-icon>
+              Reminder
+            </th>
+            <td mat-cell *matCellDef="let followUp">
+              <div class="reminder-cell">
+                <mat-icon *ngIf="followUp.emailReminder" color="primary">email</mat-icon>
+                <span *ngIf="followUp.emailReminder">{{ followUp.reminderDaysBefore }} days before</span>
+                <span *ngIf="!followUp.emailReminder" class="no-reminder">No reminder</span>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Status Column -->
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>
+              <mat-icon>info</mat-icon>
+              Status
+            </th>
+            <td mat-cell *matCellDef="let followUp">
+              <mat-chip [color]="getStatusColor(followUp.status)" selected>
+                {{ followUp.status }}
+              </mat-chip>
+            </td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let followUp">
+              <div class="action-buttons">
+                <button mat-icon-button color="primary" 
+                        (click)="editFollowUp(followUp)"
+                        [disabled]="followUp.status === 'Completed' || followUp.status === 'Cancelled'"
+                        matTooltip="Edit Follow-up">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                
+                <button mat-icon-button color="accent" 
+                        (click)="completeFollowUp(followUp)"
+                        [disabled]="followUp.status === 'Completed' || followUp.status === 'Cancelled'"
+                        matTooltip="Mark as Completed">
+                  <mat-icon>check_circle</mat-icon>
+                </button>
+                
+                <button mat-icon-button color="warn" 
+                        (click)="cancelFollowUp(followUp)"
+                        [disabled]="followUp.status === 'Completed' || followUp.status === 'Cancelled'"
+                        matTooltip="Cancel Follow-up">
+                  <mat-icon>cancel</mat-icon>
+                </button>
+              </div>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+
+        <!-- No Data Message -->
+        <div class="no-data" *ngIf="followUps.length === 0 && !isLoading">
+          <mat-icon>event_busy</mat-icon>
+          <h3>No Follow-ups Scheduled</h3>
+          <p>No follow-up appointments have been scheduled for this patient.</p>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Loading Indicator -->
+  <div class="loading-container" *ngIf="isLoading">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Loading follow-ups...</p>
+  </div>
+</div>

@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"path": "${workspaceFolder}"
+		},
+		{
+			"name": "EMR",
+			"path": "${workspaceFolder}"
+		}
+	],
+	"settings": {}
+}

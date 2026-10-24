@@ -1,0 +1,155 @@
+<div class="manage-resource-container">
+  <h2 mat-dialog-title class="dialog-title">
+    {{ formTitle }}
+    <button mat-icon-button class="close-button" (click)="onCancel()" aria-label="Close">
+      <mat-icon>close</mat-icon>
+    </button>
+  </h2>
+
+  <mat-dialog-content>
+    <form [formGroup]="resourceForm" (ngSubmit)="onSubmit()" class="resource-form">
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Title</mat-label>
+          <input matInput formControlName="title" placeholder="Enter title">
+          <mat-error *ngIf="resourceForm.get('title')?.hasError('required')">
+            Title is required
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Description</mat-label>
+          <textarea matInput formControlName="description" rows="3" placeholder="Enter description"></textarea>
+          <mat-error *ngIf="resourceForm.get('description')?.hasError('required')">
+            Description is required
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="category-field">
+          <mat-label>Category</mat-label>
+          <mat-select formControlName="category">
+            <mat-option *ngFor="let category of categories" [value]="category.value">
+              {{ category.viewValue }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-slide-toggle formControlName="isActive" class="status-toggle">
+          {{ resourceForm.get('isActive')?.value ? 'Active' : 'Inactive' }}
+        </mat-slide-toggle>
+      </div>
+
+      <!-- Article Specific Fields -->
+      <ng-container *ngIf="data.type === 'article'">
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Author</mat-label>
+            <input matInput formControlName="author" placeholder="Author name">
+            <mat-error *ngIf="resourceForm.get('author')?.hasError('required')">
+              Author is required
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <label>Content</label>
+          <app-texteditor
+            [content]="resourceForm.get('content')?.value || ''"
+            (contentChange)="resourceForm.get('content')?.setValue($event)"
+            class="content-editor">
+          </app-texteditor>
+          <mat-error *ngIf="resourceForm.get('content')?.hasError('required')">
+            Content is required
+          </mat-error>
+        </div>
+      </ng-container>
+
+      <!-- Topic Specific Fields -->
+      <ng-container *ngIf="data.type === 'topic'">
+        <div class="form-row">
+          <label>Content</label>
+          <app-texteditor
+            [content]="resourceForm.get('content')?.value || ''"
+            (contentChange)="resourceForm.get('content')?.setValue($event)"
+            class="content-editor">
+          </app-texteditor>
+          <mat-error *ngIf="resourceForm.get('content')?.hasError('required')">
+            Content is required
+          </mat-error>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Tags</mat-label>
+            <mat-chip-grid #chipGrid>
+              <mat-chip-row *ngFor="let tag of resourceForm.get('tags')?.value" (removed)="removeTag(tag)">
+                {{ tag }}
+                <button matChipRemove>
+                  <mat-icon>cancel</mat-icon>
+                </button>
+              </mat-chip-row>
+              <input
+                [matChipInputFor]="chipGrid"
+                [matChipInputSeparatorKeyCodes]="[13, 188]"
+                [matChipInputAddOnBlur]="true"
+                (matChipInputTokenEnd)="addTag($event)"
+                placeholder="Add tags..."
+                class="tag-input"
+              />
+            </mat-chip-grid>
+          </mat-form-field>
+        </div>
+      </ng-container>
+
+      <!-- Video Specific Fields -->
+      <ng-container *ngIf="data.type === 'video'">
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Video URL</mat-label>
+            <input matInput formControlName="url" placeholder="https://www.youtube.com/watch?v=...">
+            <mat-hint>Only YouTube videos are supported</mat-hint>
+            <mat-error *ngIf="resourceForm.get('url')?.hasError('required')">
+              Video URL is required
+            </mat-error>
+            <mat-error *ngIf="resourceForm.get('url')?.hasError('pattern')">
+              Please enter a valid YouTube URL
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="duration-field">
+            <mat-label>Duration (minutes)</mat-label>
+            <input matInput type="number" formControlName="duration" placeholder="e.g. 15">
+            <mat-error *ngIf="resourceForm.get('duration')?.hasError('pattern')">
+              Please enter a valid duration
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </ng-container>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="dialog-actions">
+    <button mat-button (click)="onCancel()" [disabled]="loading">
+      Cancel
+    </button>
+    <button 
+      mat-raised-button 
+      color="primary" 
+      (click)="onSubmit()" 
+      [disabled]="resourceForm.invalid || loading"
+      class="save-button">
+      <span *ngIf="loading" class="spinner-container">
+        <mat-spinner diameter="20" color="accent"></mat-spinner>
+      </span>
+      <span *ngIf="!loading">
+        {{ isEditMode ? 'Update' : 'Save' }}
+      </span>
+    </button>
+  </mat-dialog-actions>
+</div>

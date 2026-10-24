@@ -1,0 +1,278 @@
+<div class="emr-container">
+  <div class="emr-card">
+    <div class="emr-card-header">
+      <h2 class="emr-card-title">
+        <span class="emr-icon">📚</span> Learning Hub
+      </h2>
+      <div class="emr-category-selector">
+        <label class="emr-label">Choose Topic:</label>
+        <mat-form-field class="emr-form-field" appearance="outline">
+          <mat-select [(value)]="selectedCategory" (selectionChange)="loadAll()" class="emr-select">
+            <mat-option *ngFor="let cat of categories" [value]="cat.key">{{ cat.label }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="emr-card-content">
+      <!-- Tabs -->
+      <div class="emr-tab-buttons" style="margin-bottom: 20px; gap: 5px;
+    display: flex">
+        <button class="emr-btn emr-tab-btn" 
+                [class.emr-tab-active]="activeTab === 'articles'" 
+                (click)="activeTab='articles'">
+          <span class="emr-btn-icon">📝</span> Articles
+        </button>
+        <button class="emr-btn emr-tab-btn" 
+                [class.emr-tab-active]="activeTab === 'videos'" 
+                (click)="activeTab='videos'">
+          <span class="emr-btn-icon">🎬</span> Videos
+        </button>
+        <!-- <button class="emr-btn emr-tab-btn" 
+                [class.emr-tab-active]="activeTab === 'topics'" 
+                (click)="activeTab='topics'">
+          <span class="emr-btn-icon">📋</span> Topics
+        </button> -->
+        <button class="emr-btn emr-tab-btn" 
+        [class.emr-tab-active]="activeTab === 'documents'" 
+        (click)="activeTab='documents'">
+  <span class="emr-btn-icon">📑</span> Documents
+</button>
+
+      </div>
+
+      <!-- Articles Tab -->
+      <div *ngIf="activeTab==='articles'" class="emr-tab-content">
+        <div class="emr-articles-container">
+          <!-- Left Panel: Article List -->
+          <div class="emr-article-list">
+            <div class="emr-article-header">
+              <h3>Articles</h3>
+              <button *ngIf="isAdmin" (click)="createNewArticle()" class="emr-btn emr-btn-primary emr-btn-sm">
+                <span class="emr-btn-icon">➕</span> New Article
+              </button>
+            </div>
+            
+            <div *ngIf="loadingArticles" class="emr-loading">
+              <mat-spinner class="emr-spinner"></mat-spinner>
+              <p class="emr-loading-text">Loading articles...</p>
+            </div>
+            
+            <div *ngIf="!loadingArticles && (!articles || articles.length === 0)" class="emr-no-content">
+              <span class="emr-no-content-icon">📄</span>
+              <p class="emr-no-content-text">No articles available.</p>
+            </div>
+            
+            <div *ngIf="!loadingArticles && articles.length > 0" class="emr-article-items">
+              <div *ngFor="let article of articles" 
+                   class="emr-article-item"
+                   [class.active]="selectedArticle?.Id === article.Id"
+                   (click)="viewArticle(article)">
+                <div class="emr-article-item-content">
+                  <h4>{{ article.title }}</h4>
+                  <p>{{ article.summary }}</p>
+                  <small>{{ article.publishedDate | date:'shortDate' }}</small>
+                </div>
+                <div *ngIf="isAdmin" class="emr-article-item-actions">
+                  <button (click)="editArticle(article); $event.stopPropagation()" 
+                          class="emr-btn-icon-only" title="Edit">
+                    ✏️
+                  </button>
+                  <button (click)="deleteArticle(article); $event.stopPropagation()" 
+                          class="emr-btn-icon-only" title="Delete">
+                    🗑️
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Right Panel: Article Editor/Viewer -->
+          <div class="emr-article-editor">
+            <div *ngIf="!selectedArticle && !isCreatingNew" class="emr-no-selection">
+              <span class="emr-no-content-icon">📝</span>
+              <p>Select an article to view or create a new one</p>
+            </div>
+            
+            <div *ngIf="selectedArticle || isCreatingNew" class="emr-editor-container">
+              <!-- Editor Header -->
+              <div class="emr-editor-header">
+                <div class="emr-editor-fields" *ngIf="isEditMode">
+                  <input type="text" 
+                         [(ngModel)]="articleTitle" 
+                         placeholder="Article Title"
+                         class="emr-input emr-input-title">
+                  <textarea [(ngModel)]="articleSummary" 
+                            placeholder="Article Summary"
+                            class="emr-input emr-input-summary"
+                            rows="2"></textarea>
+                </div>
+                <div class="emr-editor-info" *ngIf="!isEditMode && selectedArticle">
+                  <h2>{{ selectedArticle.title }}</h2>
+                  <p>{{ selectedArticle.summary }}</p>
+                  <small>By {{ selectedArticle.author }} | {{ selectedArticle.publishedDate | date:'medium' }}</small>
+                </div>
+                
+                <div class="emr-editor-actions">
+                  <button *ngIf="isEditMode" 
+                          (click)="saveArticle()" 
+                          class="emr-btn emr-btn-success emr-btn-sm">
+                    <span class="emr-btn-icon">💾</span> Save
+                  </button>
+                  <button *ngIf="isEditMode" 
+                          (click)="cancelEdit()" 
+                          class="emr-btn emr-btn-secondary emr-btn-sm">
+                    <span class="emr-btn-icon">❌</span> Cancel
+                  </button>
+                  <button *ngIf="!isEditMode && isAdmin && selectedArticle" 
+                          (click)="editArticle(selectedArticle)" 
+                          class="emr-btn emr-btn-primary emr-btn-sm">
+                    <span class="emr-btn-icon">✏️</span> Edit
+                  </button>
+                </div>
+              </div>
+              
+              <!-- Text Editor -->
+              <div class="emr-editor-content">
+                <app-texteditor 
+                  *ngIf="isEditMode"
+                  [content]="editorContent"
+                  [showSidebar]="false"
+                  [showDocumentButtons]="false"
+                  (contentChange)="onEditorContentChange($event)"
+                  class="emr-texteditor">
+                </app-texteditor>
+                
+                <!-- Read-only view -->
+                <div *ngIf="!isEditMode" 
+                     class="emr-article-content" 
+                     [innerHTML]="editorContent">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Videos Tab -->
+      <!-- Videos Tab -->
+<div *ngIf="activeTab==='videos'" class="emr-tab-content">
+  <div *ngIf="loadingVideos" class="emr-loading">
+    <mat-spinner class="emr-spinner"></mat-spinner>
+    <p class="emr-loading-text">Loading videos from YouTube...</p>
+  </div>
+  
+  <div *ngIf="!loadingVideos && (!videos || videos.length === 0)" class="emr-no-content">
+    <span class="emr-no-content-icon">🎬</span>
+    <p class="emr-no-content-text">No videos available for this topic.</p>
+  </div>
+  
+  <div *ngIf="!loadingVideos && videos.length > 0" class="emr-video-grid">
+    <div class="emr-video-card" *ngFor="let video of videos">
+      <div class="emr-video-thumbnail">
+        <img [src]="video.snippet.thumbnails.medium.url" [alt]="video.snippet.title">
+        <div class="emr-video-play-overlay">
+          <span class="emr-play-icon">▶️</span>
+        </div>
+      </div>
+      <div class="emr-video-content">
+        <h4 class="emr-video-title">{{ video.snippet.title }}</h4>
+        <p class="emr-video-channel">{{ video.snippet.channelTitle }}</p>
+        <p class="emr-video-description">{{ video.snippet.description | slice:0:100 }}{{ video.snippet.description.length > 100 ? '...' : '' }}</p>
+        <div class="emr-video-actions">
+          <a [href]="'https://www.youtube.com/watch?v=' + video.id.videoId" 
+             target="_blank" 
+             class="emr-btn emr-btn-primary emr-btn-sm">
+            <span class="emr-btn-icon">🎬</span> Watch on YouTube
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+      <!-- Topics Tab -->
+      <div *ngIf="activeTab==='topics'" class="emr-tab-content">
+        <div *ngIf="loadingTopics" class="emr-loading">
+          <mat-spinner class="emr-spinner"></mat-spinner>
+          <p class="emr-loading-text">Loading topics...</p>
+        </div>
+        <div *ngIf="!loadingTopics && (!topics || topics.length === 0)" class="emr-no-content">
+          <span class="emr-no-content-icon">📋</span>
+          <p class="emr-no-content-text">No topics available for this category.</p>
+        </div>
+        <div *ngIf="!loadingTopics && topics.length > 0" class="emr-table-container">
+          <table class="emr-table">
+            <thead class="emr-table-header">
+              <tr>
+                <th class="emr-th">Title</th>
+                <th class="emr-th">Description</th>
+                <th class="emr-th emr-th-actions">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="emr-table-body">
+              <tr *ngFor="let topic of topics" class="emr-table-row">
+                <td class="emr-td">{{ topic.title || 'N/A' }}</td>
+                <td class="emr-td">{{ topic.Teaser || 'N/A' }}</td>
+                <td class="emr-td emr-td-actions">
+                  <button (click)="viewTopicDetails(topic)" class="emr-btn emr-btn-secondary emr-btn-sm">
+                    <span class="emr-btn-icon">👁️</span> View
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+<div *ngIf="activeTab==='documents'" class="emr-tab-content">
+  <div *ngIf="loadingDocuments" class="emr-loading">
+    <mat-spinner class="emr-spinner"></mat-spinner>
+    <p class="emr-loading-text">Loading documents...</p>
+  </div>
+
+  <div *ngIf="!loadingDocuments && (!documents || documents.length === 0)" class="emr-no-content">
+    <span class="emr-no-content-icon">📑</span>
+    <p class="emr-no-content-text">No documents available.</p>
+  </div>
+<div *ngIf="isAdmin" class="emr-upload-inline">
+  <input #fileInput type="file" (change)="onFileSelected($event)" accept="application/pdf" class="emr-input-inline">
+  <input type="text" [(ngModel)]="newDocTitle" placeholder="Document Title" class="emr-input-inline">
+  <button (click)="uploadDocument(fileInput)" class="emr-btn-inline">📤 Upload</button>
+</div>
+  <div *ngIf="!loadingDocuments && documents.length > 0" class="emr-table-container" style=" max-height: 260px; ">
+    <table class="emr-table">
+      <thead class="emr-table-header">
+        <tr>
+          <th class="emr-th">Title</th>
+          <th class="emr-th">Date</th>
+          <th class="emr-th emr-th-actions">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="emr-table-body">
+        <tr *ngFor="let doc of documents" class="emr-table-row">
+          <td class="emr-td">{{ doc.title }}</td>
+          <td class="emr-td">{{ doc.uploadedDate | date:'short' }}</td>
+          <td class="emr-td emr-td-actions" style="display: flex ; gap: 5px;">
+            <a [href]="apiUrl + 'api/documents/download/' + doc.id" 
+               target="_blank" 
+               class="emr-btn emr-btn-primary emr-btn-sm" style="height: 15px">
+              ⬇️ Download 
+            </a>
+            <button *ngIf="isAdmin" (click)="deleteDocument(doc.id)" class="emr-btn emr-btn-danger emr-btn-sm">
+              🗑️ Delete
+            </button>
+          </td>
+        </tr>
+      </tbody>  
+    </table>
+  </div>
+
+  <!-- Admin Upload -->
+
+
+
+
+
+    </div>
+  </div>
+</div>

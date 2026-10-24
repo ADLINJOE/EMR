@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 100" width="240" height="54" role="img" aria-labelledby="rxsmartTitle rxsmartDesc">
+  <title id="rxsmartTitle">RxSmart logo</title>
+  <desc id="rxsmartDesc">Capsule with full neural node network and RxSmart brand text</desc>
+
+  <defs>
+    <!-- Capsule gradient -->
+    <linearGradient id="capsuleGradient" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#34d399"/>
+      <stop offset="100%" stop-color="#14b8a6"/>
+    </linearGradient>
+
+    <!-- Gloss overlay -->
+    <linearGradient id="gloss" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.6)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+    </linearGradient>
+
+    <!-- Shadow -->
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#2d3748" flood-opacity="0.15"/>
+    </filter>
+
+    <!-- Styles -->
+    <style><![CDATA[
+      .brand { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-weight: 700; font-size: 38px; fill: #2d3748; }
+      .brand-accent { fill: #10b981; }
+      .tagline { font-size: 14px; font-weight: 500; fill: #4b5563; letter-spacing: 0.5px; }
+      .node { fill: #ffffff; stroke: rgba(255,255,255,0.3); stroke-width: 1; }
+      .line { stroke: rgba(255,255,255,0.45); stroke-width: 2; stroke-linecap: round; }
+    ]]></style>
+  </defs>
+
+  <!-- Capsule -->
+  <g transform="translate(12,18)">
+    <rect x="0" y="0" rx="32" ry="32" width="140" height="64" fill="url(#capsuleGradient)" filter="url(#shadow)"/>
+    <!-- Gloss -->
+    <rect x="0" y="0" rx="32" ry="32" width="140" height="32" fill="url(#gloss)"/>
+    
+    <!-- Neural node network (spanning entire capsule) -->
+    <g transform="translate(15,8)">
+      <!-- Top row connections -->
+      <line x1="0" y1="10" x2="30" y2="5" class="line"/>
+      <line x1="30" y1="5" x2="60" y2="12" class="line"/>
+      <line x1="60" y1="12" x2="90" y2="6" class="line"/>
+      <line x1="90" y1="6" x2="115" y2="14" class="line"/>
+      <!-- Bottom row connections -->
+      <line x1="0" y1="46" x2="30" y2="38" class="line"/>
+      <line x1="30" y1="38" x2="60" y2="50" class="line"/>
+      <line x1="60" y1="50" x2="90" y2="42" class="line"/>
+      <line x1="90" y1="42" x2="115" y2="54" class="line"/>
+      <!-- Vertical cross-links -->
+      <line x1="30" y1="5" x2="30" y2="38" class="line"/>
+      <line x1="60" y1="12" x2="60" y2="50" class="line"/>
+      <line x1="90" y1="6" x2="90" y2="42" class="line"/>
+
+      <!-- Nodes -->
+      <circle cx="0" cy="10" r="5" class="node"/>
+      <circle cx="30" cy="5" r="5" class="node"/>
+      <circle cx="60" cy="12" r="5" class="node"/>
+      <circle cx="90" cy="6" r="5" class="node"/>
+      <circle cx="115" cy="14" r="5" class="node"/>
+      <circle cx="0" cy="46" r="5" class="node"/>
+      <circle cx="30" cy="38" r="5" class="node"/>
+      <circle cx="60" cy="50" r="5" class="node"/>
+      <circle cx="90" cy="42" r="5" class="node"/>
+      <circle cx="115" cy="54" r="5" class="node"/>
+    </g>
+  </g>
+
+  <!-- Brand text -->
+  <g transform="translate(168,60)">
+    <text x="0" y="0" class="brand">
+      <tspan class="brand-accent">Rx</tspan>Smart
+    </text>
+    <text x="2" y="22" class="tagline">AI-Powered Pharmacy Management</text>
+  </g>
+</svg>

@@ -1,80 +1,182 @@
-/* Outer container with hospital theme background */
-.container {
+.auth-container {
   display: flex;
-  justify-content: center;
+  min-height: 100vh;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  align-items: stretch;
+  overflow: hidden; // Prevent scroll between image and form panel
+}
+
+.auth-image {
+  flex: 1;
+  display: flex;
   align-items: center;
-  height: 100vh;
-  padding: 16px;
-  background: linear-gradient(135deg, #e0f7fa, #e8f5e9); /* medical color blend */
-  font-family: 'Segoe UI', sans-serif;
+  justify-content: center;
+ background: linear-gradient(135deg, #f0fff4 0%, #e6fffa 100%);
+  padding: 40px;
+
+  img {
+ 
+    max-width: 600px;
+    height: auto;
+    display: block;
+    border-radius: 8px; width:380px;
+ 
+      
+   
+  }
 }
 
-/* Card styling */
-.card {
-  background: #ffffff;
-  padding: 0px 24px;
-  border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(0, 128, 128, 0.1); /* subtle teal shadow */
-  width: 100%;
-  max-width: 420px;
-  box-sizing: border-box;
-  border-top: 6px solid #00796b; /* bold hospital green top line */
+.auth-panel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+  background: #f7fbfd;
+
+  .card {
+    width: 100%;
+    max-width: 480px;
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 28px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    border-top: 6px solid rgba(0, 198, 167, 0.12);
+    overflow-y: auto; // Enable scroll within card if form is long
+    max-height: 100vh; // Limit card height to screen height
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+
+    .logo {
+      height: 36px;
+    }
+
+    .register-btn {
+      border-radius: 20px;
+      background: #f6f7fb;
+      padding: 6px 14px;
+    }
+  }
+
+  h2 {
+    color: #00695c;
+    font-size: 32px;
+    margin: 8px 0 20px;
+  }
+
+  mat-form-field {
+    width: 100%;
+    margin-bottom: 16px;
+  }
+
+  .options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+
+    .forgot {
+      color: #0288d1;
+      text-decoration: none;
+    }
+  }
+
+  .submit-btn {
+    width: 100%;
+    padding: 12px;
+    border-radius: 28px;
+    background: linear-gradient(90deg, #00c6a7, #00897b);
+    color: white;
+    font-weight: 700;
+  }
+
+  .switch {
+    text-align: center;
+    margin-top: 12px;
+  }
 }
 
-/* Headings */
-.card h2 {
-  text-align: center;
-  margin-bottom: 24px;
-  color: #00796b; /* hospital green */
+/* Mobile responsiveness */
+@media (max-width: 900px) {
+  .auth-container {
+    flex-direction: column;
+    overflow-y: auto; // Allow scroll on mobile if needed
+
+  }
+
+ .auth-container img {
+      
+    width: 183px;
+          margin-left: 0px !important;
+  }
+
+ .auth-image {
+       height: 56px !important;
+        width: 80% !important;
+      
+  }
+  .setdesign{
+        height: 30px!important;
+  }
+
+  .auth-panel {
+    padding: 24px;
+
+    .card {
+      box-shadow: none;
+      border-radius: 10px;
+      max-height: none; // Allow content to expand as needed
+    }
+  }
+
+
+
+
+
+
+
+
+
+
+
+  
 }
 
-/* Material fields */
-mat-form-field {
-  width: 100%;
-  margin-bottom: 16px;
+
+
+.mdc-dialog--open .mat-mdc-dialog-surface, .mdc-dialog--closing .mat-mdc-dialog-surface {
+  transform: none;
 }
 
-/* Buttons */
-button {
-  width: 100%;
-  margin-top: 8px;
-  font-weight: bold;
+
+@media (max-width: 600px) {
+  .auth-image {
+    height: 132px;
+    width: 183px;
+  }
+  .setdesign{
+        height: 83px!important;
+  }
+
+
+
+.auth-container{ min-height: auto;}
+
+.setdesign {
+    height:auto!important;
+  }
+
+
+
+  .auth-container img{
+    width: 289px;
+    margin-left: 0px !important;
+  }
+
 }
 
-/* Link styling */
-.link,
-.card a {
-  color: #0288d1; /* hospital blue */
-  font-size: 14px;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-.card a:hover {
-  text-decoration: underline;
-}
-.mat-flat-button.mat-primary {
-  background-color: #00796b;
-  color: white;
-}
-
-.mat-flat-button.mat-primary:hover {
-  background-color: #004d40;
-}
-.error {
-  color: #d32f2f;
-  font-size: 13px;
-  margin-top: -12px;
-  margin-bottom: 12px;
-  margin-left: 4px;
-}
-.user-type-box {
-  margin-top: 24px;
-  padding: 20px;
-  background-color: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  max-width: 400px;
-  margin-left: auto;
-  margin-right: auto;
-}

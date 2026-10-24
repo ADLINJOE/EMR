@@ -1,0 +1,410 @@
+<div class="drug-advisor-container">
+  <div class="advisor-header">
+    <h2>💊 AI-Driven Drug Cost–Benefit Advisor</h2>
+    <p class="subtitle">Compare medication costs using per-item calculation</p>
+  </div>
+
+  <div class="advisor-form">
+    <!-- Drug A Section -->
+    <div class="drug-section">
+      <label class="drug-label">Drug A *</label>
+      <div class="drug-input-group">
+        <mat-form-field appearance="outline" class="drug-field">
+          <input
+            matInput
+            placeholder="Search or type drug name..."
+            [formControl]="drugAControl"
+            [matAutocomplete]="autoA"
+          />
+          <mat-autocomplete
+            #autoA="matAutocomplete"
+            [displayWith]="displayDrug.bind(this)"
+            (optionSelected)="onDrugASelected($event.option.value)"
+          >
+            <mat-option *ngFor="let drug of filteredDrugsA | async" [value]="drug">
+              <div class="drug-option">
+                <strong>{{ drug.drugName }}</strong>
+                <small *ngIf="drug.genericName"> ({{ drug.genericName }})</small>
+                <small *ngIf="drug.strength" class="strength-badge">{{ drug.strength }}</small>
+              </div>
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+
+        <!-- Dosage Dropdown for Drug A -->
+        <mat-form-field
+          *ngIf="selectedDrugA && dosageOptionsA.length > 0"
+          appearance="outline"
+          class="dosage-field"
+        >
+          <mat-label>Dosage per day</mat-label>
+          <mat-select [(ngModel)]="selectedDosageA" (selectionChange)="updateCalculationMethod()">
+            <mat-option *ngFor="let dosage of dosageOptionsA" [value]="dosage.value">
+              {{ dosage.label }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <!-- Drug A Info Card with Per-Item Calculation -->
+      <div *ngIf="selectedDrugA" class="drug-info-card">
+        <div class="calculation-header">
+          <span class="calc-icon">🧮</span>
+          <span class="calc-title">Cost Calculation</span>
+        </div>
+        
+        <div class="info-row">
+          <span class="info-label">Generic:</span>
+          <span class="info-value">{{ selectedDrugA.genericName || 'N/A' }}</span>
+        </div>
+
+        <div class="info-row">
+          <span class="info-label">Strength:</span>
+          <span class="info-value">{{ selectedDrugA.strength || 'N/A' }}</span>
+        </div>
+
+        <div class="info-row">
+          <span class="info-label">Form:</span>
+          <span class="info-value">{{ selectedDrugA.dosageForm || 'N/A' }}</span>
+        </div>
+        
+        <div class="info-row highlight-row">
+          <span class="info-label">Pack Size:</span>
+          <span class="info-value">{{ selectedDrugA.pack || 1 }} items</span>
+        </div>
+        
+        <div class="info-row highlight-row">
+          <span class="info-label">Unit Price (Full Pack):</span>
+          <span class="info-value price">₹{{ selectedDrugA.unitPrice || 0 }}</span>
+        </div>
+        
+        <div class="calculation-row">
+          <div class="formula">
+            <span class="formula-label">Cost per Item =</span>
+            <span class="formula-value">₹{{ selectedDrugA.unitPrice || 0 }} ÷ {{ selectedDrugA.pack || 1 }}</span>
+          </div>
+          <div class="result-value">
+            = ₹{{ getCostPerItem(selectedDrugA) }} per item
+          </div>
+        </div>
+
+        <!-- Show daily and annual cost if dosage selected -->
+        <div *ngIf="drugACalculation" class="extended-calc">
+          <div class="calculation-row">
+            <div class="formula">
+              <span class="formula-label">Daily Cost =</span>
+              <span class="formula-value">₹{{ drugACalculation.costPerItem.toFixed(2) }} × {{ drugACalculation.dosagePerDay }}</span>
+            </div>
+            <div class="result-value">
+              = ₹{{ drugACalculation.dailyCost.toFixed(2) }} per day
+            </div>
+          </div>
+
+          <div class="calculation-row annual">
+            <div class="formula">
+              <span class="formula-label">Annual Cost =</span>
+              <span class="formula-value">₹{{ drugACalculation.dailyCost.toFixed(2) }} × 365 days</span>
+            </div>
+            <div class="result-value-large">
+              = ₹{{ drugACalculation.annualCost.toFixed(2) }} per year
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Drug B Section -->
+    <div class="drug-section">
+      <label class="drug-label">Drug B *</label>
+      <div class="drug-input-group">
+        <mat-form-field appearance="outline" class="drug-field">
+          <input
+            matInput
+            placeholder="Search or type drug name..."
+            [formControl]="drugBControl"
+            [matAutocomplete]="autoB"
+          />
+          <mat-autocomplete
+            #autoB="matAutocomplete"
+            [displayWith]="displayDrug.bind(this)"
+            (optionSelected)="onDrugBSelected($event.option.value)"
+          >
+            <mat-option *ngFor="let drug of filteredDrugsB | async" [value]="drug">
+              <div class="drug-option">
+                <strong>{{ drug.drugName }}</strong>
+                <small *ngIf="drug.genericName"> ({{ drug.genericName }})</small>
+                <small *ngIf="drug.strength" class="strength-badge">{{ drug.strength }}</small>
+              </div>
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+
+        <!-- Dosage Dropdown for Drug B -->
+        <mat-form-field
+          *ngIf="selectedDrugB && dosageOptionsB.length > 0"
+          appearance="outline"
+          class="dosage-field"
+        >
+          <mat-label>Dosage per day</mat-label>
+          <mat-select [(ngModel)]="selectedDosageB" (selectionChange)="updateCalculationMethod()">
+            <mat-option *ngFor="let dosage of dosageOptionsB" [value]="dosage.value">
+              {{ dosage.label }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <!-- Drug B Info Card with Per-Item Calculation -->
+      <div *ngIf="selectedDrugB" class="drug-info-card">
+        <div class="calculation-header">
+          <span class="calc-icon">🧮</span>
+          <span class="calc-title">Cost Calculation</span>
+        </div>
+        
+        <div class="info-row">
+          <span class="info-label">Generic:</span>
+          <span class="info-value">{{ selectedDrugB.genericName || 'N/A' }}</span>
+        </div>
+
+        <div class="info-row">
+          <span class="info-label">Strength:</span>
+          <span class="info-value">{{ selectedDrugB.strength || 'N/A' }}</span>
+        </div>
+
+        <div class="info-row">
+          <span class="info-label">Form:</span>
+          <span class="info-value">{{ selectedDrugB.dosageForm || 'N/A' }}</span>
+        </div>
+        
+        <div class="info-row highlight-row">
+          <span class="info-label">Pack Size:</span>
+          <span class="info-value">{{ selectedDrugB.pack || 1 }} items</span>
+        </div>
+        
+        <div class="info-row highlight-row">
+          <span class="info-label">Unit Price (Full Pack):</span>
+          <span class="info-value price">₹{{ selectedDrugB.unitPrice || 0 }}</span>
+        </div>
+        
+        <div class="calculation-row">
+          <div class="formula">
+            <span class="formula-label">Cost per Item =</span>
+            <span class="formula-value">₹{{ selectedDrugB.unitPrice || 0 }} ÷ {{ selectedDrugB.pack || 1 }}</span>
+          </div>
+          <div class="result-value">
+            = ₹{{ getCostPerItem(selectedDrugB) }} per item
+          </div>
+        </div>
+
+        <!-- Show daily and annual cost if dosage selected -->
+        <div *ngIf="drugBCalculation" class="extended-calc">
+          <div class="calculation-row">
+            <div class="formula">
+              <span class="formula-label">Daily Cost =</span>
+              <span class="formula-value">₹{{ drugBCalculation.costPerItem.toFixed(2) }} × {{ drugBCalculation.dosagePerDay }}</span>
+            </div>
+            <div class="result-value">
+              = ₹{{ drugBCalculation.dailyCost.toFixed(2) }} per day
+            </div>
+          </div>
+
+          <div class="calculation-row annual">
+            <div class="formula">
+              <span class="formula-label">Annual Cost =</span>
+              <span class="formula-value">₹{{ drugBCalculation.dailyCost.toFixed(2) }} × 365 days</span>
+            </div>
+            <div class="result-value-large">
+              = ₹{{ drugBCalculation.annualCost.toFixed(2) }} per year
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Condition -->
+    <div class="condition-section">
+      <label class="drug-label">Condition / Indication</label>
+      <mat-form-field appearance="outline" class="condition-field">
+        <input
+          matInput
+          placeholder="e.g., Type 2 Diabetes, Hypertension..."
+          [formControl]="conditionControl"
+        />
+      </mat-form-field>
+    </div>
+
+    <!-- Hint Message -->
+    <div *ngIf="hintMessage" class="hint-message" [ngClass]="'hint-' + calculationMethod">
+      <mat-icon>info</mat-icon>
+      <span>{{ hintMessage }}</span>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="button-group">
+      <button
+        class="btn-evaluate"
+        (click)="evaluate()"
+        [disabled]="loading || !drugAControl.value || !drugBControl.value"
+      >
+        <span *ngIf="!loading">{{ calculationMethod === 'api' ? '📊 Calculate Cost' : '🤖 Analyze with AI' }}</span>
+        <span *ngIf="loading">Analyzing...</span>
+      </button>
+      <button class="btn-reset" (click)="reset()" [disabled]="loading">
+        ↻ Reset
+      </button>
+    </div>
+  </div>
+
+  <!-- Results Section - Unified Design for Both AI and Database -->
+  <div *ngIf="result" class="results-container">
+    <div class="results-header">
+      <div class="source-badge" [ngClass]="result.calculationSource === 'Local Database (Per-Item Calculation)' ? 'badge-database' : 'badge-ai'">
+        <mat-icon>{{ result.calculationSource === 'Local Database (Per-Item Calculation)' ? 'storage' : 'psychology' }}</mat-icon>
+        <span>{{ result.calculationSource }}</span>
+      </div>
+      <h3>{{ result.calculationSource === 'Local Database (Per-Item Calculation)' ? '📊' : '🧠' }} Cost-Benefit Analysis Report</h3>
+    </div>
+
+    <div class="results-content">
+      <!-- Summary Card -->
+      <div class="result-card summary-card">
+        <div class="card-header">
+          <div class="card-icon">📋</div>
+          <h4>Summary</h4>
+        </div>
+        <div class="card-content">
+          <p class="summary-text">{{ result.summary }}</p>
+        </div>
+      </div>
+
+      <!-- Cost Comparison Section -->
+      <div class="comparison-section">
+        <h4 class="section-title">💰 Cost Comparison</h4>
+        
+        <!-- Database Calculation - Detailed Breakdown -->
+        <div *ngIf="result.drugACalc && result.drugBCalc" class="comparison-grid">
+          <!-- Drug A Detailed Breakdown -->
+          <div class="drug-cost-card">
+            <div class="drug-header drug-a-header">
+              <span class="drug-label">Drug A</span>
+              <h5>{{ selectedDrugA?.drugName || 'Unknown Drug' }}</h5>
+            </div>
+            
+            <div class="cost-steps">
+              <div class="cost-step">
+                <div class="step-icon">1️⃣</div>
+                <div class="step-details">
+                  <div class="step-title">Per-Item Cost</div>
+                  <div class="step-formula">₹{{ result.drugACalc.unitPrice }} ÷ {{ result.drugACalc.packSize }} items</div>
+                  <div class="step-result">₹{{ result.drugACalc.costPerItem.toFixed(2) }} per item</div>
+                </div>
+              </div>
+
+              <div class="cost-step">
+                <div class="step-icon">2️⃣</div>
+                <div class="step-details">
+                  <div class="step-title">Daily Cost</div>
+                  <div class="step-formula">₹{{ result.drugACalc.costPerItem.toFixed(2) }} × {{ result.drugACalc.dosagePerDay }} times/day</div>
+                  <div class="step-result">₹{{ result.drugACalc.dailyCost.toFixed(2) }} per day</div>
+                </div>
+              </div>
+
+              <div class="cost-step annual-step">
+                <div class="step-icon">3️⃣</div>
+                <div class="step-details">
+                  <div class="step-title">Annual Cost</div>
+                  <div class="step-formula">₹{{ result.drugACalc.dailyCost.toFixed(2) }} × 365 days</div>
+                  <div class="step-result-annual">₹{{ result.drugACalc.annualCost.toFixed(2) }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Drug B Detailed Breakdown -->
+          <div class="drug-cost-card">
+            <div class="drug-header drug-b-header">
+              <span class="drug-label">Drug B</span>
+              <h5>{{ selectedDrugB?.drugName || 'Unknown Drug' }}</h5>
+            </div>
+            
+            <div class="cost-steps">
+              <div class="cost-step">
+                <div class="step-icon">1️⃣</div>
+                <div class="step-details">
+                  <div class="step-title">Per-Item Cost</div>
+                  <div class="step-formula">₹{{ result.drugBCalc.unitPrice }} ÷ {{ result.drugBCalc.packSize }} items</div>
+                  <div class="step-result">₹{{ result.drugBCalc.costPerItem.toFixed(2) }} per item</div>
+                </div>
+              </div>
+
+              <div class="cost-step">
+                <div class="step-icon">2️⃣</div>
+                <div class="step-details">
+                  <div class="step-title">Daily Cost</div>
+                  <div class="step-formula">₹{{ result.drugBCalc.costPerItem.toFixed(2) }} × {{ result.drugBCalc.dosagePerDay }} times/day</div>
+                  <div class="step-result">₹{{ result.drugBCalc.dailyCost.toFixed(2) }} per day</div>
+                </div>
+              </div>
+
+              <div class="cost-step annual-step">
+                <div class="step-icon">3️⃣</div>
+                <div class="step-details">
+                  <div class="step-title">Annual Cost</div>
+                  <div class="step-formula">₹{{ result.drugBCalc.dailyCost.toFixed(2) }} × 365 days</div>
+                  <div class="step-result-annual">₹{{ result.drugBCalc.annualCost.toFixed(2) }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Analysis - Clean Display with Proper Drug Names -->
+        <div *ngIf="!result.drugACalc && result.annualCostsA" class="comparison-grid-simple">
+          <div class="drug-cost-card-simple">
+            <div class="drug-header drug-a-header">
+              <span class="drug-label">Drug A</span>
+              <h5>{{ getDrugADisplayName() }}</h5>
+            </div>
+            <div class="annual-cost-display">
+              <div class="cost-label">Annual Cost</div>
+              <div class="cost-value">{{ result.annualCostsA }}</div>
+            </div>
+          </div>
+
+          <div class="drug-cost-card-simple">
+            <div class="drug-header drug-b-header">
+              <span class="drug-label">Drug B</span>
+              <h5>{{ getDrugBDisplayName() }}</h5>
+            </div>
+            <div class="annual-cost-display">
+              <div class="cost-label">Annual Cost</div>
+              <div class="cost-value">{{ result.annualCostsB }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ICER Card -->
+      <div class="result-card icer-card">
+        <div class="card-header">
+          <div class="card-icon">📈</div>
+          <h4>Cost-Effectiveness Analysis (ICER)</h4>
+        </div>
+        <div class="card-content">
+          <p class="icer-text">{{ result.icer }}</p>
+        </div>
+      </div>
+
+      <!-- Recommendation Card -->
+      <!-- <div class="result-card recommendation-card">
+        <div class="card-header">
+          <div class="card-icon">✅</div>
+          <h4>Clinical Recommendation</h4>
+        </div>
+        <div class="card-content">
+          <p class="recommendation-text">{{ result.recommendation }}</p>
+        </div>
+      </div> -->
+    </div>
+  </div>
+</div>

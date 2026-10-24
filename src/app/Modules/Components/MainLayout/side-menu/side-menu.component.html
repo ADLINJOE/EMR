@@ -1,62 +1,41 @@
-<div class="side-nav">
-  <div class="top-section">
-    <div class="logo">Untitled</div>
-    <button class="menu-toggle">☰</button>
+<div
+  class="sidebar"
+  [class.collapsed]="collapsed"
+  [class.mobile]="isMobile"
+  role="navigation"
+  aria-label="Main menu"
+>
+  <div class="sidebar-header">
+    <span class="logo" *ngIf="!collapsed">Rx Smart</span>
+    <button
+      class="toggle-btn"
+      (click)="toggleSidebar()"
+      aria-label="Toggle menu"
+      [attr.aria-expanded]="!collapsed"
+    >
+      <span class="material-icons">{{ collapsed ? 'menu' : 'close' }}</span>
+    </button>
   </div>
 
-  <div class="search-bar">
-    <input type="text" placeholder="Search">
-    <button class="search-button">Q</button>
-  </div>
-  <ul class="nav-links">
-    <!-- Loop through navItems -->
-    <li *ngFor="let item of navItems; let i = index">
-      <button class="nav-link" [ngClass]="{ active: selectedIndex === i }" (click)="toggleSubmenu(i)">
-        <span class="icon">{{ item.icon }}</span> {{ item.title }}
-      </button>
-      <ul *ngIf="item.isOpen" class="submenu">
-        <li *ngFor="let subItem of item.subItems">
-          <button class="nav-link">
-            <span class="icon">{{ subItem.icon }}</span> {{ subItem.title }}
-          </button>
-        </li>
-      </ul>
-    </li>
-  </ul>
-  
-  
-  
-  
-  
-
-  <div class="bottom-section">
-    <div class="notification">
-      <button class="notification-button">
-        <span class="icon">🔔</span> Notification
-        <span class="badge">12</span>
-      </button>
-    </div>
-    <ul class="bottom-links">
-      <li>
-        <button class="bottom-link">
-          <span class="icon">❓</span> Support
-        </button>
-      </li>
-      <li>
-        <button class="bottom-link">
-          <span class="icon">⚙️</span> Settings
-        </button>
-      </li>
-    </ul>
-    <div class="user-profile">
-      <div class="avatar">
-        <!-- <img src="path/to/user-avatar.png" alt="User Avatar"> -->
-      </div>
-      <div class="user-info">
-        <div class="name">Brooklyn Simmons</div>
-        <div class="email">brooklynsimmons.com</div>
-      </div>
-      <button class="more-options">...</button>
-    </div>
-  </div>
+  <nav class="menu-section">
+    <a
+      class="menu-item"
+      *ngFor="let item of menuItems()"
+      [class.active]="isActiveRoute(item.path)"
+      (click)="navigateTo(item.path)"
+      href="javascript:void(0)"
+      role="link"
+      tabindex="0"
+    >
+      <span class="material-icons icon">{{ item.icon || 'medical_services' }}</span>
+      <span class="title" *ngIf="!collapsed">{{ item.title }}</span>
+    </a>
+  </nav>
 </div>
+
+<div
+  class="backdrop"
+  *ngIf="showBackdrop"
+  (click)="closeSidebarClick()"
+  aria-hidden="true"
+></div>

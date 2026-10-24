@@ -1,0 +1,375 @@
+@import '../../PatientManagement/currentmedication/currentmedication.component.scss';
+
+// Header section
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+
+  h2 {
+    margin: 0;
+    flex: 1;
+    min-width: 200px;
+  }
+
+  .add-btn {
+    background: linear-gradient(135deg, #2bc6b4, #004d40);
+    white-space: nowrap;
+  }
+}
+
+// Form wrapper
+.add-button-wrapper {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+
+  .field-drug {
+    flex: 1 1 300px;
+    min-width: 200px;
+  }
+
+  .field-strength {
+    flex: 1 1 180px;
+    min-width: 150px;
+  }
+
+  .field-packsize {
+    flex: 1 1 180px;
+    min-width: 150px;
+  }
+
+  .search-btn {
+    flex: 0 0 auto;
+    min-width: 100px;
+    height: 56px;
+  }
+}
+
+// Table responsive wrapper
+.tablefix {
+  margin-top: 20px;
+}
+
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.full-width-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 800px;
+
+  thead {
+    background: linear-gradient(135deg, #2bc6b4, #004d40);
+    
+    th {
+      padding: 12px;
+      text-align: left;
+      color: white;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+  }
+
+  tbody {
+    tr {
+      border-bottom: 1px solid #e0e0e0;
+      transition: background-color 0.2s;
+
+      &:hover {
+        background-color: #f5f5f5;
+      }
+
+      &.category-antibiotic {
+        background-color: #fff3e0;
+      }
+
+      &.category-vitamin {
+        background-color: #e8f5e9;
+      }
+    }
+
+    td {
+      padding: 12px;
+      
+      strong {
+        font-weight: 500;
+      }
+    }
+  }
+}
+
+// Messages
+.no-data {
+  margin-top: 20px;
+  padding: 20px;
+  text-align: center;
+  color: #999;
+  font-style: italic;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+}
+
+.loading {
+  margin-top: 20px;
+  padding: 20px;
+  text-align: center;
+  color: #007bff;
+  font-weight: 500;
+}
+
+// Button group
+.button-group {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+
+  &.button_end {
+    justify-content: flex-end;
+  }
+
+  .margin_4px {
+    margin: 4px;
+  }
+}
+
+// Modal styles
+.drug-monograph-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.drug-monograph-modal {
+  background: white;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 900px;
+  max-height: 66vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.drug-monograph-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 2px solid #e0e0e0;
+  background: linear-gradient(135deg, #2bc6b4, #004d40);
+  border-radius: 12px 12px 0 0;
+
+  h3 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    color: white;
+    font-size: 1.25rem;
+    flex: 1;
+  }
+
+  .close-btn {
+    background: transparent;
+    border: none;
+    font-size: 28px;
+    color: white;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+  }
+}
+
+.drug-monograph-content {
+  padding: 20px;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+// Tablet breakpoint (768px and below)
+@media (max-width: 768px) {
+  .header-section {
+    h2 {
+      font-size: 1.5rem;
+    }
+
+    .add-btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  .add-button-wrapper {
+    .field-drug,
+    .field-strength,
+    .field-packsize {
+      flex: 1 1 100%;
+      width: 100%;
+    }
+
+    .search-btn {
+      width: 100%;
+    }
+  }
+
+  .full-width-table {
+    min-width: 700px;
+  }
+
+  .drug-monograph-modal {
+    max-height: 80vh;
+    margin: 10px;
+  }
+
+  .drug-monograph-header {
+    h3 {
+      font-size: 1.1rem;
+    }
+  }
+}
+
+// Mobile breakpoint (576px and below)
+@media (max-width: 576px) {
+  .container {
+    padding: 10px;
+  }
+
+  .card {
+    padding: 15px;
+  }
+
+  .header-section {
+    h2 {
+      font-size: 1.25rem;
+    }
+  }
+
+  // Convert table to card-style layout on mobile
+  .full-width-table {
+    min-width: 100%;
+    
+    thead {
+      display: none;
+    }
+
+    tbody {
+      tr {
+        display: block;
+        margin-bottom: 15px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 10px;
+        
+        &:hover {
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+      }
+
+      td {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid #f0f0f0;
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        &::before {
+          content: attr(data-label);
+          font-weight: 600;
+          color: #004d40;
+          flex: 0 0 45%;
+        }
+
+        strong {
+          text-align: right;
+          flex: 1;
+        }
+      }
+    }
+  }
+
+  .drug-monograph-modal {
+    max-height: 90vh;
+    margin: 5px;
+  }
+
+  .drug-monograph-header {
+    padding: 15px;
+    
+    h3 {
+      font-size: 1rem;
+      
+      mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+      }
+    }
+
+    .close-btn {
+      font-size: 24px;
+    }
+  }
+
+  .drug-monograph-content {
+    padding: 15px;
+  }
+
+  .button-group {
+    justify-content: center !important;
+    
+    button {
+      flex: 1;
+      min-width: 120px;
+    }
+  }
+}
+
+// Extra small devices (480px and below)
+@media (max-width: 480px) {
+  .header-section {
+    h2 {
+      font-size: 1.1rem;
+    }
+  }
+
+  .add-button-wrapper {
+    gap: 10px;
+
+    .search-btn {
+      height: 48px;
+    }
+  }
+}

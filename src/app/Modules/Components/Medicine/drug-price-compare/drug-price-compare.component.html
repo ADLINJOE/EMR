@@ -1,0 +1,134 @@
+<div class="container">
+  <div class="card">
+    <div class="header-section">
+      <h2>Medicine Price Comparison</h2>
+      <button class="btn btn-primary add-btn" (click)="showCoach = true">
+        AI Drug Advisor
+      </button>
+    </div>
+    
+    <form [formGroup]="form">
+      <div class="add-button-wrapper">
+        <!-- Unified input with autocomplete -->
+        <mat-form-field class="field-drug">
+          <input
+            matInput
+            placeholder="Search medication..."
+            formControlName="medname"
+            [matAutocomplete]="auto"
+          />
+          <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onDrugSelected($event)">
+            @for (drug of filteredDrugs | async; track drug.drugName) {
+              <mat-option [value]="drug.drugName">
+                {{ drug.drugName }} - {{ drug.genericName }}
+              </mat-option>
+            }
+          </mat-autocomplete>
+        </mat-form-field>
+        
+        <mat-form-field class="field-strength">
+          <input
+            matInput
+            placeholder="Strength..."
+            formControlName="strength"
+            [matAutocomplete]="auto1"
+          />
+          <mat-autocomplete #auto1="matAutocomplete">
+            <mat-option *ngFor="let strength of strengths" [value]="strength">
+              {{ strength }}
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+
+        <mat-form-field class="field-packsize">
+          <input
+            matInput
+            placeholder="Search Packsize..."
+            formControlName="Packsize"
+            [matAutocomplete]="auto2"
+          />
+          <mat-autocomplete #auto2="matAutocomplete">
+            <mat-option *ngFor="let drug of packSizes" [value]="drug">
+              {{ drug }}
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+        
+        <button type="button" class="btn-primary search-btn" (click)="searchMedicine()">
+          Search
+        </button>
+      </div>
+
+      <!-- Results Table -->
+      <div class="tablefix" *ngIf="results.length > 0">
+        <div class="table-responsive">
+          <table class="full-width-table">
+            <thead>
+              <tr>
+                <th>Sl.No</th>
+                <th>Brand Name</th>
+                <th>Generic Name</th>
+                <th>Cost Per item</th>
+                <th>Unit Price</th>
+                <th>Strength</th>
+                <th>Dosage Form</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                *ngFor="let med of results; let i = index"
+                [ngClass]="{
+                  'category-antibiotic': med.drugCategory === 'Antibiotics',
+                  'category-vitamin': med.drugCategory === 'Vitamin',
+                }"
+              >
+                <td data-label="Sl.No"><strong>{{ i + 1 }}</strong></td>
+                <td data-label="Brand Name"><strong>{{ med.brandName }}</strong></td>
+                <td data-label="Generic Name"><strong>{{ med.genericName }}</strong></td>
+                <td data-label="Cost Per item">
+                  <strong>
+                    {{
+                      (med.unitPrice && med.pack
+                        ? med.unitPrice / med.pack
+                        : med.unitPrice) | currency: 'INR'
+                    }}
+                  </strong>
+                </td>
+                <td data-label="Unit Price"><strong>{{ med.unitPrice | currency: 'INR' }}</strong></td>
+                <td data-label="Strength"><strong>{{ med.strength }}</strong></td>
+                <td data-label="Dosage Form"><strong>{{ med.dosageForm }}</strong></td>
+                <td data-label="Status"><strong>{{ med.status }}</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Messages -->
+      <div *ngIf="!loading && results.length === 0" class="no-data">
+        No matching records found.
+      </div>
+      <div *ngIf="loading" class="loading">Loading...</div>
+
+      <!-- Button Group -->
+      <div class="button-group button_end">
+        <button type="button" class="btn-secondary margin_4px" (click)="cancel()">
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div *ngIf="showCoach" class="drug-monograph-overlay" (click)="closeCoach()">
+  <div class="drug-monograph-modal" (click)="$event.stopPropagation()">
+    <div class="drug-monograph-header">
+      <h3><mat-icon>description</mat-icon>AI-Driven Drug Cost–Benefit Advisor</h3>
+      <button class="close-btn" (click)="closeCoach()">×</button>
+    </div>
+    <div class="drug-monograph-content">
+      <app-drug-advisor></app-drug-advisor>
+    </div>
+  </div>
+</div>

@@ -1,66 +1,107 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, OnInit, Output, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { SharedServiceService } from '../../../../Service/Sharedservice/shared-service.service';
 
 @Component({
   selector: 'app-side-menu',
+  standalone: true,
   imports: [CommonModule],
   templateUrl: './side-menu.component.html',
-  styleUrl: './side-menu.component.scss'
+  styleUrl: './side-menu.component.scss',
 })
-export class SideMenuComponent {
-  navItems = [
-    {
-      title: 'Home',
-      icon: '🏠',
-      isOpen: false,
-      subItems: [
-        { title: 'Sub Home 1', icon: '🔹' },
-        { title: 'Sub Home 2', icon: '🔸' },
-      ],
-    },
-    {
-      title: 'Dashboard',
-      icon: '📊',
-      isOpen: false,
-      subItems: [
-        { title: 'Sub Dashboard 1', icon: '🔹' },
-        { title: 'Sub Dashboard 2', icon: '🔸' },
-      ],
-    },
-    {
-      title: 'Projects',
-      icon: '📂',
-      isOpen: false,
-      subItems: [
-        { title: 'Sub Project 1', icon: '🔹' },
-        { title: 'Sub Project 2', icon: '🔸' },
-      ],
-    },
-    {
-      title: 'Tasks',
-      icon: '📋',
-      isOpen: false,
-      subItems: [
-        { title: 'Sub Task 1', icon: '🔹' },
-        { title: 'Sub Task 2', icon: '🔸' },
-      ],
-    },
-    {
-      title: 'Reporting',
-      icon: '📈',
-      isOpen: false,
-      subItems: [
-        { title: 'Sub Reporting 1', icon: '🔹' },
-        { title: 'Sub Reporting 2', icon: '🔸' },
-      ],
-    },
-  ];
+export class SideMenuComponent implements OnInit {
+  menuItems = signal<any[]>([]);
+  isMobile = window.innerWidth <= 768;
 
-  selectedIndex: number | null = null;  // Track the selected item index
+  @Input() collapsed: boolean = true;
+  @Output() collapsedChange = new EventEmitter<boolean>();
+  @Output() closeSidebar = new EventEmitter<void>();
 
-  // Toggle submenu visibility and set active class
-  toggleSubmenu(index: number): void {
-    this.navItems[index].isOpen = !this.navItems[index].isOpen;
-    this.selectedIndex = this.selectedIndex === index ? null : index;  // Toggle active class
+  private sharedService = inject(SharedServiceService);
+  private router = inject(Router);
+get showBackdrop() {
+  return this.isMobile && !this.collapsed;
+}
+
+ ngOnInit() {
+ const items = this.sharedService.menuItems().map(item => {
+      const title = item.componentName.replace('Component', '');
+      return {
+        title,
+        icon: item.icon || this.getIconForTitle(title),
+        path: item.componentPath,
+        startpage: item.startPage,
+      };
+    });
+  this.menuItems.set(items);
+
+  // ✅ Select the first menu item initially if exists
+  if (items.length > 0) {
+    const firstPath = items[0].path;
+    if (!this.router.url.includes(firstPath)) {
+      this.router.navigate(['MainLayout', firstPath]);
+    }
+  }
+}
+ getIconForTitle(title: string): string {
+  const iconMap: Record<string, string> = {
+    "Patient List": "monitor_heart",
+    "Medicine List": "science",
+    "Price Comparison": "vaccines",
+    "Scan Prescription": "document_scanner",
+    "drugcompare": "compare_arrows",
+    "BP & Glucose Trends": "favorite",
+    "Adverse Drug Report": "warning",
+    "Health Education Resources": "menu_book",
+    "Appointments": "event",
+    "Drug & Allergy Info": "vaccines",
+    "Reports": "insert_chart",
+    "Settings": "settings",
+    "Default": "medical_services",
+    "Drug Cost - Benefit Advisor": "medication"
+  };
+
+  return iconMap[title] || iconMap["Default"];
+}
+
+
+  toggleSidebar() {
+    this.collapsed = !this.collapsed;
+    this.collapsedChange.emit(this.collapsed);
+  }
+
+  isActiveRoute(path: string): boolean {
+    const currentPath = this.router.url.split('/').pop();
+    return currentPath === path;
+  }
+
+  navigateTo(path: string) {
+    this.router.navigate(['MainLayout', path]);
+    if (this.isMobile) {
+      this.collapsed = true;
+      this.collapsedChange.emit(this.collapsed);
+    }
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: any) {
+    this.isMobile = event.target.innerWidth <= 768;
+    if (!this.isMobile) {
+      this.collapsed = false;
+      this.collapsedChange.emit(this.collapsed);
+    } else {
+      this.collapsed = true;
+      this.collapsedChange.emit(this.collapsed);
+    }
+  }
+
+  // Rename this method to avoid conflict with @Output() closeSidebar
+  closeSidebarClick() {
+    if (this.isMobile) {
+      this.collapsed = true;
+      this.collapsedChange.emit(this.collapsed);
+      this.closeSidebar.emit();
+    }
   }
 }

@@ -1,12 +1,20 @@
-<app-header-main></app-header-main>
+ <app-header-main (toggleSidebar)="onToggleSidebar()"></app-header-main>
 
-<div class="layout-container">
-  <app-side-menu></app-side-menu>
+    <div class="layout-container" style="    display: flex
+;
+    flex-direction: row;
+    height: 100vh;
+    width: 100%;">
+      <app-side-menu   class="responsive-sidebar" style="    width: 19%;
+    min-width: 193px;
+    max-width: 231px;"
+        [collapsed]="isSidebarCollapsed()"
+        (closeSidebar)="onCloseSidebar()"
+      ></app-side-menu>
 
-  <div class="content-container">
-    <router-outlet></router-outlet>
-  </div>
-</div>
+      <div class="content-container" style="width: 86% !important;">
+        <router-outlet></router-outlet>
+      </div>
+    </div>
 
-<app-footer-main></app-footer-main>
-
+    <app-footer-main></app-footer-main>

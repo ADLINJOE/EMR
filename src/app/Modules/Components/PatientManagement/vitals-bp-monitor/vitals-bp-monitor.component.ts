@@ -1,0 +1,462 @@
+import { Component, ElementRef, ViewChild, inject, computed } from '@angular/core';
+import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { Chart, registerables } from 'chart.js';
+import annotationPlugin from 'chartjs-plugin-annotation';
+import { CommonService } from '../../../../Service/common.service';
+import { SharedServiceService } from '../../../../Service/Sharedservice/shared-service.service';
+import { MatCardModule } from "@angular/material/card";
+import { MatTabGroup, MatTabsModule } from "@angular/material/tabs";
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatNativeDateModule } from '@angular/material/core';
+import { CommonModule } from '@angular/common';
+
+
+Chart.register(...registerables, annotationPlugin);
+
+@Component({
+  selector: 'app-vitals-bp-monitor',
+  standalone: true,
+  imports: [
+    MatTabGroup, 
+    MatTabsModule, 
+    MatCardModule, 
+    MatDatepickerModule, 
+    MatFormFieldModule, 
+    MatInputModule, 
+    MatButtonModule, 
+    MatNativeDateModule,
+    ReactiveFormsModule,
+    CommonModule
+  ],
+  templateUrl: './vitals-bp-monitor.component.html',
+  styleUrls: ['./vitals-bp-monitor.component.scss', '../../../Shared/styles/table-template.scss']
+})
+export class VitalsBpMonitorComponent {
+  @ViewChild('bpTimeChart') bpTimeChartRef!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('bpTrendChart') bpTrendChartRef!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('sugarTimeChart') sugarTimeChartRef!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('sugarTrendChart') sugarTrendChartRef!: ElementRef<HTMLCanvasElement>;
+
+  private commonService = inject(CommonService);
+  private sharedService = inject(SharedServiceService);
+  patientDetails = computed(() => this.sharedService.patientDetails());
+
+  selectedTab = 0;
+  readings: any[] = [];
+  filteredReadings: any[] = [];
+  
+  // Date range form
+  dateRangeForm = new FormGroup({
+    startDate: new FormControl<Date | null>(null),
+    endDate: new FormControl<Date | null>(null)
+  });
+  
+  // Chart instances to destroy before re-rendering
+  bpTimeChart: Chart | null = null;
+  bpTrendChart: Chart | null = null;
+  sugarTimeChart: Chart | null = null;
+  sugarTrendChart: Chart | null = null;
+
+  ngAfterViewInit() {
+    // Set default date range to last 30 days BEFORE initial load
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - 30);
+
+    this.dateRangeForm.patchValue({ startDate, endDate });
+    this.loadVitals(startDate, endDate);
+  }
+
+  loadVitals(startDate?: Date, endDate?: Date) {
+    const details = this.patientDetails();
+    if (!details) return;
+
+    const payload: any = {
+      Mode: 'GET',
+      PatientId: details.patientID
+    };
+
+    // Add date range to payload if provided
+    if (startDate && endDate) {
+      payload.StartDate = startDate.toISOString().split('T')[0];
+      payload.EndDate = endDate.toISOString().split('T')[0];
+    }
+
+    this.commonService.Post('dashboard/vitalschart', payload)
+      .subscribe((res: any) => {
+        if (res.success && res.result) {
+          this.readings = res.result.map((v: any) => ({
+            date: v.readingDateTime.split('T')[0],
+            dateTime: new Date(v.readingDateTime),
+            systolic: v.systolic,
+            diastolic: v.diastolic,
+            sugarFasting: v.sugarFasting,
+            sugarPP: v.sugarPP
+          }));
+          this.applyDateFilter();
+          this.updateCharts();
+        }
+      });
+  }
+
+  applyDateFilter() {
+    const startDate = this.dateRangeForm.get('startDate')?.value;
+    const endDate = this.dateRangeForm.get('endDate')?.value;
+
+    if (!startDate || !endDate) {
+      this.filteredReadings = [...this.readings];
+      return;
+    }
+
+    this.filteredReadings = this.readings.filter(reading => {
+      const readingDate = reading.dateTime;
+      return readingDate >= startDate && readingDate <= endDate;
+    });
+  }
+
+  onDateRangeChange() {
+    const startDate = this.dateRangeForm.get('startDate')?.value;
+    const endDate = this.dateRangeForm.get('endDate')?.value;
+
+    if (startDate && endDate) {
+      this.loadVitals(startDate, endDate);
+    }
+  }
+
+  resetDateRange() {
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - 30);
+    
+    this.dateRangeForm.patchValue({
+      startDate: startDate,
+      endDate: endDate
+    });
+    
+    this.loadVitals(startDate, endDate);
+  }
+
+  updateCharts() {
+    // Destroy existing charts before creating new ones
+    this.destroyCharts();
+    
+    if (this.selectedTab === 0) {
+      this.renderBpTimeSeries();
+      this.renderBpTrends();
+    } else {
+      this.renderSugarTimeSeries();
+      this.renderSugarTrends();
+    }
+  }
+
+  destroyCharts() {
+    if (this.bpTimeChart) {
+      this.bpTimeChart.destroy();
+      this.bpTimeChart = null;
+    }
+    if (this.bpTrendChart) {
+      this.bpTrendChart.destroy();
+      this.bpTrendChart = null;
+    }
+    if (this.sugarTimeChart) {
+      this.sugarTimeChart.destroy();
+      this.sugarTimeChart = null;
+    }
+    if (this.sugarTrendChart) {
+      this.sugarTrendChart.destroy();
+      this.sugarTrendChart = null;
+    }
+  }
+
+  renderBpTimeSeries() {
+    this.bpTimeChart = new Chart(this.bpTimeChartRef.nativeElement, {
+      type: 'line',
+      data: {
+        labels: this.filteredReadings.map(r => r.date),
+        datasets: [
+          {
+            label: 'Systolic',
+            data: this.filteredReadings.map(r => r.systolic),
+            borderColor: '#e53935',
+            fill: false,
+            pointBackgroundColor: ctx => (ctx.raw as number) > 140 ? 'red' : '#e53935'
+          },
+          {
+            label: 'Diastolic',
+            data: this.filteredReadings.map(r => r.diastolic),
+            borderColor: '#1e88e5',
+            fill: false,
+            pointBackgroundColor: ctx => (ctx.raw as number) > 90 ? 'red' : '#1e88e5'
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          annotation: {
+            annotations: {
+              systolicRange: { type: 'box', yMin: 90, yMax: 140, backgroundColor: 'rgba(255,0,0,0.05)' },
+              diastolicRange: { type: 'box', yMin: 60, yMax: 90, backgroundColor: 'rgba(0,0,255,0.05)' }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  renderBpTrends() {
+    const avgBp = this.filteredReadings.map(r => (r.systolic + r.diastolic) / 2);
+    this.bpTrendChart = new Chart(this.bpTrendChartRef.nativeElement, {
+      type: 'bar',
+      data: {
+        labels: this.filteredReadings.map(r => r.date),
+        datasets: [{
+          label: 'Avg BP',
+          data: avgBp,
+          backgroundColor: avgBp.map(v => v > 120 ? 'rgba(255,0,0,0.5)' : 'rgba(0,150,0,0.5)')
+        }]
+      }
+    });
+  }
+
+  renderSugarTimeSeries() {
+    this.sugarTimeChart = new Chart(this.sugarTimeChartRef.nativeElement, {
+      type: 'line',
+      data: {
+        labels: this.filteredReadings.map(r => r.date),
+        datasets: [
+          {
+            label: 'Fasting Sugar',
+            data: this.filteredReadings.map(r => r.sugarFasting),
+            borderColor: '#43a047',
+            fill: false,
+            pointBackgroundColor: ctx => (ctx.raw as number) > 100 ? 'red' : '#43a047'
+          },
+          {
+            label: 'PP Sugar',
+            data: this.filteredReadings.map(r => r.sugarPP),
+            borderColor: '#fb8c00',
+            fill: false,
+            pointBackgroundColor: ctx => (ctx.raw as number) > 140 ? 'red' : '#fb8c00'
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          annotation: {
+            annotations: {
+              fastingRange: { type: 'box', yMin: 70, yMax: 100, backgroundColor: 'rgba(0,255,0,0.05)' },
+              ppRange: { type: 'box', yMin: 80, yMax: 140, backgroundColor: 'rgba(255,165,0,0.05)' }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  renderSugarTrends() {
+    const avgSugar = this.filteredReadings.map(r => (r.sugarFasting + r.sugarPP) / 2);
+    this.sugarTrendChart = new Chart(this.sugarTrendChartRef.nativeElement, {
+      type: 'bar',
+      data: {
+        labels: this.filteredReadings.map(r => r.date),
+        datasets: [{
+          label: 'Avg Sugar',
+          data: avgSugar,
+          backgroundColor: avgSugar.map(v => v > 120 ? 'rgba(255,0,0,0.5)' : 'rgba(0,150,0,0.5)')
+        }]
+      }
+    });
+  }
+// @ViewChild('bpChart') bpChartRef!: ElementRef<HTMLCanvasElement>;
+//   @ViewChild('bpTrendChart') bpTrendChartRef!: ElementRef<HTMLCanvasElement>;
+
+//   private commonService = inject(CommonService);
+//     private sharedService = inject(SharedServiceService);
+//  patientDetails = computed(() => this.sharedService.patientDetails());
+//   readings: any[] = [];
+
+//   ngAfterViewInit() {
+//     this.loadVitals();
+//   }
+
+//   loadVitals() {
+//      const details = this.patientDetails();
+//     if (!details) return;
+//     const payload = {
+
+//       Mode: 'GET',
+//   PatientId: details.patientID
+ 
+//     };
+//     this.commonService.Post('dashboard/vitalschart', payload).subscribe((res: any) => {
+//       if (res.success && res.result) {
+//         this.readings = res.result.map((v: any) => ({
+//           date: v.readingDateTime.split('T')[0],
+//           systolic: v.systolic,
+//           diastolic: v.diastolic
+//         }));
+//         this.renderBpChart();
+//         this.renderDailyTrendChart();
+//       }
+//     });
+//   }
+
+// renderBpChart() {
+//   const canvas = this.bpChartRef?.nativeElement;
+//   if (!canvas) return;
+
+//   const ctx = canvas.getContext('2d');
+//   if (!ctx) return;
+
+//   // Gradient colors
+//   const systolicGradient = ctx.createLinearGradient(0, 0, 0, 400);
+//   systolicGradient.addColorStop(0, 'rgba(244,67,54,0.4)'); // red top
+//   systolicGradient.addColorStop(1, 'rgba(244,67,54,0)');   // fade bottom
+
+//   const diastolicGradient = ctx.createLinearGradient(0, 0, 0, 400);
+//   diastolicGradient.addColorStop(0, 'rgba(33,150,243,0.4)'); // blue top
+//   diastolicGradient.addColorStop(1, 'rgba(33,150,243,0)');   // fade bottom
+
+//   const labels = this.readings.map(r => r.date);
+
+//   const config: ChartConfiguration<'line'> = {
+//     type: 'line',
+//     data: {
+//       labels,
+//       datasets: [
+//         {
+//           label: 'Systolic (mmHg)',
+//           data: this.readings.map(r => r.systolic),
+//           borderColor: '#f44336',
+//           backgroundColor: systolicGradient,
+//           fill: true,
+//           tension: 0.4,
+//           borderWidth: 3,
+//           pointRadius: 6,
+//           pointHoverRadius: 8,
+//           pointBackgroundColor: (ctx) => {
+//             const val = ctx.raw as number;
+//             return val > 140 ? '#ff1744' : '#f44336';
+//           },
+//           pointBorderWidth: 2,
+//           pointBorderColor: '#fff',
+//         },
+//         {
+//           label: 'Diastolic (mmHg)',
+//           data: this.readings.map(r => r.diastolic),
+//           borderColor: '#2196f3',
+//           backgroundColor: diastolicGradient,
+//           fill: true,
+//           tension: 0.4,
+//           borderWidth: 3,
+//           pointRadius: 6,
+//           pointHoverRadius: 8,
+//           pointBackgroundColor: (ctx) => {
+//             const val = ctx.raw as number;
+//             return val > 90 ? '#2979ff' : '#2196f3';
+//           },
+//           pointBorderWidth: 2,
+//           pointBorderColor: '#fff',
+//         }
+//       ]
+//     },
+//     options: {
+//       responsive: true,
+//       maintainAspectRatio: false,
+//       plugins: {
+//         legend: {
+//           position: 'top',
+//           labels: {
+//             font: { size: 14, family: 'Segoe UI, Arial, sans-serif' },
+//             color: '#333'
+//           }
+//         },
+//         tooltip: {
+//           callbacks: {
+//             label: (context) => {
+//               return `${context.dataset.label}: ${context.formattedValue} mmHg`;
+//             }
+//           },
+//           backgroundColor: 'rgba(0,0,0,0.8)',
+//           titleFont: { size: 14 },
+//           bodyFont: { size: 13 },
+//           padding: 10
+//         },
+//         annotation: {
+//           annotations: {
+//             normalZone: {
+//               type: 'box',
+//               yMin: 60,
+//               yMax: 90,
+//               backgroundColor: 'rgba(76,175,80,0.1)',
+//               borderWidth: 0
+//             },
+//             cautionZone: {
+//               type: 'box',
+//               yMin: 90,
+//               yMax: 140,
+//               backgroundColor: 'rgba(255,193,7,0.1)',
+//               borderWidth: 0
+//             },
+//             highZone: {
+//               type: 'box',
+//               yMin: 140,
+//               yMax: 200,
+//               backgroundColor: 'rgba(244,67,54,0.1)',
+//               borderWidth: 0
+//             }
+//           }
+//         }
+//       },
+//       scales: {
+//         x: {
+//           grid: { color: 'rgba(0,0,0,0.05)' },
+//           ticks: { font: { size: 12 }, color: '#666' }
+//         },
+//         y: {
+//           grid: { color: 'rgba(0,0,0,0.05)' },
+//           ticks: { font: { size: 12 }, color: '#666' },
+//           beginAtZero: false
+//         }
+//       }
+//     }
+//   };
+
+//   new Chart(ctx, config);
+// }
+
+
+
+
+//   renderDailyTrendChart() {
+//     const labels = this.readings.map(r => r.date);
+//     const avgBp = this.readings.map(r => (r.systolic + r.diastolic) / 2);
+
+//     const config: ChartConfiguration<'bar'> = {
+//       type: 'bar',
+//       data: {
+//         labels,
+//         datasets: [
+//           {
+//             label: 'Average BP',
+//             data: avgBp,
+//             backgroundColor: avgBp.map(v => v > 120 ? 'rgba(255,0,0,0.5)' : 'rgba(0,150,0,0.5)'),
+//             borderRadius: 5
+//           }
+//         ]
+//       },
+//       options: {
+//         responsive: true,
+//         plugins: { legend: { display: false } },
+//         scales: { y: { beginAtZero: false } }
+//       }
+//     };
+
+//     new Chart(this.bpTrendChartRef.nativeElement, config);
+//   }
+}
